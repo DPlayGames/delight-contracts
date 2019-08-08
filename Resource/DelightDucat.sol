@@ -6,6 +6,6 @@ import "../Standard/ERC165.sol";
 import "../Util/NetworkChecker.sol";
 import "../Util/SafeMath.sol";
 
-contract DelightIron is DelightResourceInterface, ERC20, ERC165, NetworkChecker {
+contract DelightDucat is DelightResourceInterface, ERC20, ERC165, NetworkChecker {
 	using SafeMath for uint;
 }
