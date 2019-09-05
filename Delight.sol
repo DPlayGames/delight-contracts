@@ -10,7 +10,7 @@ contract Delight is DelightBase {
 	uint constant private ORDER_CREATE_ARMY = 1;
 	
 	// 건물을 짓습니다.
-	function build(uint kind, uint col, uint row) internal returns (uint buildingId) {
+	function build(uint kind, uint col, uint row) checkRange(col, row) internal returns (uint buildingId) {
 		
 	}
 	
@@ -20,7 +20,7 @@ contract Delight is DelightBase {
 	}
 	
 	// 부대를 이동시킵니다.
-	function moveArmy(uint armyId, uint toCol, uint toRow) internal {
+	function moveArmy(uint armyId, uint toCol, uint toRow) checkRange(toCol, toRow) internal {
 		
 	}
 	
