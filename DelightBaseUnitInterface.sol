@@ -1,6 +1,6 @@
 pragma solidity ^0.5.9;
 
-interface DelightBuildingInterface {
+interface DelightBaseUnitInterface {
 	
 	// 재료 정보
 	struct Materials {
