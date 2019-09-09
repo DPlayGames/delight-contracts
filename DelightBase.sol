@@ -19,7 +19,7 @@ contract DelightBase is DelightInterface, NetworkChecker {
 	}
 	
 	// 한 위치에 존재할 수 있는 최대 유닛 수
-	uint constant private MAX_POSITION_UNIT_COUNT = 100;
+	uint constant internal MAX_POSITION_UNIT_COUNT = 50;
 	
 	// 건물
 	uint constant internal BUILDING_HQ = 0;

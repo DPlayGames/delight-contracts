@@ -69,6 +69,16 @@ contract DelightBuildingManager is DelightBase {
 		// 건물 소유주만 부대 생산이 가능합니다.
 		require(building.owner == msg.sender);
 		
+		uint[] memory armyIds = positionToArmyIds[building.col][building.row];
+		
+		uint totalUnitCount = unitCount;
+		for (uint i = 0; i < armyIds.length; i += 1) {
+			totalUnitCount = totalUnitCount.add(armies[armyIds[i]].unitCount);
+		}
+		
+		// 건물이 위치한 곳의 총 유닛 숫자가 최대 유닛 수를 넘기면 안됩니다.
+		require(totalUnitCount <= MAX_POSITION_UNIT_COUNT);
+		
 		uint armyKind;
 		
 		// 본부의 경우 기사를 생산합니다.
