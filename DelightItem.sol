@@ -4,14 +4,14 @@ import "./Standard/ERC20.sol";
 import "./Standard/ERC165.sol";
 import "./Util/SafeMath.sol";
 
-contract DelightResource is ERC20, ERC165 {
+contract DelightItem is ERC20, ERC165 {
 	using SafeMath for uint;
 	
 	// Token information
 	// 토큰 정보 
 	string internal _name;
 	string internal _symbol;
-	uint internal _totalSupply;
+	uint private _totalSupply = 0;
 	
 	uint8 constant private DECIMALS = 0;
 	
@@ -27,6 +27,13 @@ contract DelightResource is ERC20, ERC165 {
 	// The address of DPlay trading post
 	// DPlay 교역소 주소
 	address public dplayTradingPost;
+	
+	constructor() public {
+		
+		balances[msg.sender] = _totalSupply;
+		
+		emit Transfer(address(0x0), msg.sender, _totalSupply);
+	}
 	
 	function setDelightOnce(address addr) external {
 		

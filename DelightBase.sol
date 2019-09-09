@@ -1,8 +1,7 @@
 pragma solidity ^0.5.9;
 
 import "./DelightInterface.sol";
-import "./DelightBuildingInterface.sol";
-import "./DelightArmyInterface.sol";
+import "./Standard/ERC20.sol";
 import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
@@ -19,19 +18,22 @@ contract DelightBase is DelightInterface, NetworkChecker {
 		_;
 	}
 	
+	// 한 위치에 존재할 수 있는 최대 유닛 수
+	uint constant private MAX_POSITION_UNIT_COUNT = 100;
+	
 	// 건물
-	uint constant private BUILDING_HQ = 0;
-	uint constant private BUILDING_TRAINING_CENTER = 1;
-	uint constant private BUILDING_ARCHERY_RANGE = 2;
-	uint constant private BUILDING_STABLE = 3;
-	uint constant private BUILDING_WALL = 4;
-	uint constant private BUILDING_GATE = 5;
+	uint constant internal BUILDING_HQ = 0;
+	uint constant internal BUILDING_TRAINING_CENTER = 1;
+	uint constant internal BUILDING_ARCHERY_RANGE = 2;
+	uint constant internal BUILDING_STABLE = 3;
+	uint constant internal BUILDING_WALL = 4;
+	uint constant internal BUILDING_GATE = 5;
 	
 	// 유닛
-	uint constant private ARMY_KNIGHT = 0;
-	uint constant private ARMY_SWORDSMAN = 1;
-	uint constant private ARMY_ARCHER = 2;
-	uint constant private ARMY_CAVALY = 3;
+	uint constant internal ARMY_KNIGHT = 0;
+	uint constant internal ARMY_SWORDSMAN = 1;
+	uint constant internal ARMY_ARCHER = 2;
+	uint constant internal ARMY_CAVALY = 3;
 	
 	// 아이템
 	uint constant private ITEM_AXE = 0;
@@ -44,9 +46,23 @@ contract DelightBase is DelightInterface, NetworkChecker {
 	uint constant private ITEM_CAMEL = 7;
 	uint constant private ITEM_ELEPHANT = 8;
 	
+	ERC20 internal wood;
+	ERC20 internal stone;
+	ERC20 internal iron;
+	ERC20 internal ducat;
+	
 	Material[] internal buildingMaterials;
 	Material[] internal unitMaterials;
 	Material[] internal itemMaterials;
+	
+	Building[] internal buildings;
+	Army[] internal armies;
+	
+	mapping(uint => mapping(uint => uint)) internal positionToBuildingId;
+	mapping(uint => mapping(uint => uint[])) internal positionToArmyIds;
+	
+	mapping(uint => address) internal buildingIdToOwner;
+	mapping(uint => address) internal armyIdToOwner;
 	
 	constructor() NetworkChecker() public {
 		
@@ -54,6 +70,10 @@ contract DelightBase is DelightInterface, NetworkChecker {
 			//TODO
 		} else if (network == Network.Kovan) {
 			//TODO
+			wood = ERC20(0x0);
+			stone = ERC20(0x0);
+			iron = ERC20(0x0);
+			ducat = ERC20(0x0);
 		} else if (network == Network.Ropsten) {
 			//TODO
 		} else if (network == Network.Rinkeby) {
@@ -214,13 +234,4 @@ contract DelightBase is DelightInterface, NetworkChecker {
 			ducat : 300
 		}));
 	}
-	
-	DelightBuildingInterface[] private buildings;
-	DelightArmyInterface[] private armies;
-	
-	mapping(uint => mapping(uint => uint)) internal positionToBuildingId;
-	mapping(uint => mapping(uint => uint[])) internal positionToArmyIds;
-	
-	mapping(uint => address) internal buildingIdToOwner;
-	mapping(uint => address) internal armyIdToOwner;
 }

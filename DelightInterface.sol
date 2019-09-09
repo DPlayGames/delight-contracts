@@ -5,12 +5,20 @@ interface DelightInterface {
 	// 건물 정보
 	struct Building {
 		uint kind;
+		uint col;
+		uint row;
+		address owner;
+		uint buildTime;
 	}
 	
 	// 부대 정보
 	struct Army {
 		uint kind;
-		uint count;
+		uint unitCount;
+		uint col;
+		uint row;
+		address owner;
+		uint createTime;
 	}
 	
 	// 재료 정보
