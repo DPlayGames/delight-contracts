@@ -1,11 +1,19 @@
 pragma solidity ^0.5.9;
 
-import "../DelightResourceInterface.sol";
-import "../Standard/ERC20.sol";
-import "../Standard/ERC165.sol";
-import "../Util/NetworkChecker.sol";
+import "../DelightResource.sol";
 import "../Util/SafeMath.sol";
 
-contract DelightDucat is DelightResourceInterface, ERC20, ERC165, NetworkChecker {
+contract DelightDucat is DelightResource {
 	using SafeMath for uint;
+	
+	constructor() public {
+		
+		_name = "Delight Ducat";
+		_symbol = "DD";
+		_decimals = 18;
+		_totalSupply = 100000000 * (10 ** uint(_decimals));
+		
+		balances[msg.sender] = _totalSupply;
+		emit Transfer(address(0x0), msg.sender, _totalSupply);
+	}
 }

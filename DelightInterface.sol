@@ -12,4 +12,12 @@ interface DelightInterface {
 		uint kind;
 		uint count;
 	}
+	
+	// 재료 정보
+	struct Material {
+		uint wood;
+		uint stone;
+		uint iron;
+		uint ducat;
+	}
 }
