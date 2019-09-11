@@ -5,6 +5,7 @@ interface DelightInterface {
 	// 건물 정보
 	struct Building {
 		uint kind;
+		uint level;
 		uint col;
 		uint row;
 		address owner;

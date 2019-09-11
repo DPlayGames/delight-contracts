@@ -1,7 +1,9 @@
 pragma solidity ^0.5.9;
 
 import "./DelightInterface.sol";
+import "./DelightItem.sol";
 import "./Standard/ERC20.sol";
+import "./Standard/ERC721.sol";
 import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
@@ -30,26 +32,69 @@ contract DelightBase is DelightInterface, NetworkChecker {
 	uint constant internal BUILDING_GATE = 5;
 	
 	// 유닛
-	uint constant internal ARMY_KNIGHT = 0;
-	uint constant internal ARMY_SWORDSMAN = 1;
-	uint constant internal ARMY_ARCHER = 2;
-	uint constant internal ARMY_CAVALY = 3;
+	uint constant internal ARMY_SWORDSMAN = 0;
+	uint constant internal ARMY_AXEMAN = 1;
+	uint constant internal ARMY_SPEARMAN = 2;
+	uint constant internal ARMY_SHIELDMAN = 3;
+	uint constant internal ARMY_SPY = 4;
+	uint constant internal ARMY_ARCHER = 5;
+	uint constant internal ARMY_CROSSBOWMAN = 6;
+	uint constant internal ARMY_BALLISTA = 7;
+	uint constant internal ARMY_CATAPULT = 8;
+	uint constant internal ARMY_CAVALY = 9;
+	uint constant internal ARMY_CAMELRY = 10;
+	uint constant internal ARMY_WAR_ELEPHANT = 11;
+	uint constant internal ARMY_KNIGHT = 12;
 	
 	// 아이템
-	uint constant private ITEM_AXE = 0;
-	uint constant private ITEM_SPEAR = 1;
-	uint constant private ITEM_SHIELD = 2;
-	uint constant private ITEM_HOOD = 3;
-	uint constant private ITEM_CROSSBOW = 4;
-	uint constant private ITEM_BALLISTA = 5;
-	uint constant private ITEM_CATAPULT = 6;
-	uint constant private ITEM_CAMEL = 7;
-	uint constant private ITEM_ELEPHANT = 8;
+	uint constant internal ITEM_AXE = 0;
+	uint constant internal ITEM_SPEAR = 1;
+	uint constant internal ITEM_SHIELD = 2;
+	uint constant internal ITEM_HOOD = 3;
+	uint constant internal ITEM_CROSSBOW = 4;
+	uint constant internal ITEM_BALLISTA = 5;
+	uint constant internal ITEM_CATAPULT = 6;
+	uint constant internal ITEM_CAMEL = 7;
+	uint constant internal ITEM_ELEPHANT = 8;
 	
 	ERC20 internal wood;
 	ERC20 internal stone;
 	ERC20 internal iron;
 	ERC20 internal ducat;
+	
+	DelightItem internal axe;
+	DelightItem internal spear;
+	DelightItem internal shield;
+	DelightItem internal hood;
+	DelightItem internal crossbow;
+	DelightItem internal ballista;
+	DelightItem internal catapult;
+	DelightItem internal camel;
+	DelightItem internal elephant;
+	
+	function getItemContract(uint kind) view internal returns (DelightItem) {
+		if (kind == ITEM_AXE) {
+			return axe;
+		} else if (kind == ITEM_SPEAR) {
+			return spear;
+		} else if (kind == ITEM_SHIELD) {
+			return shield;
+		} else if (kind == ITEM_HOOD) {
+			return hood;
+		} else if (kind == ITEM_CROSSBOW) {
+			return crossbow;
+		} else if (kind == ITEM_BALLISTA) {
+			return ballista;
+		} else if (kind == ITEM_CATAPULT) {
+			return catapult;
+		} else if (kind == ITEM_CAMEL) {
+			return camel;
+		} else if (kind == ITEM_ELEPHANT) {
+			return elephant;
+		}
+	}
+	
+	ERC721 internal knightItem;
 	
 	Material[] internal buildingMaterials;
 	Material[] internal unitMaterials;
@@ -58,8 +103,13 @@ contract DelightBase is DelightInterface, NetworkChecker {
 	Building[] internal buildings;
 	Army[] internal armies;
 	
+	// 공격 우선순위
+	mapping(uint => uint) internal attackPriority;
+	
 	mapping(uint => mapping(uint => uint)) internal positionToBuildingId;
 	mapping(uint => mapping(uint => uint[])) internal positionToArmyIds;
+	
+	mapping(address => uint[]) internal ownerToHQIds;
 	
 	mapping(uint => address) internal buildingIdToOwner;
 	mapping(uint => address) internal armyIdToOwner;
@@ -68,19 +118,57 @@ contract DelightBase is DelightInterface, NetworkChecker {
 		
 		if (network == Network.Mainnet) {
 			//TODO
-		} else if (network == Network.Kovan) {
+		}
+		
+		else if (network == Network.Kovan) {
 			//TODO
+			
+			// 자원들
 			wood = ERC20(0x0);
 			stone = ERC20(0x0);
 			iron = ERC20(0x0);
 			ducat = ERC20(0x0);
-		} else if (network == Network.Ropsten) {
+			
+			// 아이템들
+			axe = DelightItem(0x0);
+			ballista = DelightItem(0x0);
+			camel = DelightItem(0x0);
+			catapult = DelightItem(0x0);
+			crossbow = DelightItem(0x0);
+			elephant = DelightItem(0x0);
+			hood = DelightItem(0x0);
+			shield = DelightItem(0x0);
+			spear = DelightItem(0x0);
+			
+			// 기사 아이템
+			knightItem = ERC721(0x0);
+		}
+		
+		else if (network == Network.Ropsten) {
 			//TODO
-		} else if (network == Network.Rinkeby) {
+		}
+		
+		else if (network == Network.Rinkeby) {
 			//TODO
-		} else {
+		}
+		
+		else {
 			revert();
 		}
+		
+		attackPriority[ARMY_SWORDSMAN] = 5;
+		attackPriority[ARMY_AXEMAN] = 3;
+		attackPriority[ARMY_SPEARMAN] = 7;
+		attackPriority[ARMY_SHIELDMAN] = 1;
+		attackPriority[ARMY_SPY] = 12;
+		attackPriority[ARMY_ARCHER] = 9;
+		attackPriority[ARMY_CROSSBOWMAN] = 8;
+		attackPriority[ARMY_BALLISTA] = 11;
+		attackPriority[ARMY_CATAPULT] = 10;
+		attackPriority[ARMY_CAVALY] = 6;
+		attackPriority[ARMY_CAMELRY] = 4;
+		attackPriority[ARMY_WAR_ELEPHANT] = 2;
+		attackPriority[ARMY_KNIGHT] = 13;
 		
 		// BUILDING_HQ
 		buildingMaterials.push(Material({

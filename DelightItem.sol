@@ -54,6 +54,28 @@ contract DelightItem is ERC20, ERC165 {
 		dplayTradingPost = addr;
 	}
 	
+	// 아이템을 제조하여 특정 유저에게 전달합니다.
+	function assemble(address to, uint amount) external {
+		
+		// Delight에서만 사용할 수 있는 함수입니다.
+		require(msg.sender == delight);
+		
+		balances[to] = balances[to].add(amount);
+		
+		emit Transfer(delight, to, amount);
+	}
+	
+	// 아이템을 분해합니다.
+	function disassemble(uint amount) external {
+		
+		// Delight에서만 사용할 수 있는 함수입니다.
+		require(msg.sender == delight);
+		
+		balances[delight] = balances[delight].sub(amount);
+		
+		emit Transfer(delight, address(0x0), amount);
+	}
+	
 	// Checks if the address is misued.
 	// 주소를 잘못 사용하는 것인지 체크 
 	function checkAddressMisused(address target) internal view returns (bool) {

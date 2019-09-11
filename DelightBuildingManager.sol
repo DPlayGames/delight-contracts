@@ -14,20 +14,26 @@ contract DelightBuildingManager is DelightBase {
 		
 		// 필드에 적군이 존재하면 안됩니다.
 		require(positionToArmyIds[col][row].length == 0 || armyIdToOwner[positionToArmyIds[col][row][0]] == msg.sender);
-		_;
-	}
-	
-	// 건물을 짓는데 필요한 자원이 충분한지 확인합니다.
-	modifier checkBuildingMaterial(uint kind) {
 		
-		Material memory material = buildingMaterials[kind];
+		// 본부가 주변에 존재하는지 확인합니다.
+		bool existsHQAround = false;
+		for (uint i = 0; i < ownerToHQIds[msg.sender].length; i += 1) {
+			
+			Building memory building = buildings[ownerToHQIds[msg.sender][i]];
+			uint hqCol = building.col;
+			uint hqRow = building.row;
+			
+			if (
+				(col < hqCol ? hqCol - col : col - hqCol) +
+				(row < hqRow ? hqRow - row : row - hqRow) <= 5 + building.level.mul(2)
+			) {
+				existsHQAround = true;
+				break;
+			}
+		}
 		
-		require(
-			wood.balanceOf(msg.sender) >= material.wood &&
-			stone.balanceOf(msg.sender) >= material.stone &&
-			iron.balanceOf(msg.sender) >= material.iron &&
-			ducat.balanceOf(msg.sender) >= material.ducat
-		);
+		// 월드에 본부가 아예 없거나, 본부가 주변에 존재하는지 확인합니다.
+		require(ownerToHQIds[msg.sender].length == 0 || existsHQAround == true);
 		_;
 	}
 	
@@ -35,22 +41,32 @@ contract DelightBuildingManager is DelightBase {
 	function build(uint kind, uint col, uint row)
 	checkRange(col, row)
 	checkBuildingPosition(col, row)
-	checkBuildingMaterial(kind)
 	internal returns (uint) {
 		
-		uint buildTime = now;
+		Material memory material = buildingMaterials[kind];
+		
+		// 건물을 짓는데 필요한 자원이 충분한지 확인합니다.
+		require(
+			wood.balanceOf(msg.sender) >= material.wood &&
+			stone.balanceOf(msg.sender) >= material.stone &&
+			iron.balanceOf(msg.sender) >= material.iron &&
+			ducat.balanceOf(msg.sender) >= material.ducat
+		);
 		
 		uint buildingId = buildings.push(Building({
 			kind : kind,
+			level : 0,
 			col : col,
 			row : row,
 			owner : msg.sender,
-			buildTime : buildTime
+			buildTime : now
 		})).sub(1);
 		
 		positionToBuildingId[col][row] = buildingId;
 		
-		Material memory material = buildingMaterials[kind];
+		if (kind == BUILDING_HQ) {
+			ownerToHQIds[msg.sender].push(buildingId);
+		}
 		
 		// 자원을 Delight로 이전합니다.
 		wood.transferFrom(msg.sender, address(this), material.wood);
@@ -61,6 +77,17 @@ contract DelightBuildingManager is DelightBase {
 		return buildingId;
 	}
 	
+	// 본부를 업그레이드합니다.
+	function upgradeHQ(uint buildingId) internal {
+		
+		Building storage building = buildings[buildingId];
+		
+		require(building.kind == BUILDING_HQ);
+		require(building.level < 2);
+		
+		building.level += 1;
+	}
+	
 	// 건물에서 부대를 생산합니다.
 	function createArmy(uint buildingId, uint unitCount) internal returns (uint) {
 		
@@ -69,6 +96,7 @@ contract DelightBuildingManager is DelightBase {
 		// 건물 소유주만 부대 생산이 가능합니다.
 		require(building.owner == msg.sender);
 		
+		// 건물이 위치한 곳의 총 유닛 숫자를 계산합니다.
 		uint[] memory armyIds = positionToArmyIds[building.col][building.row];
 		
 		uint totalUnitCount = unitCount;
@@ -115,15 +143,13 @@ contract DelightBuildingManager is DelightBase {
 			ducat.balanceOf(msg.sender) >= material.ducat.mul(unitCount)
 		);
 		
-		uint createTime = now;
-		
 		uint armyId = armies.push(Army({
 			kind : armyKind,
 			unitCount : unitCount,
 			col : building.col,
 			row : building.row,
 			owner : msg.sender,
-			createTime : createTime
+			createTime : now
 		})).sub(1);
 		
 		positionToArmyIds[building.col][building.row].push(armyId);
