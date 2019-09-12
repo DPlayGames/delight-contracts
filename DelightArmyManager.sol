@@ -92,7 +92,18 @@ contract DelightArmyManager is DelightBase {
 				distance <= units[army.unitKind].movableDistance) {
 					
 					// 아군의 공격력 추가
-					totalDamage = totalDamage.add(units[army.unitKind].damage.mul(army.unitCount));
+					totalDamage = totalDamage.add(
+						units[army.unitKind].damage.add(
+							
+							// 기사인 경우 기사 아이템의 공격력을 추가합니다.
+							i == UNIT_KNIGHT ? knightItem.getItemDamage(army.knightItemId) : (
+								
+								// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
+								armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
+							)
+							
+						).mul(army.unitCount)
+					);
 				}
 				
 				Army memory enemyArmy = armies[targetArmyIds[i]];
@@ -101,7 +112,18 @@ contract DelightArmyManager is DelightBase {
 				if (enemyArmy.unitCount > 0) {
 					
 					// 적군의 공격력 추가
-					totalEnemyDamage = totalEnemyDamage.add(units[enemyArmy.unitKind].damage.mul(enemyArmy.unitCount));
+					totalEnemyDamage = totalEnemyDamage.add(
+						units[enemyArmy.unitKind].damage.add(
+							
+							// 기사인 경우 기사 아이템의 공격력을 추가합니다.
+							i == UNIT_KNIGHT ? knightItem.getItemDamage(enemyArmy.knightItemId) : (
+								
+								// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
+								targetArmyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(armies[targetArmyIds[UNIT_KNIGHT]].knightItemId) : 0
+							)
+							
+						).mul(enemyArmy.unitCount)
+					);
 				}
 			}
 			
@@ -119,7 +141,17 @@ contract DelightArmyManager is DelightBase {
 				distance <= units[army.unitKind].movableDistance) {
 					
 					// 아군의 체력을 계산합니다.
-					uint armyHP = units[army.unitKind].hp.mul(army.unitCount);
+					uint armyHP = units[army.unitKind].hp.add(
+						
+						// 기사인 경우 기사 아이템의 HP를 추가합니다.
+						i == UNIT_KNIGHT ? knightItem.getItemHP(army.knightItemId) : (
+							
+							// 기사가 아닌 경우 기사의 버프 HP를 추가합니다.
+							armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
+						)
+						
+					).mul(army.unitCount);
+					
 					armyHP = armyHP <= totalEnemyDamage ? 0 : armyHP.sub(totalEnemyDamage);
 					
 					// 전투 결과를 계산합니다.
@@ -127,8 +159,7 @@ contract DelightArmyManager is DelightBase {
 					uint deadUnitCount = army.unitCount.sub(remainUnitCount);
 					
 					// 적의 총 공격력을 낮춥니다.
-					uint damage = deadUnitCount.mul(units[army.unitKind].hp);
-					totalEnemyDamage = totalEnemyDamage <= damage ? 0 : totalEnemyDamage.sub(damage);
+					totalEnemyDamage = totalEnemyDamage <= deadUnitCount.mul(units[army.unitKind].hp) ? 0 : totalEnemyDamage.sub(deadUnitCount.mul(units[army.unitKind].hp));
 					
 					// 전리품을 계산합니다.
 					Material memory unitMaterial = unitMaterials[army.unitKind];
@@ -151,7 +182,17 @@ contract DelightArmyManager is DelightBase {
 				if (enemyArmy.unitCount > 0) {
 					
 					// 적군의 체력을 계산합니다.
-					uint ememyArmyHP = units[enemyArmy.unitKind].hp.mul(enemyArmy.unitCount);
+					uint ememyArmyHP = units[enemyArmy.unitKind].hp.add(
+						
+						// 기사인 경우 기사 아이템의 HP를 추가합니다.
+						i == UNIT_KNIGHT ? knightItem.getItemHP(enemyArmy.knightItemId) : (
+							
+							// 기사가 아닌 경우 기사의 버프 HP를 추가합니다.
+							targetArmyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[targetArmyIds[UNIT_KNIGHT]].knightItemId) : 0
+						)
+						
+					).mul(enemyArmy.unitCount);
+					
 					ememyArmyHP = ememyArmyHP <= totalDamage ? 0 : ememyArmyHP.sub(totalDamage);
 					
 					// 전투 결과를 계산합니다.
@@ -159,8 +200,7 @@ contract DelightArmyManager is DelightBase {
 					uint deadEnemyUnitCount = enemyArmy.unitCount.sub(remainEnemyUnitCount);
 					
 					// 아군의 총 공격력을 낮춥니다.
-					uint damage = deadEnemyUnitCount.mul(units[enemyArmy.unitKind].hp);
-					totalDamage = totalDamage <= damage ? 0 : totalDamage.sub(damage);
+					totalDamage = totalDamage <= deadEnemyUnitCount.mul(units[enemyArmy.unitKind].hp) ? 0 : totalDamage.sub(deadEnemyUnitCount.mul(units[enemyArmy.unitKind].hp));
 					
 					// 전리품을 계산합니다.
 					rewardMaterial.wood = rewardMaterial.wood.add(unitMaterials[enemyArmy.unitKind].wood.mul(deadEnemyUnitCount));
@@ -255,7 +295,18 @@ contract DelightArmyManager is DelightBase {
 			distance <= units[army.unitKind].attackableDistance) {
 				
 				// 아군의 공격력 추가
-				totalDamage = totalDamage.add(units[army.unitKind].damage.mul(army.unitCount));
+				totalDamage = totalDamage.add(
+					units[army.unitKind].damage.add(
+						
+						// 기사인 경우 기사 아이템의 공격력을 추가합니다.
+						i == UNIT_KNIGHT ? knightItem.getItemDamage(army.knightItemId) : (
+							
+							// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
+							armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
+						)
+						
+					).mul(army.unitCount)
+				);
 			}
 			
 			Army memory enemyArmy = armies[targetArmyIds[i]];
@@ -268,7 +319,18 @@ contract DelightArmyManager is DelightBase {
 			distance <= units[enemyArmy.unitKind].attackableDistance) {
 				
 				// 적군의 공격력 추가
-				totalEnemyDamage = totalEnemyDamage.add(units[enemyArmy.unitKind].damage.mul(enemyArmy.unitCount));
+				totalEnemyDamage = totalEnemyDamage.add(
+					units[enemyArmy.unitKind].damage.add(
+						
+						// 기사인 경우 기사 아이템의 공격력을 추가합니다.
+						i == UNIT_KNIGHT ? knightItem.getItemDamage(enemyArmy.knightItemId) : (
+							
+							// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
+							targetArmyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(armies[targetArmyIds[UNIT_KNIGHT]].knightItemId) : 0
+						)
+						
+					).mul(enemyArmy.unitCount)
+				);
 			}
 		}
 		
@@ -282,7 +344,17 @@ contract DelightArmyManager is DelightBase {
 			if (army.unitCount > 0) {
 				
 				// 아군의 체력을 계산합니다.
-				uint armyHP = units[army.unitKind].hp.mul(army.unitCount);
+				uint armyHP = units[army.unitKind].hp.add(
+					
+					// 기사인 경우 기사 아이템의 HP를 추가합니다.
+					i == UNIT_KNIGHT ? knightItem.getItemHP(army.knightItemId) : (
+						
+						// 기사가 아닌 경우 기사의 버프 HP를 추가합니다.
+						armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
+					)
+					
+				).mul(army.unitCount);
+				
 				armyHP = armyHP <= totalEnemyDamage ? 0 : armyHP.sub(totalEnemyDamage);
 				
 				// 전투 결과를 계산합니다.
@@ -290,8 +362,7 @@ contract DelightArmyManager is DelightBase {
 				uint deadUnitCount = army.unitCount.sub(remainUnitCount);
 				
 				// 적의 총 공격력을 낮춥니다.
-				uint damage = deadUnitCount.mul(units[army.unitKind].hp);
-				totalEnemyDamage = totalEnemyDamage <= damage ? 0 : totalEnemyDamage.sub(damage);
+				totalEnemyDamage = totalEnemyDamage <= deadUnitCount.mul(units[army.unitKind].hp) ? 0 : totalEnemyDamage.sub(deadUnitCount.mul(units[army.unitKind].hp));
 				
 				// 일방적인 공격일 경우 자원을 그대로 돌려받습니다.
 				wood.transferFrom(address(this), msg.sender, unitMaterials[army.unitKind].wood.mul(deadUnitCount));
@@ -313,7 +384,17 @@ contract DelightArmyManager is DelightBase {
 			if (enemyArmy.unitCount > 0) {
 				
 				// 적군의 체력을 계산합니다.
-				uint ememyArmyHP = units[enemyArmy.unitKind].hp.mul(enemyArmy.unitCount);
+				uint ememyArmyHP = units[enemyArmy.unitKind].hp.add(
+					
+					// 기사인 경우 기사 아이템의 HP를 추가합니다.
+					i == UNIT_KNIGHT ? knightItem.getItemHP(enemyArmy.knightItemId) : (
+						
+						// 기사가 아닌 경우 기사의 버프 HP를 추가합니다.
+						targetArmyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[targetArmyIds[UNIT_KNIGHT]].knightItemId) : 0
+					)
+					
+				).mul(enemyArmy.unitCount);
+				
 				ememyArmyHP = ememyArmyHP <= totalDamage ? 0 : ememyArmyHP.sub(totalDamage);
 				
 				// 전투 결과를 계산합니다.
@@ -321,8 +402,7 @@ contract DelightArmyManager is DelightBase {
 				uint deadEnemyUnitCount = enemyArmy.unitCount.sub(remainEnemyUnitCount);
 				
 				// 아군의 총 공격력을 낮춥니다.
-				uint damage = deadEnemyUnitCount.mul(units[enemyArmy.unitKind].hp);
-				totalDamage = totalDamage <= damage ? 0 : totalDamage.sub(damage);
+				totalDamage = totalDamage <= deadEnemyUnitCount.mul(units[enemyArmy.unitKind].hp) ? 0 : totalDamage.sub(deadEnemyUnitCount.mul(units[enemyArmy.unitKind].hp));
 				
 				// 일방적인 공격일 경우 자원을 그대로 돌려받습니다.
 				wood.transferFrom(address(this), targetArmyOwner, unitMaterials[army.unitKind].wood.mul(deadEnemyUnitCount));

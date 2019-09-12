@@ -2,8 +2,8 @@ pragma solidity ^0.5.9;
 
 import "./DelightInterface.sol";
 import "./DelightItem.sol";
+import "./DelightKnightItem.sol";
 import "./Standard/ERC20.sol";
-import "./Standard/ERC721.sol";
 import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
@@ -52,6 +52,10 @@ contract DelightBase is DelightInterface, NetworkChecker {
 	uint constant internal ITEM_CAMEL		= 7;
 	uint constant internal ITEM_ELEPHANT	= 8;
 	
+	// 기사의 기본 버프
+	uint constant internal KNIGHT_DEFAULT_BUFF_HP = 10;
+	uint constant internal KNIGHT_DEFAULT_BUFF_DAMAGE = 5;
+	
 	ERC20 internal wood;
 	ERC20 internal stone;
 	ERC20 internal iron;
@@ -89,7 +93,7 @@ contract DelightBase is DelightInterface, NetworkChecker {
 		}
 	}
 	
-	ERC721 internal knightItem;
+	DelightKnightItem internal knightItem;
 	
 	// 유닛 정보
 	mapping(uint => Unit) internal units;
@@ -155,7 +159,7 @@ contract DelightBase is DelightInterface, NetworkChecker {
 			spear = DelightItem(0x0);
 			
 			// 기사 아이템
-			knightItem = ERC721(0x0);
+			knightItem = DelightKnightItem(0x0);
 		}
 		
 		else if (network == Network.Ropsten) {
