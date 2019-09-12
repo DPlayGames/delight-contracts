@@ -12,9 +12,17 @@ interface DelightInterface {
 		uint buildTime;
 	}
 	
+	// 유닛 정보
+	struct Unit {
+		uint hp;
+		uint damage;
+		uint movableDistance;
+		uint attackableDistance;
+	}
+	
 	// 부대 정보
 	struct Army {
-		uint kind;
+		uint unitKind;
 		uint unitCount;
 		uint col;
 		uint row;
@@ -28,5 +36,10 @@ interface DelightInterface {
 		uint stone;
 		uint iron;
 		uint ducat;
+	}
+	
+	// 기록 정보
+	struct Record {
+		uint kind;
 	}
 }

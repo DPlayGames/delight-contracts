@@ -7,13 +7,13 @@ contract DelightBuildingManager is DelightBase {
 	using SafeMath for uint;
 	
 	// 건물을 짓는 위치를 확인합니다.
-	modifier checkBuildingPosition(uint col, uint row) {
+	modifier checkBuildingPosition(uint kind, uint col, uint row) {
 		
 		// 필드에 건물이 존재하면 안됩니다.
 		require(positionToBuildingId[col][row] == 0);
 		
 		// 필드에 적군이 존재하면 안됩니다.
-		require(positionToArmyIds[col][row].length == 0 || armyIdToOwner[positionToArmyIds[col][row][0]] == msg.sender);
+		require(positionToArmyIds[col][row].length == 0 || getArmyOwnerByPosition(col, row) == msg.sender);
 		
 		// 본부가 주변에 존재하는지 확인합니다.
 		bool existsHQAround = false;
@@ -33,14 +33,20 @@ contract DelightBuildingManager is DelightBase {
 		}
 		
 		// 월드에 본부가 아예 없거나, 본부가 주변에 존재하는지 확인합니다.
-		require(ownerToHQIds[msg.sender].length == 0 || existsHQAround == true);
+		require(ownerToHQIds[msg.sender].length == 0 || existsHQAround == true ||
+		// 본부인 경우, 내 병사가 있는 위치에 지을 수 있습니다.
+		(
+			kind == BUILDING_HQ &&
+			positionToArmyIds[col][row].length > 0 &&
+			getArmyOwnerByPosition(col, row) == msg.sender
+		));
 		_;
 	}
 	
 	// 건물을 짓습니다.
 	function build(uint kind, uint col, uint row)
 	checkRange(col, row)
-	checkBuildingPosition(col, row)
+	checkBuildingPosition(kind, col, row)
 	internal returns (uint) {
 		
 		Material memory material = buildingMaterials[kind];
@@ -97,7 +103,7 @@ contract DelightBuildingManager is DelightBase {
 		require(building.owner == msg.sender);
 		
 		// 건물이 위치한 곳의 총 유닛 숫자를 계산합니다.
-		uint[] memory armyIds = positionToArmyIds[building.col][building.row];
+		uint[] storage armyIds = positionToArmyIds[building.col][building.row];
 		
 		uint totalUnitCount = unitCount;
 		for (uint i = 0; i < armyIds.length; i += 1) {
@@ -107,33 +113,39 @@ contract DelightBuildingManager is DelightBase {
 		// 건물이 위치한 곳의 총 유닛 숫자가 최대 유닛 수를 넘기면 안됩니다.
 		require(totalUnitCount <= MAX_POSITION_UNIT_COUNT);
 		
-		uint armyKind;
+		uint unitKind;
 		
 		// 본부의 경우 기사를 생산합니다.
 		if (building.kind == BUILDING_HQ) {
-			armyKind = ARMY_KNIGHT;
+			
+			// 이미 기사가 존재하는 곳이면, 취소합니다.
+			if (armyIds.length == UNIT_KIND_COUNT && armyIds[UNIT_KNIGHT] != 0) {
+				revert();
+			} else {
+				unitKind = UNIT_KNIGHT;
+			}
 		}
 		
 		// 훈련소의 경우 검병을 생산합니다.
 		else if (building.kind == BUILDING_TRAINING_CENTER) {
-			armyKind = ARMY_SWORDSMAN;
+			unitKind = UNIT_SWORDSMAN;
 		}
 		
 		// 사격소의 경우 궁수를 생산합니다.
 		else if (building.kind == BUILDING_TRAINING_CENTER) {
-			armyKind = ARMY_ARCHER;
+			unitKind = UNIT_ARCHER;
 		}
 		
 		// 마굿간의 경우 기마병을 생산합니다.
 		else if (building.kind == BUILDING_STABLE) {
-			armyKind = ARMY_CAVALY;
+			unitKind = UNIT_CAVALY;
 		}
 		
 		else {
 			revert();
 		}
 		
-		Material memory material = unitMaterials[armyKind];
+		Material memory material = unitMaterials[unitKind];
 		
 		// 부대를 생성하는데 필요한 자원이 충분한지 확인합니다.
 		require(
@@ -144,7 +156,7 @@ contract DelightBuildingManager is DelightBase {
 		);
 		
 		uint armyId = armies.push(Army({
-			kind : armyKind,
+			unitKind : unitKind,
 			unitCount : unitCount,
 			col : building.col,
 			row : building.row,
@@ -152,7 +164,8 @@ contract DelightBuildingManager is DelightBase {
 			createTime : now
 		})).sub(1);
 		
-		positionToArmyIds[building.col][building.row].push(armyId);
+		armyIds.length = UNIT_KIND_COUNT;
+		armyIds[unitKind] = armyId;
 		
 		// 자원을 Delight로 이전합니다.
 		wood.transferFrom(msg.sender, address(this), material.wood.mul(unitCount));

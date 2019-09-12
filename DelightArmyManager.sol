@@ -9,18 +9,342 @@ contract DelightArmyManager is DelightBase {
 	
 	// 부대를 이동시키고, 해당 지역에 적이 있으면 공격합니다.
 	function moveAndAttack(uint col, uint row, uint toCol, uint toRow) checkRange(col, row) checkRange(toCol, toRow) internal {
-		//TODO:
+		
+		// 부대의 소유주를 확인합니다.
+		require(getArmyOwnerByPosition(col, row) == msg.sender);
+		
+		// 거리 계산
+		uint distance = (col < toCol ? toCol - col : col - toCol) + (row < toRow ? toRow - row : row - toRow);
+		
+		// 전리품
+		Material memory rewardMaterial = Material({
+			wood : 0,
+			stone : 0,
+			iron : 0,
+			ducat : 0
+		});
+		
+		address targetArmyOwner = getArmyOwnerByPosition(toCol, toRow);
+		
+		uint[] storage armyIds = positionToArmyIds[col][row];
+		uint[] storage targetArmyIds = positionToArmyIds[toCol][toRow];
+		
+		// 아군이 위치한 곳이면 부대를 합병합니다.
+		if (targetArmyOwner == msg.sender) {
+			
+			targetArmyIds.length = UNIT_KIND_COUNT;
+			
+			for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+				
+				Army storage army = armies[armyIds[i]];
+				
+				if (
+				// 유닛의 개수가 0개 이상이어야 합니다.
+				army.unitCount > 0 &&
+				
+				// 이동이 가능한 거리인지 확인합니다.
+				distance <= units[army.unitKind].movableDistance) {
+					
+					Army storage targetArmy = armies[targetArmyIds[i]];
+					
+					// 비어있는 곳이면 이전합니다.
+					if (targetArmy.unitCount == 0) {
+						
+						targetArmyIds[i] = armyIds[i];
+						
+						delete armyIds[i];
+					}
+					
+					// 비어있지 않으면 합병합니다.
+					else {
+						
+						targetArmy.unitCount = targetArmy.unitCount.add(army.unitCount);
+						
+						army.unitCount = 0;
+						army.owner = address(0x0);
+						
+						delete armyIds[i];
+					}
+				}
+			}
+		}
+		
+		// 적군이 위치한 곳이면 공격합니다.
+		else {
+			
+			uint totalDamage = 0;
+			uint totalEnemyDamage = 0;
+			
+			// 총 공격력을 계산합니다.
+			for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+				
+				Army memory army = armies[armyIds[i]];
+				
+				if (
+				// 유닛의 개수가 0개 이상이어야 합니다.
+				army.unitCount > 0 &&
+				
+				// 이동이 가능한 거리인지 확인합니다.
+				distance <= units[army.unitKind].movableDistance) {
+					
+					// 아군의 공격력 추가
+					totalDamage = totalDamage.add(units[army.unitKind].damage.mul(army.unitCount));
+				}
+				
+				Army memory enemyArmy = armies[targetArmyIds[i]];
+				
+				// 유닛의 개수가 0개 이상이어야 합니다.
+				if (enemyArmy.unitCount > 0) {
+					
+					// 적군의 공격력 추가
+					totalEnemyDamage = totalEnemyDamage.add(units[enemyArmy.unitKind].damage.mul(enemyArmy.unitCount));
+				}
+			}
+			
+			// 전투를 개시합니다.
+			for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+				
+				// 적군이 아군을 공격합니다.
+				Army storage army = armies[armyIds[i]];
+				
+				if (
+				// 유닛의 개수가 0개 이상이어야 합니다.
+				army.unitCount > 0 &&
+				
+				// 이동이 가능한 거리인지 확인합니다.
+				distance <= units[army.unitKind].movableDistance) {
+					
+					// 아군의 체력을 계산합니다.
+					uint unitHP = units[army.unitKind].hp;
+					uint armyHP = unitHP.mul(army.unitCount);
+					armyHP = armyHP <= totalEnemyDamage ? 0 : armyHP.sub(totalEnemyDamage);
+					
+					// 전투 결과를 계산합니다.
+					uint remainUnitCount = armyHP.add(armyHP % unitHP).div(unitHP);
+					uint deadUnitCount = army.unitCount.sub(remainUnitCount);
+					
+					// 적의 총 공격력을 낮춥니다.
+					uint damage = deadUnitCount.mul(unitHP);
+					totalEnemyDamage = totalEnemyDamage <= damage ? 0 : totalEnemyDamage.sub(damage);
+					
+					// 전리품을 계산합니다.
+					Material memory unitMaterial = unitMaterials[army.unitKind];
+					rewardMaterial.wood = rewardMaterial.wood.add(unitMaterial.wood.mul(deadUnitCount));
+					rewardMaterial.stone = rewardMaterial.wood.add(unitMaterial.stone.mul(deadUnitCount));
+					rewardMaterial.iron = rewardMaterial.wood.add(unitMaterial.iron.mul(deadUnitCount));
+					rewardMaterial.ducat = rewardMaterial.wood.add(unitMaterial.ducat.mul(deadUnitCount));
+					
+					// 남은 병사 숫자를 저장합니다.
+					army.unitCount = remainUnitCount;
+					if (army.unitCount == 0) {
+						army.owner = address(0x0);
+					}
+				}
+				
+				// 아군이 적군을 공격합니다.
+				Army storage enemyArmy = armies[targetArmyIds[i]];
+				
+				// 유닛의 개수가 0개 이상이어야 합니다.
+				if (enemyArmy.unitCount > 0) {
+					
+					// 적군의 체력을 계산합니다.
+					uint unitHP = units[enemyArmy.unitKind].hp;
+					uint ememyArmyHP = unitHP.mul(enemyArmy.unitCount);
+					ememyArmyHP = ememyArmyHP <= totalDamage ? 0 : ememyArmyHP.sub(totalDamage);
+					
+					// 전투 결과를 계산합니다.
+					uint remainEnemyUnitCount = ememyArmyHP.add(ememyArmyHP % unitHP).div(unitHP);
+					uint deadEnemyUnitCount = enemyArmy.unitCount.sub(remainEnemyUnitCount);
+					
+					// 아군의 총 공격력을 낮춥니다.
+					uint damage = deadEnemyUnitCount.mul(unitHP);
+					totalDamage = totalDamage <= damage ? 0 : totalDamage.sub(damage);
+					
+					// 전리품을 계산합니다.
+					Material memory unitMaterial = unitMaterials[enemyArmy.unitKind];
+					rewardMaterial.wood = rewardMaterial.wood.add(unitMaterial.wood.mul(deadEnemyUnitCount));
+					rewardMaterial.stone = rewardMaterial.wood.add(unitMaterial.stone.mul(deadEnemyUnitCount));
+					rewardMaterial.iron = rewardMaterial.wood.add(unitMaterial.iron.mul(deadEnemyUnitCount));
+					rewardMaterial.ducat = rewardMaterial.wood.add(unitMaterial.ducat.mul(deadEnemyUnitCount));
+					
+					// 남은 병사 숫자를 저장합니다.
+					enemyArmy.unitCount = remainEnemyUnitCount;
+					if (enemyArmy.unitCount == 0) {
+						enemyArmy.owner = address(0x0);
+					}
+				}
+			}
+			
+			// 승리
+			if (totalDamage >= totalEnemyDamage) {
+				
+				targetArmyIds.length = UNIT_KIND_COUNT;
+				
+				// 승리하면 병력을 이동합니다.
+				for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+					
+					Army memory army = armies[armyIds[i]];
+					
+					if (
+					// 유닛의 개수가 0개 이상이어야 합니다.
+					army.unitCount > 0 &&
+					
+					// 이동이 가능한 거리인지 확인합니다.
+					distance <= units[army.unitKind].movableDistance) {
+						
+						targetArmyIds[i] = armyIds[i];
+						
+						delete armyIds[i];
+					}
+				}
+				
+				// 전리품을 취득합니다.
+				wood.transferFrom(address(this), msg.sender, rewardMaterial.wood);
+				stone.transferFrom(address(this), msg.sender, rewardMaterial.stone);
+				iron.transferFrom(address(this), msg.sender, rewardMaterial.iron);
+				ducat.transferFrom(address(this), msg.sender, rewardMaterial.ducat);
+			}
+			
+			// 패배
+			else {
+				
+				// 패배하면 상대방이 전리품을 취득합니다.
+				wood.transferFrom(address(this), targetArmyOwner, rewardMaterial.wood);
+				stone.transferFrom(address(this), targetArmyOwner, rewardMaterial.stone);
+				iron.transferFrom(address(this), targetArmyOwner, rewardMaterial.iron);
+				ducat.transferFrom(address(this), targetArmyOwner, rewardMaterial.ducat);
+			}
+		}
 	}
 	
 	// 원거리 유닛으로 특정 지역을 공격합니다.
 	function rangedAttack(uint col, uint row, uint toCol, uint toRow) checkRange(col, row) checkRange(toCol, toRow) internal {
-		//TODO:
+		
+		// 부대의 소유주를 확인합니다.
+		require(getArmyOwnerByPosition(col, row) == msg.sender);
+		
+		address targetArmyOwner = getArmyOwnerByPosition(toCol, toRow);
+		
+		// 아군을 공격할 수 없습니다.
+		require(targetArmyOwner != msg.sender);
+		
+		// 거리 계산
+		uint distance = (col < toCol ? toCol - col : col - toCol) + (row < toRow ? toRow - row : row - toRow);
+		
+		uint[] storage armyIds = positionToArmyIds[col][row];
+		uint[] storage targetArmyIds = positionToArmyIds[toCol][toRow];
+		
+		uint totalDamage = 0;
+		uint totalEnemyDamage = 0;
+		
+		// 총 공격력을 계산합니다.
+		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+			
+			Army memory army = armies[armyIds[i]];
+			
+			if (
+			// 유닛의 개수가 0개 이상이어야 합니다.
+			army.unitCount > 0 &&
+			
+			// 공격이 가능한 거리인지 확인합니다.
+			distance <= units[army.unitKind].attackableDistance) {
+				
+				// 아군의 공격력 추가
+				totalDamage = totalDamage.add(units[army.unitKind].damage.mul(army.unitCount));
+			}
+			
+			Army memory enemyArmy = armies[targetArmyIds[i]];
+			
+			if (
+			// 유닛의 개수가 0개 이상이어야 합니다.
+			enemyArmy.unitCount > 0 &&
+			
+			// 공격이 가능한 거리인지 확인합니다.
+			distance <= units[enemyArmy.unitKind].attackableDistance) {
+				
+				// 적군의 공격력 추가
+				totalEnemyDamage = totalEnemyDamage.add(units[enemyArmy.unitKind].damage.mul(enemyArmy.unitCount));
+			}
+		}
+		
+		// 전투를 개시합니다.
+		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+			
+			// 적군이 아군을 공격합니다.
+			Army storage army = armies[armyIds[i]];
+			
+			// 유닛의 개수가 0개 이상이어야 합니다.
+			if (army.unitCount > 0) {
+				
+				// 아군의 체력을 계산합니다.
+				uint unitHP = units[army.unitKind].hp;
+				uint armyHP = unitHP.mul(army.unitCount);
+				armyHP = armyHP <= totalEnemyDamage ? 0 : armyHP.sub(totalEnemyDamage);
+				
+				// 전투 결과를 계산합니다.
+				uint remainUnitCount = armyHP.add(armyHP % unitHP).div(unitHP);
+				uint deadUnitCount = army.unitCount.sub(remainUnitCount);
+				
+				// 적의 총 공격력을 낮춥니다.
+				uint damage = deadUnitCount.mul(unitHP);
+				totalEnemyDamage = totalEnemyDamage <= damage ? 0 : totalEnemyDamage.sub(damage);
+				
+				// 일방적인 공격일 경우 자원을 그대로 돌려받습니다.
+				Material memory unitMaterial = unitMaterials[army.unitKind];
+				wood.transferFrom(address(this), msg.sender, unitMaterial.wood.mul(deadUnitCount));
+				stone.transferFrom(address(this), msg.sender, unitMaterial.stone.mul(deadUnitCount));
+				iron.transferFrom(address(this), msg.sender, unitMaterial.iron.mul(deadUnitCount));
+				ducat.transferFrom(address(this), msg.sender, unitMaterial.ducat.mul(deadUnitCount));
+				
+				// 남은 병사 숫자를 저장합니다.
+				army.unitCount = remainUnitCount;
+				if (army.unitCount == 0) {
+					army.owner = address(0x0);
+				}
+			}
+			
+			// 아군이 적군을 공격합니다.
+			Army storage enemyArmy = armies[targetArmyIds[i]];
+			
+			// 유닛의 개수가 0개 이상이어야 합니다.
+			if (enemyArmy.unitCount > 0) {
+				
+				// 적군의 체력을 계산합니다.
+				uint unitHP = units[enemyArmy.unitKind].hp;
+				uint ememyArmyHP = unitHP.mul(enemyArmy.unitCount);
+				ememyArmyHP = ememyArmyHP <= totalDamage ? 0 : ememyArmyHP.sub(totalDamage);
+				
+				// 전투 결과를 계산합니다.
+				uint remainEnemyUnitCount = ememyArmyHP.add(ememyArmyHP % unitHP).div(unitHP);
+				uint deadEnemyUnitCount = enemyArmy.unitCount.sub(remainEnemyUnitCount);
+				
+				// 아군의 총 공격력을 낮춥니다.
+				uint damage = deadEnemyUnitCount.mul(unitHP);
+				totalDamage = totalDamage <= damage ? 0 : totalDamage.sub(damage);
+				
+				// 일방적인 공격일 경우 자원을 그대로 돌려받습니다.
+				Material memory unitMaterial = unitMaterials[army.unitKind];
+				wood.transferFrom(address(this), targetArmyOwner, unitMaterial.wood.mul(deadEnemyUnitCount));
+				stone.transferFrom(address(this), targetArmyOwner, unitMaterial.stone.mul(deadEnemyUnitCount));
+				iron.transferFrom(address(this), targetArmyOwner, unitMaterial.iron.mul(deadEnemyUnitCount));
+				ducat.transferFrom(address(this), targetArmyOwner, unitMaterial.ducat.mul(deadEnemyUnitCount));
+				
+				// 남은 병사 숫자를 저장합니다.
+				enemyArmy.unitCount = remainEnemyUnitCount;
+				if (enemyArmy.unitCount == 0) {
+					enemyArmy.owner = address(0x0);
+				}
+			}
+		}
 	}
 	
 	// 부대에 아이템을 장착합니다.
 	function attachItem(uint armyId, uint itemKind, uint unitCount) internal {
 		
 		Army storage army = armies[armyId];
+		
+		// 부대의 소유주를 확인합니다.
+		require(army.owner == msg.sender);
 		
 		// 유닛 수가 충분한지 확인합니다.
 		require(army.unitCount >= unitCount);
@@ -34,7 +358,7 @@ contract DelightArmyManager is DelightBase {
 		require(
 			// 검병
 			(
-				army.kind == ARMY_SWORDSMAN &&
+				army.unitKind == UNIT_SWORDSMAN &&
 				(
 					itemKind == ITEM_AXE ||
 					itemKind == ITEM_SPEAR ||
@@ -45,7 +369,7 @@ contract DelightArmyManager is DelightBase {
 			
 			// 궁수
 			(
-				army.kind == ARMY_ARCHER &&
+				army.unitKind == UNIT_ARCHER &&
 				(
 					itemKind == ITEM_CROSSBOW ||
 					itemKind == ITEM_BALLISTA ||
@@ -55,7 +379,7 @@ contract DelightArmyManager is DelightBase {
 			
 			// 기마병
 			(
-				army.kind == ARMY_CAVALY &&
+				army.unitKind == UNIT_CAVALY &&
 				(
 					itemKind == ITEM_CAMEL ||
 					itemKind == ITEM_ELEPHANT
@@ -65,44 +389,48 @@ contract DelightArmyManager is DelightBase {
 		
 		// 유닛의 일부를 변경하여 새로운 부대를 생성합니다.
 		
-		// 새 부대의 성격
-		uint armyKind;
+		// 새 부대 유닛의 성격
+		uint unitKind;
 		
 		if (itemKind == ITEM_AXE) {
-			armyKind = ARMY_AXEMAN;
+			unitKind = UNIT_AXEMAN;
 		} else if (itemKind == ITEM_SPEAR) {
-			armyKind = ARMY_SPEARMAN;
+			unitKind = UNIT_SPEARMAN;
 		} else if (itemKind == ITEM_SHIELD) {
-			armyKind = ARMY_SHIELDMAN;
+			unitKind = UNIT_SHIELDMAN;
 		} else if (itemKind == ITEM_HOOD) {
-			armyKind = ARMY_SPY;
+			unitKind = UNIT_SPY;
 		}
 		
 		else if (itemKind == ITEM_CROSSBOW) {
-			armyKind = ARMY_CROSSBOWMAN;
+			unitKind = UNIT_CROSSBOWMAN;
 		} else if (itemKind == ITEM_BALLISTA) {
-			armyKind = ARMY_BALLISTA;
+			unitKind = UNIT_BALLISTA;
 		} else if (itemKind == ITEM_CATAPULT) {
-			armyKind = ARMY_CATAPULT;
+			unitKind = UNIT_CATAPULT;
 		}
 		
 		else if (itemKind == ITEM_CAMEL) {
-			armyKind = ARMY_CAMELRY;
+			unitKind = UNIT_CAMELRY;
 		} else if (itemKind == ITEM_ELEPHANT) {
-			armyKind = ARMY_WAR_ELEPHANT;
+			unitKind = UNIT_WAR_ELEPHANT;
 		}
 		
-		// 숫자가 완전히 동일하면 부대의 성격을 변경합니다.
-		if (army.unitCount == unitCount) {
-			army.kind = armyKind;
+		army.unitCount = army.unitCount.sub(unitCount);
+		
+		positionToArmyIds[army.col][army.row].length = UNIT_KIND_COUNT;
+		
+		// 기존에 부대가 존재하면 부대원의 숫자 증가
+		uint originArmyId = positionToArmyIds[army.col][army.row][unitKind];
+		if (originArmyId != 0) {
+			armies[originArmyId].unitCount = armies[originArmyId].unitCount.add(unitCount);
 		}
 		
-		// 숫자가 다르면 새 부대를 생성합니다.
+		// 새 부대 생성
 		else {
-			army.unitCount = army.unitCount.sub(unitCount);
 			
 			uint newArmyId = armies.push(Army({
-				kind : armyKind,
+				unitKind : unitKind,
 				unitCount : unitCount,
 				col : army.col,
 				row : army.row,
@@ -110,7 +438,7 @@ contract DelightArmyManager is DelightBase {
 				createTime : now
 			})).sub(1);
 			
-			positionToArmyIds[army.col][army.row].push(newArmyId);
+			positionToArmyIds[army.col][army.row][unitKind] = newArmyId;
 		}
 		
 		// 아이템을 Delight로 이전합니다.
