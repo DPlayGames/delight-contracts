@@ -7,6 +7,18 @@ import "./Util/SafeMath.sol";
 contract DelightKnightItem is ERC721 {
 	using SafeMath for uint;
 	
+	// 기사 아이템 정보
+	struct KnightItem {
+		uint hp;
+		uint damage;
+		uint movableDistance;
+		uint attackableDistance;
+		uint buffHP;
+		uint buffDamage;
+	}
+	
+	KnightItem[] private items;
+	
 	mapping(uint => address) public itemIdToOwner;
 	mapping(address => uint[]) public ownerToItemIds;
 	mapping(uint => uint) internal itemIdToItemIdsIndex;
@@ -19,6 +31,357 @@ contract DelightKnightItem is ERC721 {
 	// The address of DPlay trading post
 	// DPlay 교역소 주소
 	address public dplayTradingPost;
+	
+	// 아이템을 생성합니다.
+	function createItem(KnightItem memory item) private {
+		
+		uint itemId = items.push(item).sub(1);
+		
+		itemIdToOwner[itemId] = msg.sender;
+		itemIdToItemIdsIndex[itemId] = ownerToItemIds[msg.sender].push(itemId).sub(1);
+		
+		emit Transfer(address(0x0), msg.sender, itemId);
+	}
+	
+	constructor() public {
+		
+		// 0번지는 사용하지 않습니다.
+		items.push(KnightItem({
+			hp					: 0,
+			damage				: 0,
+			movableDistance		: 0,
+			attackableDistance	: 0,
+			buffHP				: 0,
+			buffDamage			: 0
+		}));
+		
+		// Mistilteinn
+		createItem(KnightItem({
+			hp					: 1,
+			damage				: 1,
+			movableDistance		: 1,
+			attackableDistance	: 1,
+			buffHP				: 1,
+			buffDamage			: 1
+		}));
+		
+		// Gungnir
+		createItem(KnightItem({
+			hp					: 2,
+			damage				: 2,
+			movableDistance		: 2,
+			attackableDistance	: 2,
+			buffHP				: 2,
+			buffDamage			: 2
+		}));
+		
+		// Traitor Hero's Straight Sword
+		createItem(KnightItem({
+			hp					: 3,
+			damage				: 3,
+			movableDistance		: 3,
+			attackableDistance	: 3,
+			buffHP				: 3,
+			buffDamage			: 3
+		}));
+		
+		// Sword of Valhalla
+		createItem(KnightItem({
+			hp					: 4,
+			damage				: 4,
+			movableDistance		: 4,
+			attackableDistance	: 4,
+			buffHP				: 4,
+			buffDamage			: 4
+		}));
+		
+		// Ymir's Fragment
+		createItem(KnightItem({
+			hp					: 5,
+			damage				: 5,
+			movableDistance		: 5,
+			attackableDistance	: 5,
+			buffHP				: 5,
+			buffDamage			: 5
+		}));
+		
+		// Hel's Scythe
+		createItem(KnightItem({
+			hp					: 6,
+			damage				: 6,
+			movableDistance		: 6,
+			attackableDistance	: 6,
+			buffHP				: 6,
+			buffDamage			: 6
+		}));
+		
+		// Skull
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Laevateinn
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Jormungand's Canine
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Tyrfing
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Heimdallr's Sword
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Rapier
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Song of the Cherry Blossoms
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Ancient God's Sword
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Undead's Sword
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Greek Shield
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Nymph's Spear
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Triaina
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Titan Sword
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Amazonian Dagger
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Hector's Sword
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Rhea's Scythe
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Tyr's Claw
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Kronos' Two Handed Axe
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Oceanus' Axe
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Bone Axe of Typhon
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Helios' Sun Hammer
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Mace
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Hermes' Staff
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+		
+		// Hephaestus' Hammer
+		createItem(KnightItem({
+			hp					: 7,
+			damage				: 7,
+			movableDistance		: 7,
+			attackableDistance	: 7,
+			buffHP				: 7,
+			buffDamage			: 7
+		}));
+	}
+	
+	// 아이템의 개수를 반환합니다.
+	function getItemCount() external view returns (uint) {
+		return items.length;
+	}
+	
+	// 아이템의 정보를 반환합니다.
+	function getItemInfo(uint itemId) external view returns (
+		uint hp,
+		uint damage,
+		uint movableDistance,
+		uint attackableDistance,
+		uint buffHP,
+		uint buffDamage
+	) {
+		
+		KnightItem memory item = items[itemId];
+		
+		return (
+			item.hp,
+			item.damage,
+			item.movableDistance,
+			item.attackableDistance,
+			item.buffHP,
+			item.buffDamage
+		);
+	}
 	
 	modifier onlyOwnerOf(uint itemId) {
 		require(msg.sender == ownerOf(itemId));

@@ -24,6 +24,7 @@ interface DelightInterface {
 	struct Army {
 		uint unitKind;
 		uint unitCount;
+		uint knightItemId;
 		uint col;
 		uint row;
 		address owner;

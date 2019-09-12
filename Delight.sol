@@ -15,6 +15,7 @@ contract Delight is DelightBuildingManager, DelightArmyManager, DelightItemManag
 	uint constant private ORDER_RANGED_ATTACK = 4;
 	uint constant private ORDER_CREATE_ITEM = 5;
 	uint constant private ORDER_ATTACH_ITEM = 6;
+	uint constant private ORDER_ATTACH_KNIGHT_ITEM = 7;
 	
 	// 명령 큐를 실행합니다.
 	function runOrderQueue(uint[] calldata orders, uint[] calldata params1, uint[] calldata params2, uint[] calldata params3, uint[] calldata params4) external {
@@ -54,6 +55,11 @@ contract Delight is DelightBuildingManager, DelightArmyManager, DelightItemManag
 			// 아이템을 장착합니다.
 			else if (orders[i] == ORDER_ATTACH_ITEM) {
 				attachItem(params1[i], params2[i], params3[i]);
+			}
+			
+			// 아이템을 장착합니다.
+			else if (orders[i] == ORDER_ATTACH_KNIGHT_ITEM) {
+				attachKnightItem(params1[i], params2[i]);
 			}
 		}
 	}

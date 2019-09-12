@@ -8,7 +8,11 @@ contract DelightArmyManager is DelightBase {
 	using SafeMath for uint;
 	
 	// 부대를 이동시키고, 해당 지역에 적이 있으면 공격합니다.
-	function moveAndAttack(uint col, uint row, uint toCol, uint toRow) checkRange(col, row) checkRange(toCol, toRow) internal {
+	function moveAndAttack(uint col, uint row, uint toCol, uint toRow) internal {
+		
+		// 올바른 범위인지 체크합니다.
+		require(col < COL_RANGE && row < ROW_RANGE);
+		require(toCol < COL_RANGE && toRow < ROW_RANGE);
 		
 		// 부대의 소유주를 확인합니다.
 		require(getArmyOwnerByPosition(col, row) == msg.sender);
@@ -115,16 +119,15 @@ contract DelightArmyManager is DelightBase {
 				distance <= units[army.unitKind].movableDistance) {
 					
 					// 아군의 체력을 계산합니다.
-					uint unitHP = units[army.unitKind].hp;
-					uint armyHP = unitHP.mul(army.unitCount);
+					uint armyHP = units[army.unitKind].hp.mul(army.unitCount);
 					armyHP = armyHP <= totalEnemyDamage ? 0 : armyHP.sub(totalEnemyDamage);
 					
 					// 전투 결과를 계산합니다.
-					uint remainUnitCount = armyHP.add(armyHP % unitHP).div(unitHP);
+					uint remainUnitCount = armyHP.add(armyHP % units[army.unitKind].hp).div(units[army.unitKind].hp);
 					uint deadUnitCount = army.unitCount.sub(remainUnitCount);
 					
 					// 적의 총 공격력을 낮춥니다.
-					uint damage = deadUnitCount.mul(unitHP);
+					uint damage = deadUnitCount.mul(units[army.unitKind].hp);
 					totalEnemyDamage = totalEnemyDamage <= damage ? 0 : totalEnemyDamage.sub(damage);
 					
 					// 전리품을 계산합니다.
@@ -148,24 +151,22 @@ contract DelightArmyManager is DelightBase {
 				if (enemyArmy.unitCount > 0) {
 					
 					// 적군의 체력을 계산합니다.
-					uint unitHP = units[enemyArmy.unitKind].hp;
-					uint ememyArmyHP = unitHP.mul(enemyArmy.unitCount);
+					uint ememyArmyHP = units[enemyArmy.unitKind].hp.mul(enemyArmy.unitCount);
 					ememyArmyHP = ememyArmyHP <= totalDamage ? 0 : ememyArmyHP.sub(totalDamage);
 					
 					// 전투 결과를 계산합니다.
-					uint remainEnemyUnitCount = ememyArmyHP.add(ememyArmyHP % unitHP).div(unitHP);
+					uint remainEnemyUnitCount = ememyArmyHP.add(ememyArmyHP % units[enemyArmy.unitKind].hp).div(units[enemyArmy.unitKind].hp);
 					uint deadEnemyUnitCount = enemyArmy.unitCount.sub(remainEnemyUnitCount);
 					
 					// 아군의 총 공격력을 낮춥니다.
-					uint damage = deadEnemyUnitCount.mul(unitHP);
+					uint damage = deadEnemyUnitCount.mul(units[enemyArmy.unitKind].hp);
 					totalDamage = totalDamage <= damage ? 0 : totalDamage.sub(damage);
 					
 					// 전리품을 계산합니다.
-					Material memory unitMaterial = unitMaterials[enemyArmy.unitKind];
-					rewardMaterial.wood = rewardMaterial.wood.add(unitMaterial.wood.mul(deadEnemyUnitCount));
-					rewardMaterial.stone = rewardMaterial.wood.add(unitMaterial.stone.mul(deadEnemyUnitCount));
-					rewardMaterial.iron = rewardMaterial.wood.add(unitMaterial.iron.mul(deadEnemyUnitCount));
-					rewardMaterial.ducat = rewardMaterial.wood.add(unitMaterial.ducat.mul(deadEnemyUnitCount));
+					rewardMaterial.wood = rewardMaterial.wood.add(unitMaterials[enemyArmy.unitKind].wood.mul(deadEnemyUnitCount));
+					rewardMaterial.stone = rewardMaterial.wood.add(unitMaterials[enemyArmy.unitKind].stone.mul(deadEnemyUnitCount));
+					rewardMaterial.iron = rewardMaterial.wood.add(unitMaterials[enemyArmy.unitKind].iron.mul(deadEnemyUnitCount));
+					rewardMaterial.ducat = rewardMaterial.wood.add(unitMaterials[enemyArmy.unitKind].ducat.mul(deadEnemyUnitCount));
 					
 					// 남은 병사 숫자를 저장합니다.
 					enemyArmy.unitCount = remainEnemyUnitCount;
@@ -218,7 +219,11 @@ contract DelightArmyManager is DelightBase {
 	}
 	
 	// 원거리 유닛으로 특정 지역을 공격합니다.
-	function rangedAttack(uint col, uint row, uint toCol, uint toRow) checkRange(col, row) checkRange(toCol, toRow) internal {
+	function rangedAttack(uint col, uint row, uint toCol, uint toRow) internal {
+		
+		// 올바른 범위인지 체크합니다.
+		require(col < COL_RANGE && row < ROW_RANGE);
+		require(toCol < COL_RANGE && toRow < ROW_RANGE);
 		
 		// 부대의 소유주를 확인합니다.
 		require(getArmyOwnerByPosition(col, row) == msg.sender);
@@ -277,24 +282,22 @@ contract DelightArmyManager is DelightBase {
 			if (army.unitCount > 0) {
 				
 				// 아군의 체력을 계산합니다.
-				uint unitHP = units[army.unitKind].hp;
-				uint armyHP = unitHP.mul(army.unitCount);
+				uint armyHP = units[army.unitKind].hp.mul(army.unitCount);
 				armyHP = armyHP <= totalEnemyDamage ? 0 : armyHP.sub(totalEnemyDamage);
 				
 				// 전투 결과를 계산합니다.
-				uint remainUnitCount = armyHP.add(armyHP % unitHP).div(unitHP);
+				uint remainUnitCount = armyHP.add(armyHP % units[army.unitKind].hp).div(units[army.unitKind].hp);
 				uint deadUnitCount = army.unitCount.sub(remainUnitCount);
 				
 				// 적의 총 공격력을 낮춥니다.
-				uint damage = deadUnitCount.mul(unitHP);
+				uint damage = deadUnitCount.mul(units[army.unitKind].hp);
 				totalEnemyDamage = totalEnemyDamage <= damage ? 0 : totalEnemyDamage.sub(damage);
 				
 				// 일방적인 공격일 경우 자원을 그대로 돌려받습니다.
-				Material memory unitMaterial = unitMaterials[army.unitKind];
-				wood.transferFrom(address(this), msg.sender, unitMaterial.wood.mul(deadUnitCount));
-				stone.transferFrom(address(this), msg.sender, unitMaterial.stone.mul(deadUnitCount));
-				iron.transferFrom(address(this), msg.sender, unitMaterial.iron.mul(deadUnitCount));
-				ducat.transferFrom(address(this), msg.sender, unitMaterial.ducat.mul(deadUnitCount));
+				wood.transferFrom(address(this), msg.sender, unitMaterials[army.unitKind].wood.mul(deadUnitCount));
+				stone.transferFrom(address(this), msg.sender, unitMaterials[army.unitKind].stone.mul(deadUnitCount));
+				iron.transferFrom(address(this), msg.sender, unitMaterials[army.unitKind].iron.mul(deadUnitCount));
+				ducat.transferFrom(address(this), msg.sender, unitMaterials[army.unitKind].ducat.mul(deadUnitCount));
 				
 				// 남은 병사 숫자를 저장합니다.
 				army.unitCount = remainUnitCount;
@@ -310,24 +313,22 @@ contract DelightArmyManager is DelightBase {
 			if (enemyArmy.unitCount > 0) {
 				
 				// 적군의 체력을 계산합니다.
-				uint unitHP = units[enemyArmy.unitKind].hp;
-				uint ememyArmyHP = unitHP.mul(enemyArmy.unitCount);
+				uint ememyArmyHP = units[enemyArmy.unitKind].hp.mul(enemyArmy.unitCount);
 				ememyArmyHP = ememyArmyHP <= totalDamage ? 0 : ememyArmyHP.sub(totalDamage);
 				
 				// 전투 결과를 계산합니다.
-				uint remainEnemyUnitCount = ememyArmyHP.add(ememyArmyHP % unitHP).div(unitHP);
+				uint remainEnemyUnitCount = ememyArmyHP.add(ememyArmyHP % units[enemyArmy.unitKind].hp).div(units[enemyArmy.unitKind].hp);
 				uint deadEnemyUnitCount = enemyArmy.unitCount.sub(remainEnemyUnitCount);
 				
 				// 아군의 총 공격력을 낮춥니다.
-				uint damage = deadEnemyUnitCount.mul(unitHP);
+				uint damage = deadEnemyUnitCount.mul(units[enemyArmy.unitKind].hp);
 				totalDamage = totalDamage <= damage ? 0 : totalDamage.sub(damage);
 				
 				// 일방적인 공격일 경우 자원을 그대로 돌려받습니다.
-				Material memory unitMaterial = unitMaterials[army.unitKind];
-				wood.transferFrom(address(this), targetArmyOwner, unitMaterial.wood.mul(deadEnemyUnitCount));
-				stone.transferFrom(address(this), targetArmyOwner, unitMaterial.stone.mul(deadEnemyUnitCount));
-				iron.transferFrom(address(this), targetArmyOwner, unitMaterial.iron.mul(deadEnemyUnitCount));
-				ducat.transferFrom(address(this), targetArmyOwner, unitMaterial.ducat.mul(deadEnemyUnitCount));
+				wood.transferFrom(address(this), targetArmyOwner, unitMaterials[army.unitKind].wood.mul(deadEnemyUnitCount));
+				stone.transferFrom(address(this), targetArmyOwner, unitMaterials[army.unitKind].stone.mul(deadEnemyUnitCount));
+				iron.transferFrom(address(this), targetArmyOwner, unitMaterials[army.unitKind].iron.mul(deadEnemyUnitCount));
+				ducat.transferFrom(address(this), targetArmyOwner, unitMaterials[army.unitKind].ducat.mul(deadEnemyUnitCount));
 				
 				// 남은 병사 숫자를 저장합니다.
 				enemyArmy.unitCount = remainEnemyUnitCount;
@@ -432,6 +433,7 @@ contract DelightArmyManager is DelightBase {
 			uint newArmyId = armies.push(Army({
 				unitKind : unitKind,
 				unitCount : unitCount,
+				knightItemId : 0,
 				col : army.col,
 				row : army.row,
 				owner : msg.sender,
@@ -443,5 +445,29 @@ contract DelightArmyManager is DelightBase {
 		
 		// 아이템을 Delight로 이전합니다.
 		itemContract.transferFrom(msg.sender, address(this), unitCount);
+	}
+	
+	// 기사에 아이템을 장착합니다.
+	function attachKnightItem(uint armyId, uint itemId) internal {
+		
+		Army storage army = armies[armyId];
+		
+		// 부대의 소유주를 확인합니다.
+		require(army.owner == msg.sender);
+		
+		// 기사인지 확인합니다.
+		require(army.unitKind == UNIT_KNIGHT);
+		
+		// 기사가 아이템을 장착하고 있지 않은지 확인합니다.
+		require(army.knightItemId == 0);
+		
+		// 아이템을 소유하고 있는지 확인합니다.
+		require(knightItem.ownerOf(itemId) == msg.sender);
+		
+		// 기사 아이템을 지정합니다.
+		army.knightItemId = itemId;
+		
+		// 아이템을 Delight로 이전합니다.
+		knightItem.transferFrom(msg.sender, address(this), itemId);
 	}
 }

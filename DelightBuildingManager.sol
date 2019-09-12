@@ -45,9 +45,11 @@ contract DelightBuildingManager is DelightBase {
 	
 	// 건물을 짓습니다.
 	function build(uint kind, uint col, uint row)
-	checkRange(col, row)
 	checkBuildingPosition(kind, col, row)
 	internal returns (uint) {
+		
+		// 올바른 범위인지 체크합니다.
+		require(col < COL_RANGE && row < ROW_RANGE);
 		
 		Material memory material = buildingMaterials[kind];
 		
@@ -158,6 +160,7 @@ contract DelightBuildingManager is DelightBase {
 		uint armyId = armies.push(Army({
 			unitKind : unitKind,
 			unitCount : unitCount,
+			knightItemId : 0,
 			col : building.col,
 			row : building.row,
 			owner : msg.sender,

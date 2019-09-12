@@ -11,14 +11,8 @@ contract DelightBase is DelightInterface, NetworkChecker {
 	using SafeMath for uint;
 	
 	// 지형의 범위
-	uint constant private COL_RANGE = 100;
-	uint constant private ROW_RANGE = 100;
-	
-	// 범위를 체크합니다.
-	modifier checkRange(uint col, uint row) {
-		require(col < COL_RANGE && row < ROW_RANGE);
-		_;
-	}
+	uint constant internal COL_RANGE = 100;
+	uint constant internal ROW_RANGE = 100;
 	
 	// 한 위치에 존재할 수 있는 최대 유닛 수
 	uint constant internal MAX_POSITION_UNIT_COUNT = 50;
@@ -190,6 +184,7 @@ contract DelightBase is DelightInterface, NetworkChecker {
 		armies.push(Army({
 			unitKind : 99,
 			unitCount : 0,
+			knightItemId : 0,
 			col : COL_RANGE,
 			row : ROW_RANGE,
 			owner : msg.sender,
