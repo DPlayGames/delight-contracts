@@ -44,6 +44,15 @@ contract DelightBuildingManager is DelightBase {
 			getArmyOwnerByPosition(col, row) == msg.sender
 		));
 		
+		// 만약 월드에 본부가 아예 없는 경우, 처음 짓는 곳 주변에 건물이 존재하면 안됩니다.
+		if (ownerToHQIds[msg.sender].length == 0) {
+			for (uint i = (col <= 9 ? 0 : col - 9); i < (col >= 91 ? 100 : col + 9); i += 1) {
+				for (uint j = (row <= 9 ? 0 : row - 9); j < (row >= 91 ? 100 : row + 9); j += 1) {
+					require(positionToBuildingId[i][j] == 0);
+				}
+			}
+		}
+		
 		Material memory material = buildingMaterials[kind];
 		
 		// 건물을 짓는데 필요한 자원이 충분한지 확인합니다.
@@ -77,7 +86,45 @@ contract DelightBuildingManager is DelightBase {
 		iron.transferFrom(msg.sender, address(this), material.iron);
 		ducat.transferFrom(msg.sender, address(this), material.ducat);
 		
-		emit Build(msg.sender, buildingId, kind, col, row, bulidTime);
+		// 기록을 저장합니다.
+		history.push(Record({
+			kind : RECORD_BUILD,
+			
+			owner : msg.sender,
+			enemy : address(0x0),
+			
+			col : col,
+			row : row,
+			toCol : 0,
+			toRow : 0,
+			
+			buildingId : buildingId,
+			buildingKind : kind,
+			buildingLevel : 0,
+			
+			armyId : 0,
+			unitKind : 0,
+			unitCount : 0,
+			
+			itemId : 0,
+			itemKind : 0,
+			itemCount : 0,
+			
+			wood : material.wood,
+			stone : material.stone,
+			iron : material.iron,
+			ducat : material.ducat,
+			
+			enemyWood : 0,
+			enemyStone : 0,
+			enemyIron : 0,
+			enemyDucat : 0,
+			
+			time : bulidTime
+		}));
+		
+		// 이벤트 발생
+		emit Build(msg.sender, buildingId, kind, col, row, bulidTime, material.wood, material.stone, material.iron, material.ducat);
 		
 		return buildingId;
 	}
@@ -89,12 +136,60 @@ contract DelightBuildingManager is DelightBase {
 		
 		require(building.kind == BUILDING_HQ);
 		
+		Material memory material = hpUpgradeMaterials[building.level + 1];
+		
+		// 본부를 업그레이드하는데 필요한 자원이 충분한지 확인합니다.
+		require(
+			wood.balanceOf(msg.sender) >= material.wood &&
+			stone.balanceOf(msg.sender) >= material.stone &&
+			iron.balanceOf(msg.sender) >= material.iron &&
+			ducat.balanceOf(msg.sender) >= material.ducat
+		);
+		
 		// 최대 레벨은 2입니다. (0 ~ 2)
 		require(building.level < 2);
 		
 		building.level += 1;
 		
-		emit UpgradeHQ(building.owner, buildingId, building.level, building.col, building.row);
+		// 기록을 저장합니다.
+		history.push(Record({
+			kind : RECORD_UPGRADE_HQ,
+			
+			owner : address(0x0),
+			enemy : address(0x0),
+			
+			col : building.col,
+			row : building.row,
+			toCol : 0,
+			toRow : 0,
+			
+			buildingId : buildingId,
+			buildingKind : building.kind,
+			buildingLevel : building.level,
+			
+			armyId : 0,
+			unitKind : 0,
+			unitCount : 0,
+			
+			itemId : 0,
+			itemKind : 0,
+			itemCount : 0,
+			
+			wood : material.wood,
+			stone : material.stone,
+			iron : material.iron,
+			ducat : material.ducat,
+			
+			enemyWood : 0,
+			enemyStone : 0,
+			enemyIron : 0,
+			enemyDucat : 0,
+			
+			time : now
+		}));
+		
+		// 이벤트 발생
+		emit UpgradeHQ(building.owner, buildingId, building.level, building.col, building.row, material.wood, material.stone, material.iron, material.ducat);
 	}
 	
 	// 건물에서 부대를 생산합니다.
@@ -148,14 +243,20 @@ contract DelightBuildingManager is DelightBase {
 			revert();
 		}
 		
-		Material memory material = unitMaterials[unitKind];
+		Material memory unitMaterial = unitMaterials[unitKind];
+		Material memory material = Material({
+			wood : unitMaterial.wood.mul(unitCount),
+			stone : unitMaterial.stone.mul(unitCount),
+			iron : unitMaterial.iron.mul(unitCount),
+			ducat : unitMaterial.ducat.mul(unitCount)
+		});
 		
 		// 부대를 생성하는데 필요한 자원이 충분한지 확인합니다.
 		require(
-			wood.balanceOf(msg.sender) >= material.wood.mul(unitCount) &&
-			stone.balanceOf(msg.sender) >= material.stone.mul(unitCount) &&
-			iron.balanceOf(msg.sender) >= material.iron.mul(unitCount) &&
-			ducat.balanceOf(msg.sender) >= material.ducat.mul(unitCount)
+			wood.balanceOf(msg.sender) >= material.wood &&
+			stone.balanceOf(msg.sender) >= material.stone &&
+			iron.balanceOf(msg.sender) >= material.iron &&
+			ducat.balanceOf(msg.sender) >= material.ducat
 		);
 		
 		armyIds.length = UNIT_KIND_COUNT;
@@ -188,21 +289,97 @@ contract DelightBuildingManager is DelightBase {
 		}
 		
 		// 자원을 Delight로 이전합니다.
-		wood.transferFrom(msg.sender, address(this), material.wood.mul(unitCount));
-		stone.transferFrom(msg.sender, address(this), material.stone.mul(unitCount));
-		iron.transferFrom(msg.sender, address(this), material.iron.mul(unitCount));
-		ducat.transferFrom(msg.sender, address(this), material.ducat.mul(unitCount));
+		wood.transferFrom(msg.sender, address(this), material.wood);
+		stone.transferFrom(msg.sender, address(this), material.stone);
+		iron.transferFrom(msg.sender, address(this), material.iron);
+		ducat.transferFrom(msg.sender, address(this), material.ducat);
 		
 		if (originArmyId != 0) {
 			
-			emit AddUnits(msg.sender, originArmyId, unitKind, unitCount, building.col, building.row);
+			// 기록을 저장합니다.
+			history.push(Record({
+				kind : RECORD_ADD_UNITS,
+				
+				owner : msg.sender,
+				enemy : address(0x0),
+				
+				col : building.col,
+				row : building.row,
+				toCol : 0,
+				toRow : 0,
+				
+				buildingId : buildingId,
+				buildingKind : building.kind,
+				buildingLevel : building.level,
+				
+				armyId : originArmyId,
+				unitKind : unitKind,
+				unitCount : unitCount,
+				
+				itemId : 0,
+				itemKind : 0,
+				itemCount : 0,
+				
+				wood : material.wood,
+				stone : material.stone,
+				iron : material.iron,
+				ducat : material.ducat,
+				
+				enemyWood : 0,
+				enemyStone : 0,
+				enemyIron : 0,
+				enemyDucat : 0,
+				
+				time : now
+			}));
+			
+			// 이벤트 발생
+			emit AddUnits(msg.sender, originArmyId, unitKind, unitCount, building.col, building.row, material.wood, material.stone, material.iron, material.ducat);
 			
 			return originArmyId;
 		}
 		
 		else {
 			
-			emit CreateArmy(msg.sender, newArmyId, unitKind, unitCount, building.col, building.row, createTime);
+			// 기록을 저장합니다.
+			history.push(Record({
+				kind : RECORD_CREATE_ARMY,
+				
+				owner : msg.sender,
+				enemy : address(0x0),
+				
+				col : building.col,
+				row : building.row,
+				toCol : 0,
+				toRow : 0,
+				
+				buildingId : buildingId,
+				buildingKind : building.kind,
+				buildingLevel : building.level,
+				
+				armyId : newArmyId,
+				unitKind : unitKind,
+				unitCount : unitCount,
+				
+				itemId : 0,
+				itemKind : 0,
+				itemCount : 0,
+				
+				wood : material.wood,
+				stone : material.stone,
+				iron : material.iron,
+				ducat : material.ducat,
+				
+				enemyWood : 0,
+				enemyStone : 0,
+				enemyIron : 0,
+				enemyDucat : 0,
+				
+				time : createTime
+			}));
+			
+			// 이벤트 발생
+			emit CreateArmy(msg.sender, newArmyId, unitKind, unitCount, building.col, building.row, createTime, material.wood, material.stone, material.iron, material.ducat);
 			
 			return newArmyId;
 		}

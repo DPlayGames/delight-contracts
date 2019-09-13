@@ -4,12 +4,12 @@ interface DelightInterface {
 	
 	// Events
 	// 이벤트
-    event Build				(address indexed owner, uint buildingId, uint kind, uint col, uint row, uint bulidTime);
-    event UpgradeHQ			(address indexed owner, uint buildingId, uint level, uint col, uint row);
+    event Build				(address indexed owner, uint buildingId, uint kind, uint col, uint row, uint bulidTime, uint wood, uint stone, uint iron, uint ducat);
+    event UpgradeHQ			(address indexed owner, uint buildingId, uint level, uint col, uint row, uint wood, uint stone, uint iron, uint ducat);
     event DestroyBuilding	(address indexed owner, uint buildingId, uint kind, uint col, uint row);
     
-    event CreateArmy		(address indexed owner, uint armyId, uint unitKind, uint unitCount, uint col, uint row, uint createTime);
-    event AddUnits			(address indexed owner, uint armyId, uint unitKind, uint unitCount, uint col, uint row);
+    event CreateArmy		(address indexed owner, uint armyId, uint unitKind, uint unitCount, uint col, uint row, uint createTime, uint wood, uint stone, uint iron, uint ducat);
+    event AddUnits			(address indexed owner, uint armyId, uint unitKind, uint unitCount, uint col, uint row, uint wood, uint stone, uint iron, uint ducat);
     
     event Move				(address indexed owner, uint fromCol, uint fromRow, uint toCol, uint toRow);
     event MoveArmy			(address indexed owner, uint fromArmyId, uint toArmyId, uint unitCount);
@@ -19,7 +19,7 @@ interface DelightInterface {
     event RangedAttack		(address indexed owner, address indexed enemy, uint fromCol, uint fromRow, uint toCol, uint toRow, uint wood, uint stone, uint iron, uint ducat, uint enemyWood, uint enemyStone, uint enemyIron, uint enemyDucat);
     event DeadUnits			(address indexed owner, uint armyId, uint unitCount);
     
-    event CreateItem		(address indexed owner, uint itemKind, uint count);
+    event CreateItem		(address indexed owner, uint itemKind, uint count, uint wood, uint stone, uint iron, uint ducat);
     event AttachItem		(address indexed owner, uint armyId, uint itemKind, uint count);
     event AttackKnightItem	(address indexed owner, uint armyId, uint itemId);
 	
@@ -103,10 +103,15 @@ interface DelightInterface {
 		
 		uint recordId;
 		
+		address owner;
+		
 		uint armyId;
 		uint toArmyId;
 		
 		uint unitKind;
 		uint unitCount;
+		
+		uint buildingId;
+		uint buildingKind;
 	}
 }

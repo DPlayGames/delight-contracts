@@ -74,7 +74,25 @@ contract DelightArmyManager is DelightBase {
 									createTime : now
 								})).sub(1);
 								
-								emit MoveArmy(msg.sender, armyIds[i], targetArmyIds[army.unitKind], MAX_POSITION_UNIT_COUNT.sub(totalUnitCount));
+								// 상세 기록을 저장합니다.
+								recordIdToDetails[history.length].push(RecordDetail({
+									
+									recordId : history.length,
+									
+									owner : msg.sender,
+									
+									armyId : armyIds[i],
+									toArmyId : targetArmyIds[i],
+									
+									unitKind : army.unitKind,
+									unitCount : MAX_POSITION_UNIT_COUNT.sub(totalUnitCount),
+									
+									buildingId : 0,
+									buildingKind : 0
+								}));
+								
+								// 이벤트 발생
+								emit MoveArmy(msg.sender, armyIds[i], targetArmyIds[i], MAX_POSITION_UNIT_COUNT.sub(totalUnitCount));
 							}
 							
 							// 비어있지 않으면 합병합니다.
@@ -83,6 +101,24 @@ contract DelightArmyManager is DelightBase {
 								targetArmy.unitCount = targetArmy.unitCount.add(MAX_POSITION_UNIT_COUNT.sub(totalUnitCount));
 								army.unitCount = army.unitCount.sub(MAX_POSITION_UNIT_COUNT.sub(totalUnitCount));
 								
+								// 상세 기록을 저장합니다.
+								recordIdToDetails[history.length].push(RecordDetail({
+									
+									recordId : history.length,
+									
+									owner : msg.sender,
+									
+									armyId : armyIds[i],
+									toArmyId : targetArmyIds[i],
+									
+									unitKind : army.unitKind,
+									unitCount : MAX_POSITION_UNIT_COUNT.sub(totalUnitCount),
+									
+									buildingId : 0,
+									buildingKind : 0
+								}));
+								
+								// 이벤트 발생
 								emit MoveArmy(msg.sender, armyIds[i], targetArmyIds[i], MAX_POSITION_UNIT_COUNT.sub(totalUnitCount));
 							}
 						}
@@ -95,6 +131,24 @@ contract DelightArmyManager is DelightBase {
 							
 							targetArmyIds[i] = armyIds[i];
 							
+							// 상세 기록을 저장합니다.
+							recordIdToDetails[history.length].push(RecordDetail({
+								
+								recordId : history.length,
+								
+								owner : msg.sender,
+								
+								armyId : armyIds[i],
+								toArmyId : targetArmyIds[i],
+								
+								unitKind : army.unitKind,
+								unitCount : army.unitCount,
+								
+								buildingId : 0,
+								buildingKind : 0
+							}));
+							
+							// 이벤트 발생
 							emit MoveArmy(msg.sender, armyIds[i], targetArmyIds[i], army.unitCount);
 							
 							delete armyIds[i];
@@ -105,10 +159,28 @@ contract DelightArmyManager is DelightBase {
 							
 							targetArmy.unitCount = targetArmy.unitCount.add(army.unitCount);
 							
+							// 상세 기록을 저장합니다.
+							recordIdToDetails[history.length].push(RecordDetail({
+								
+								recordId : history.length,
+								
+								owner : msg.sender,
+								
+								armyId : armyIds[i],
+								toArmyId : targetArmyIds[i],
+								
+								unitKind : army.unitKind,
+								unitCount : army.unitCount,
+								
+								buildingId : 0,
+								buildingKind : 0
+							}));
+							
+							// 이벤트 발생
+							emit MoveArmy(msg.sender, armyIds[i], targetArmyIds[i], army.unitCount);
+							
 							army.unitCount = 0;
 							army.owner = address(0x0);
-							
-							emit MoveArmy(msg.sender, armyIds[i], targetArmyIds[i], army.unitCount);
 							
 							delete armyIds[i];
 						}
@@ -116,6 +188,44 @@ contract DelightArmyManager is DelightBase {
 				}
 			}
 			
+			// 기록을 저장합니다.
+			history.push(Record({
+				kind : RECORD_MOVE_ARMY,
+				
+				owner : msg.sender,
+				enemy : address(0x0),
+				
+				col : fromCol,
+				row : fromRow,
+				toCol : toCol,
+				toRow : toRow,
+				
+				buildingId : 0,
+				buildingKind : 0,
+				buildingLevel : 0,
+				
+				armyId : 0,
+				unitKind : 0,
+				unitCount : 0,
+				
+				itemId : 0,
+				itemKind : 0,
+				itemCount : 0,
+				
+				wood : 0,
+				stone : 0,
+				iron : 0,
+				ducat : 0,
+				
+				enemyWood : 0,
+				enemyStone : 0,
+				enemyIron : 0,
+				enemyDucat : 0,
+				
+				time : now
+			}));
+			
+			// 이벤트 발생
 			emit Move(msg.sender, fromCol, fromRow, toCol, toRow);
 		}
 		
@@ -220,6 +330,24 @@ contract DelightArmyManager is DelightBase {
 						army.owner = address(0x0);
 					}
 					
+					// 상세 기록을 저장합니다.
+					recordIdToDetails[history.length].push(RecordDetail({
+						
+						recordId : history.length,
+						
+						owner : msg.sender,
+						
+						armyId : armyIds[i],
+						toArmyId : 0,
+						
+						unitKind : army.unitKind,
+						unitCount : deadUnitCount,
+						
+						buildingId : 0,
+						buildingKind : 0
+					}));
+					
+					// 이벤트 발생
 					emit DeadUnits(msg.sender, armyIds[i], deadUnitCount);
 				}
 				
@@ -262,6 +390,24 @@ contract DelightArmyManager is DelightBase {
 						enemyArmy.owner = address(0x0);
 					}
 					
+					// 상세 기록을 저장합니다.
+					recordIdToDetails[history.length].push(RecordDetail({
+						
+						recordId : history.length,
+						
+						owner : targetArmyOwner,
+						
+						armyId : targetArmyIds[i],
+						toArmyId : 0,
+						
+						unitKind : enemyArmy.unitKind,
+						unitCount : deadEnemyUnitCount,
+						
+						buildingId : 0,
+						buildingKind : 0
+					}));
+					
+					// 이벤트 발생
 					emit DeadUnits(targetArmyOwner, targetArmyIds[i], deadEnemyUnitCount);
 				}
 			}
@@ -323,6 +469,24 @@ contract DelightArmyManager is DelightBase {
 					delete buildings[positionToBuildingId[toCol][toRow]];
 					delete positionToBuildingId[toCol][toRow];
 					
+					// 상세 기록을 저장합니다.
+					recordIdToDetails[history.length].push(RecordDetail({
+						
+						recordId : history.length,
+						
+						owner : targetArmyOwner,
+						
+						armyId : 0,
+						toArmyId : 0,
+						
+						unitKind : 0,
+						unitCount : 0,
+						
+						buildingId : positionToBuildingId[toCol][toRow],
+						buildingKind : buildingKind
+					}));
+					
+					// 이벤트 발생
 					emit DestroyBuilding(targetArmyOwner, positionToBuildingId[toCol][toRow], buildingKind, toCol, toRow);
 				}
 				
@@ -332,6 +496,44 @@ contract DelightArmyManager is DelightBase {
 				iron.transferFrom(address(this), msg.sender, rewardMaterial.iron);
 				ducat.transferFrom(address(this), msg.sender, rewardMaterial.ducat);
 				
+				// 기록을 저장합니다.
+				history.push(Record({
+					kind : RECORD_WIN,
+					
+					owner : msg.sender,
+					enemy : targetArmyOwner,
+					
+					col : fromCol,
+					row : fromRow,
+					toCol : toCol,
+					toRow : toRow,
+					
+					buildingId : 0,
+					buildingKind : 0,
+					buildingLevel : 0,
+					
+					armyId : 0,
+					unitKind : 0,
+					unitCount : 0,
+					
+					itemId : 0,
+					itemKind : 0,
+					itemCount : 0,
+					
+					wood : rewardMaterial.wood,
+					stone : rewardMaterial.stone,
+					iron : rewardMaterial.iron,
+					ducat : rewardMaterial.ducat,
+					
+					enemyWood : 0,
+					enemyStone : 0,
+					enemyIron : 0,
+					enemyDucat : 0,
+					
+					time : now
+				}));
+				
+				// 이벤트 발생
 				emit Win(msg.sender, targetArmyOwner, fromCol, fromRow, toCol, toRow, rewardMaterial.wood, rewardMaterial.stone, rewardMaterial.iron, rewardMaterial.ducat);
 			}
 			
@@ -344,6 +546,44 @@ contract DelightArmyManager is DelightBase {
 				iron.transferFrom(address(this), targetArmyOwner, rewardMaterial.iron);
 				ducat.transferFrom(address(this), targetArmyOwner, rewardMaterial.ducat);
 				
+				// 기록을 저장합니다.
+				history.push(Record({
+					kind : RECORD_LOSE,
+					
+					owner : msg.sender,
+					enemy : targetArmyOwner,
+					
+					col : fromCol,
+					row : fromRow,
+					toCol : toCol,
+					toRow : toRow,
+					
+					buildingId : 0,
+					buildingKind : 0,
+					buildingLevel : 0,
+					
+					armyId : 0,
+					unitKind : 0,
+					unitCount : 0,
+					
+					itemId : 0,
+					itemKind : 0,
+					itemCount : 0,
+					
+					wood : rewardMaterial.wood,
+					stone : rewardMaterial.stone,
+					iron : rewardMaterial.iron,
+					ducat : rewardMaterial.ducat,
+					
+					enemyWood : 0,
+					enemyStone : 0,
+					enemyIron : 0,
+					enemyDucat : 0,
+					
+					time : now
+				}));
+				
+				// 이벤트 발생
 				emit Lose(msg.sender, targetArmyOwner, fromCol, fromRow, toCol, toRow, rewardMaterial.wood, rewardMaterial.stone, rewardMaterial.iron, rewardMaterial.ducat);
 			}
 		}
@@ -483,48 +723,83 @@ contract DelightArmyManager is DelightBase {
 					army.owner = address(0x0);
 				}
 				
+				// 상세 기록을 저장합니다.
+				recordIdToDetails[history.length].push(RecordDetail({
+					
+					recordId : history.length,
+					
+					owner : msg.sender,
+					
+					armyId : armyIds[i],
+					toArmyId : 0,
+					
+					unitKind : army.unitKind,
+					unitCount : deadUnitCount,
+					
+					buildingId : 0,
+					buildingKind : 0
+				}));
+				
+				// 이벤트 발생
 				emit DeadUnits(msg.sender, armyIds[i], deadUnitCount);
 			}
 			
 			// 아군이 적군을 공격합니다.
-			Army storage enemyArmy = armies[targetArmyIds[i]];
 			
 			// 유닛의 개수가 0개 이상이어야 합니다.
-			if (enemyArmy.unitCount > 0) {
+			if (armies[targetArmyIds[i]].unitCount > 0) {
 				
 				// 적군의 체력을 계산합니다.
-				uint ememyArmyHP = units[enemyArmy.unitKind].hp.add(
+				uint ememyArmyHP = units[armies[targetArmyIds[i]].unitKind].hp.add(
 					
 					// 기사인 경우 기사 아이템의 HP를 추가합니다.
-					i == UNIT_KNIGHT ? knightItem.getItemHP(enemyArmy.knightItemId) : (
+					i == UNIT_KNIGHT ? knightItem.getItemHP(armies[targetArmyIds[i]].knightItemId) : (
 						
 						// 기사가 아닌 경우 기사의 버프 HP를 추가합니다.
 						targetArmyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[targetArmyIds[UNIT_KNIGHT]].knightItemId) : 0
 					)
 					
-				).mul(enemyArmy.unitCount);
+				).mul(armies[targetArmyIds[i]].unitCount);
 				
 				ememyArmyHP = ememyArmyHP <= totalDamage ? 0 : ememyArmyHP.sub(totalDamage);
 				
 				// 전투 결과를 계산합니다.
-				uint remainEnemyUnitCount = ememyArmyHP.add(ememyArmyHP % units[enemyArmy.unitKind].hp).div(units[enemyArmy.unitKind].hp);
-				uint deadEnemyUnitCount = enemyArmy.unitCount.sub(remainEnemyUnitCount);
+				uint remainEnemyUnitCount = ememyArmyHP.add(ememyArmyHP % units[armies[targetArmyIds[i]].unitKind].hp).div(units[armies[targetArmyIds[i]].unitKind].hp);
+				uint deadEnemyUnitCount = armies[targetArmyIds[i]].unitCount.sub(remainEnemyUnitCount);
 				
 				// 아군의 총 공격력을 낮춥니다.
-				totalDamage = totalDamage <= deadEnemyUnitCount.mul(units[enemyArmy.unitKind].hp) ? 0 : totalDamage.sub(deadEnemyUnitCount.mul(units[enemyArmy.unitKind].hp));
+				totalDamage = totalDamage <= deadEnemyUnitCount.mul(units[armies[targetArmyIds[i]].unitKind].hp) ? 0 : totalDamage.sub(deadEnemyUnitCount.mul(units[armies[targetArmyIds[i]].unitKind].hp));
 				
 				// 돌려받을 자원을 계산합니다.
-				enemyReturnMaterial.wood = enemyReturnMaterial.wood.add(unitMaterials[enemyArmy.unitKind].wood.mul(deadEnemyUnitCount));
-				enemyReturnMaterial.stone = enemyReturnMaterial.wood.add(unitMaterials[enemyArmy.unitKind].stone.mul(deadEnemyUnitCount));
-				enemyReturnMaterial.iron = enemyReturnMaterial.wood.add(unitMaterials[enemyArmy.unitKind].iron.mul(deadEnemyUnitCount));
-				enemyReturnMaterial.ducat = enemyReturnMaterial.wood.add(unitMaterials[enemyArmy.unitKind].ducat.mul(deadEnemyUnitCount));
+				enemyReturnMaterial.wood = enemyReturnMaterial.wood.add(unitMaterials[armies[targetArmyIds[i]].unitKind].wood.mul(deadEnemyUnitCount));
+				enemyReturnMaterial.stone = enemyReturnMaterial.wood.add(unitMaterials[armies[targetArmyIds[i]].unitKind].stone.mul(deadEnemyUnitCount));
+				enemyReturnMaterial.iron = enemyReturnMaterial.wood.add(unitMaterials[armies[targetArmyIds[i]].unitKind].iron.mul(deadEnemyUnitCount));
+				enemyReturnMaterial.ducat = enemyReturnMaterial.wood.add(unitMaterials[armies[targetArmyIds[i]].unitKind].ducat.mul(deadEnemyUnitCount));
 				
 				// 남은 병사 숫자를 저장합니다.
-				enemyArmy.unitCount = remainEnemyUnitCount;
-				if (enemyArmy.unitCount == 0) {
-					enemyArmy.owner = address(0x0);
+				armies[targetArmyIds[i]].unitCount = remainEnemyUnitCount;
+				if (armies[targetArmyIds[i]].unitCount == 0) {
+					armies[targetArmyIds[i]].owner = address(0x0);
 				}
 				
+				// 상세 기록을 저장합니다.
+				recordIdToDetails[history.length].push(RecordDetail({
+					
+					recordId : history.length,
+					
+					owner : targetArmyOwner,
+					
+					armyId : targetArmyIds[i],
+					toArmyId : 0,
+					
+					unitKind : armies[targetArmyIds[i]].unitKind,
+					unitCount : deadEnemyUnitCount,
+					
+					buildingId : 0,
+					buildingKind : 0
+				}));
+				
+				// 이벤트 발생
 				emit DeadUnits(targetArmyOwner, targetArmyIds[i], deadEnemyUnitCount);
 			}
 		}
@@ -534,11 +809,50 @@ contract DelightArmyManager is DelightBase {
 		stone.transferFrom(address(this), msg.sender, returnMaterial.stone);
 		iron.transferFrom(address(this), msg.sender, returnMaterial.iron);
 		ducat.transferFrom(address(this), msg.sender, returnMaterial.ducat);
+		
 		wood.transferFrom(address(this), targetArmyOwner, enemyReturnMaterial.wood);
 		stone.transferFrom(address(this), targetArmyOwner, enemyReturnMaterial.stone);
 		iron.transferFrom(address(this), targetArmyOwner, enemyReturnMaterial.iron);
 		ducat.transferFrom(address(this), targetArmyOwner, enemyReturnMaterial.ducat);
 		
+		// 기록을 저장합니다.
+		history.push(Record({
+			kind : RECORD_RANGED_ATTACK,
+			
+			owner : msg.sender,
+			enemy : targetArmyOwner,
+			
+			col : fromCol,
+			row : fromRow,
+			toCol : toCol,
+			toRow : toRow,
+			
+			buildingId : 0,
+			buildingKind : 0,
+			buildingLevel : 0,
+			
+			armyId : 0,
+			unitKind : 0,
+			unitCount : 0,
+			
+			itemId : 0,
+			itemKind : 0,
+			itemCount : 0,
+			
+			wood : returnMaterial.wood,
+			stone : returnMaterial.stone,
+			iron : returnMaterial.iron,
+			ducat : returnMaterial.ducat,
+			
+			enemyWood : enemyReturnMaterial.wood,
+			enemyStone : enemyReturnMaterial.stone,
+			enemyIron : enemyReturnMaterial.iron,
+			enemyDucat : enemyReturnMaterial.ducat,
+			
+			time : now
+		}));
+		
+		// 이벤트 발생
 		emit RangedAttack(msg.sender, targetArmyOwner, fromCol, fromRow, toCol, toRow, returnMaterial.wood, returnMaterial.stone, returnMaterial.iron, returnMaterial.ducat, enemyReturnMaterial.wood, enemyReturnMaterial.stone, enemyReturnMaterial.iron, enemyReturnMaterial.ducat);
 	}
 	
@@ -651,6 +965,44 @@ contract DelightArmyManager is DelightBase {
 		// 아이템을 Delight로 이전합니다.
 		itemContract.transferFrom(msg.sender, address(this), unitCount);
 		
+		// 기록을 저장합니다.
+		history.push(Record({
+			kind : RECORD_ATTACH_ITEM,
+			
+			owner : msg.sender,
+			enemy : address(0x0),
+			
+			col : army.col,
+			row : army.row,
+			toCol : 0,
+			toRow : 0,
+			
+			buildingId : 0,
+			buildingKind : 0,
+			buildingLevel : 0,
+			
+			armyId : armyIds[unitKind],
+			unitKind : unitKind,
+			unitCount : unitCount,
+			
+			itemId : 0,
+			itemKind : itemKind,
+			itemCount : unitCount,
+			
+			wood : 0,
+			stone : 0,
+			iron : 0,
+			ducat : 0,
+			
+			enemyWood : 0,
+			enemyStone : 0,
+			enemyIron : 0,
+			enemyDucat : 0,
+			
+			time : now
+		}));
+		
+		// 이벤트 발생
 		emit AttachItem(msg.sender, armyIds[unitKind], itemKind, unitCount);
 	}
 	
@@ -677,6 +1029,44 @@ contract DelightArmyManager is DelightBase {
 		// 아이템을 Delight로 이전합니다.
 		knightItem.transferFrom(msg.sender, address(this), itemId);
 		
+		// 기록을 저장합니다.
+		history.push(Record({
+			kind : RECORD_ATTACH_KNIGHT_ITEM,
+			
+			owner : msg.sender,
+			enemy : address(0x0),
+			
+			col : army.col,
+			row : army.row,
+			toCol : 0,
+			toRow : 0,
+			
+			buildingId : 0,
+			buildingKind : 0,
+			buildingLevel : 0,
+			
+			armyId : armyId,
+			unitKind : army.unitKind,
+			unitCount : army.unitCount,
+			
+			itemId : itemId,
+			itemKind : 0,
+			itemCount : 1,
+			
+			wood : 0,
+			stone : 0,
+			iron : 0,
+			ducat : 0,
+			
+			enemyWood : 0,
+			enemyStone : 0,
+			enemyIron : 0,
+			enemyDucat : 0,
+			
+			time : now
+		}));
+		
+		// 이벤트 발생
 		emit AttackKnightItem(msg.sender, armyId, itemId);
 	}
 }

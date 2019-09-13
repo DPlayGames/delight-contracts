@@ -62,12 +62,12 @@ contract DelightBase is DelightInterface, NetworkChecker {
 	uint constant internal RECORD_CREATE_ARMY			= 2;
 	uint constant internal RECORD_ADD_UNITS				= 3;
 	uint constant internal RECORD_MOVE_ARMY				= 4;
-	uint constant internal RECORD_MERGE_ARMY			= 5;
-	uint constant internal RECORD_MOVE_AND_ATTACK		= 6;
-	uint constant internal RECORD_RANGED_ATTACK			= 7;
-	uint constant internal RECORD_CREATE_ITEM			= 8;
-	uint constant internal RECORD_ATTACH_ITEM			= 9;
-	uint constant internal RECORD_ATTACH_KNIGHT_ITEM	= 10;
+	uint constant internal RECORD_WIN					= 6;
+	uint constant internal RECORD_LOSE					= 7;
+	uint constant internal RECORD_RANGED_ATTACK			= 8;
+	uint constant internal RECORD_CREATE_ITEM			= 9;
+	uint constant internal RECORD_ATTACH_ITEM			= 10;
+	uint constant internal RECORD_ATTACH_KNIGHT_ITEM	= 11;
 	
 	ERC20 internal wood;
 	ERC20 internal stone;
@@ -113,6 +113,7 @@ contract DelightBase is DelightInterface, NetworkChecker {
 	
 	// 재료 정보
 	mapping(uint => Material) internal buildingMaterials;
+	mapping(uint => Material) internal hpUpgradeMaterials;
 	mapping(uint => Material) internal unitMaterials;
 	mapping(uint => Material) internal itemMaterials;
 	
@@ -120,6 +121,7 @@ contract DelightBase is DelightInterface, NetworkChecker {
 	Army[] internal armies;
 	
 	Record[] internal history;
+	mapping(uint => RecordDetail[]) internal recordIdToDetails;
 	
 	mapping(uint => mapping(uint => uint)) internal positionToBuildingId;
 	mapping(uint => mapping(uint => uint[])) internal positionToArmyIds;
@@ -206,9 +208,41 @@ contract DelightBase is DelightInterface, NetworkChecker {
 		}));
 		
 		// 0번지는 사용하지 않습니다.
-		/*history.push(Record({
-			kind : 99
-		}));*/
+		history.push(Record({
+			kind : 99,
+			
+			owner : address(0x0),
+			enemy : address(0x0),
+			
+			col : 0,
+			row : 0,
+			toCol : 0,
+			toRow : 0,
+			
+			buildingId : 0,
+			buildingKind : 0,
+			buildingLevel : 0,
+			
+			armyId : 0,
+			unitKind : 0,
+			unitCount : 0,
+			
+			itemId : 0,
+			itemKind : 0,
+			itemCount : 0,
+			
+			wood : 0,
+			stone : 0,
+			iron : 0,
+			ducat : 0,
+			
+			enemyWood : 0,
+			enemyStone : 0,
+			enemyIron : 0,
+			enemyDucat : 0,
+			
+			time : now
+		}));
 		
 		units[UNIT_SWORDSMAN] = Unit({
 			hp : 100,
@@ -306,6 +340,20 @@ contract DelightBase is DelightInterface, NetworkChecker {
 			stone : 0,
 			iron : 0,
 			ducat : 100
+		});
+		
+		hpUpgradeMaterials[1] = Material({
+			wood : 0,
+			stone : 400,
+			iron : 0,
+			ducat : 200
+		});
+		
+		hpUpgradeMaterials[2] = Material({
+			wood : 0,
+			stone : 0,
+			iron : 400,
+			ducat : 300
 		});
 		
 		buildingMaterials[BUILDING_TRAINING_CENTER] = Material({
