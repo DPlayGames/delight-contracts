@@ -8,7 +8,7 @@ contract DelightItemManager is DelightBase {
 	using SafeMath for uint;
 	
 	// 아이템을 생성합니다.
-	function createItem(uint kind, uint count) external returns (uint) {
+	function createItem(uint kind, uint count) internal returns (uint) {
 		
 		Material memory itemMaterial = itemMaterials[kind];
 		Material memory material = Material({

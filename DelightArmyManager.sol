@@ -8,7 +8,7 @@ contract DelightArmyManager is DelightBase {
 	using SafeMath for uint;
 	
 	// 부대를 이동시키고, 해당 지역에 적이 있으면 공격합니다.
-	function moveAndAttack(uint fromCol, uint fromRow, uint toCol, uint toRow) external {
+	function moveAndAttack(uint fromCol, uint fromRow, uint toCol, uint toRow) internal {
 		
 		// 올바른 범위인지 체크합니다.
 		require(fromCol < COL_RANGE && fromRow < ROW_RANGE);
@@ -590,7 +590,7 @@ contract DelightArmyManager is DelightBase {
 	}
 	
 	// 원거리 유닛으로 특정 지역을 공격합니다.
-	function rangedAttack(uint fromCol, uint fromRow, uint toCol, uint toRow) external {
+	function rangedAttack(uint fromCol, uint fromRow, uint toCol, uint toRow) internal {
 		
 		// 올바른 범위인지 체크합니다.
 		require(fromCol < COL_RANGE && fromRow < ROW_RANGE);
@@ -857,7 +857,7 @@ contract DelightArmyManager is DelightBase {
 	}
 	
 	// 부대에 아이템을 장착합니다.
-	function attachItem(uint armyId, uint itemKind, uint unitCount) external {
+	function attachItem(uint armyId, uint itemKind, uint unitCount) internal {
 		
 		Army storage army = armies[armyId];
 		
@@ -1007,7 +1007,7 @@ contract DelightArmyManager is DelightBase {
 	}
 	
 	// 기사에 아이템을 장착합니다.
-	function attachKnightItem(uint armyId, uint itemId) external {
+	function attachKnightItem(uint armyId, uint itemId) internal {
 		
 		Army storage army = armies[armyId];
 		
