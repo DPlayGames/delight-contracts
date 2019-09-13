@@ -38,6 +38,11 @@ contract DelightArmyManager is DelightBase {
 			
 			targetArmyIds.length = UNIT_KIND_COUNT;
 			
+			uint totalUnitCount = 0;
+			for (uint i = 0; i < targetArmyIds.length; i += 1) {
+				totalUnitCount = totalUnitCount.add(armies[targetArmyIds[i]].unitCount);
+			}
+			
 			for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
 				
 				Army storage army = armies[armyIds[i]];
@@ -51,23 +56,53 @@ contract DelightArmyManager is DelightBase {
 					
 					Army storage targetArmy = armies[targetArmyIds[i]];
 					
-					// 비어있는 곳이면 이전합니다.
-					if (targetArmy.unitCount == 0) {
+					if (totalUnitCount.add(army.unitCount) >= MAX_POSITION_UNIT_COUNT) {
 						
-						targetArmyIds[i] = armyIds[i];
-						
-						delete armyIds[i];
+						// 이동할 유닛의 개수가 0개 이상이어야 합니다.
+						if (MAX_POSITION_UNIT_COUNT.sub(totalUnitCount) > 0) {
+							
+							// 비어있는 곳이면 새 부대를 생성합니다.
+							if (targetArmy.unitCount == 0) {
+								
+								targetArmyIds[army.unitKind] = armies.push(Army({
+									unitKind : army.unitKind,
+									unitCount : MAX_POSITION_UNIT_COUNT.sub(totalUnitCount),
+									knightItemId : 0,
+									col : toCol,
+									row : toRow,
+									owner : msg.sender,
+									createTime : now
+								})).sub(1);
+							}
+							
+							// 비어있지 않으면 합병합니다.
+							else {
+								targetArmy.unitCount = targetArmy.unitCount.add(MAX_POSITION_UNIT_COUNT.sub(totalUnitCount));
+								army.unitCount = army.unitCount.sub(MAX_POSITION_UNIT_COUNT.sub(totalUnitCount));
+							}
+						}
 					}
 					
-					// 비어있지 않으면 합병합니다.
 					else {
 						
-						targetArmy.unitCount = targetArmy.unitCount.add(army.unitCount);
+						// 비어있는 곳이면 이전합니다.
+						if (targetArmy.unitCount == 0) {
+							
+							targetArmyIds[i] = armyIds[i];
+							
+							delete armyIds[i];
+						}
 						
-						army.unitCount = 0;
-						army.owner = address(0x0);
-						
-						delete armyIds[i];
+						// 비어있지 않으면 합병합니다.
+						else {
+							
+							targetArmy.unitCount = targetArmy.unitCount.add(army.unitCount);
+							
+							army.unitCount = 0;
+							army.owner = address(0x0);
+							
+							delete armyIds[i];
+						}
 					}
 				}
 			}
@@ -499,10 +534,12 @@ contract DelightArmyManager is DelightBase {
 		
 		army.unitCount = army.unitCount.sub(unitCount);
 		
-		positionToArmyIds[army.col][army.row].length = UNIT_KIND_COUNT;
+		uint[] storage armyIds = positionToArmyIds[army.col][army.row];
+		
+		armyIds.length = UNIT_KIND_COUNT;
 		
 		// 기존에 부대가 존재하면 부대원의 숫자 증가
-		uint originArmyId = positionToArmyIds[army.col][army.row][unitKind];
+		uint originArmyId = armyIds[unitKind];
 		if (originArmyId != 0) {
 			armies[originArmyId].unitCount = armies[originArmyId].unitCount.add(unitCount);
 		}
@@ -520,7 +557,7 @@ contract DelightArmyManager is DelightBase {
 				createTime : now
 			})).sub(1);
 			
-			positionToArmyIds[army.col][army.row][unitKind] = newArmyId;
+			armyIds[unitKind] = newArmyId;
 		}
 		
 		// 아이템을 Delight로 이전합니다.

@@ -8,14 +8,14 @@ import "./Util/SafeMath.sol";
 contract Delight is DelightBuildingManager, DelightArmyManager, DelightItemManager {
 	using SafeMath for uint;
 	
-	uint constant private ORDER_BUILD = 0;
-	uint constant private ORDER_UPGRADE_HQ = 1;
-	uint constant private ORDER_CREATE_ARMY = 2;
-	uint constant private ORDER_MOVE_AND_ATTACK = 3;
-	uint constant private ORDER_RANGED_ATTACK = 4;
-	uint constant private ORDER_CREATE_ITEM = 5;
-	uint constant private ORDER_ATTACH_ITEM = 6;
-	uint constant private ORDER_ATTACH_KNIGHT_ITEM = 7;
+	uint constant private ORDER_BUILD				= 0;
+	uint constant private ORDER_UPGRADE_HQ			= 1;
+	uint constant private ORDER_CREATE_ARMY			= 2;
+	uint constant private ORDER_MOVE_AND_ATTACK		= 3;
+	uint constant private ORDER_RANGED_ATTACK		= 4;
+	uint constant private ORDER_CREATE_ITEM			= 5;
+	uint constant private ORDER_ATTACH_ITEM			= 6;
+	uint constant private ORDER_ATTACH_KNIGHT_ITEM	= 7;
 	
 	// 명령 큐를 실행합니다.
 	function runOrderQueue(uint[] calldata orders, uint[] calldata params1, uint[] calldata params2, uint[] calldata params3, uint[] calldata params4) external {

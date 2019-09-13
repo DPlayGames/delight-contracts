@@ -6,8 +6,11 @@ import "./Util/SafeMath.sol";
 contract DelightBuildingManager is DelightBase {
 	using SafeMath for uint;
 	
-	// 건물을 짓는 위치를 확인합니다.
-	modifier checkBuildingPosition(uint kind, uint col, uint row) {
+	// 건물을 짓습니다.
+	function build(uint kind, uint col, uint row) internal returns (uint) {
+		
+		// 올바른 범위인지 체크합니다.
+		require(col < COL_RANGE && row < ROW_RANGE);
 		
 		// 필드에 건물이 존재하면 안됩니다.
 		require(positionToBuildingId[col][row] == 0);
@@ -40,16 +43,6 @@ contract DelightBuildingManager is DelightBase {
 			positionToArmyIds[col][row].length > 0 &&
 			getArmyOwnerByPosition(col, row) == msg.sender
 		));
-		_;
-	}
-	
-	// 건물을 짓습니다.
-	function build(uint kind, uint col, uint row)
-	checkBuildingPosition(kind, col, row)
-	internal returns (uint) {
-		
-		// 올바른 범위인지 체크합니다.
-		require(col < COL_RANGE && row < ROW_RANGE);
 		
 		Material memory material = buildingMaterials[kind];
 		
@@ -60,6 +53,8 @@ contract DelightBuildingManager is DelightBase {
 			iron.balanceOf(msg.sender) >= material.iron &&
 			ducat.balanceOf(msg.sender) >= material.ducat
 		);
+		
+		uint bulidTime = now;
 		
 		uint buildingId = buildings.push(Building({
 			kind : kind,
@@ -82,6 +77,8 @@ contract DelightBuildingManager is DelightBase {
 		iron.transferFrom(msg.sender, address(this), material.iron);
 		ducat.transferFrom(msg.sender, address(this), material.ducat);
 		
+		emit Build(msg.sender, buildingId, kind, col, row, bulidTime);
+		
 		return buildingId;
 	}
 	
@@ -94,6 +91,8 @@ contract DelightBuildingManager is DelightBase {
 		require(building.level < 2);
 		
 		building.level += 1;
+		
+		//emit UpgradeHQ(buildingId);
 	}
 	
 	// 건물에서 부대를 생산합니다.
@@ -157,18 +156,31 @@ contract DelightBuildingManager is DelightBase {
 			ducat.balanceOf(msg.sender) >= material.ducat.mul(unitCount)
 		);
 		
-		uint armyId = armies.push(Army({
-			unitKind : unitKind,
-			unitCount : unitCount,
-			knightItemId : 0,
-			col : building.col,
-			row : building.row,
-			owner : msg.sender,
-			createTime : now
-		})).sub(1);
-		
 		armyIds.length = UNIT_KIND_COUNT;
-		armyIds[unitKind] = armyId;
+		
+		// 기존에 부대가 존재하면 부대원의 숫자 증가
+		uint originArmyId = armyIds[unitKind];
+		uint newArmyId;
+		
+		if (originArmyId != 0) {
+			armies[originArmyId].unitCount = armies[originArmyId].unitCount.add(unitCount);
+		}
+		
+		// 새 부대 생성
+		else {
+			
+			newArmyId = armies.push(Army({
+				unitKind : unitKind,
+				unitCount : unitCount,
+				knightItemId : 0,
+				col : building.col,
+				row : building.row,
+				owner : msg.sender,
+				createTime : now
+			})).sub(1);
+			
+			armyIds[unitKind] = newArmyId;
+		}
 		
 		// 자원을 Delight로 이전합니다.
 		wood.transferFrom(msg.sender, address(this), material.wood.mul(unitCount));
@@ -176,6 +188,18 @@ contract DelightBuildingManager is DelightBase {
 		iron.transferFrom(msg.sender, address(this), material.iron.mul(unitCount));
 		ducat.transferFrom(msg.sender, address(this), material.ducat.mul(unitCount));
 		
-		return armyId;
+		if (originArmyId != 0) {
+			
+			//emit MergeArmy(originArmyId);
+			
+			return originArmyId;
+		}
+		
+		else {
+			
+			//emit CreateArmy(newArmyId);
+			
+			return newArmyId;
+		}
 	}
 }

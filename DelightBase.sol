@@ -56,6 +56,19 @@ contract DelightBase is DelightInterface, NetworkChecker {
 	uint constant internal KNIGHT_DEFAULT_BUFF_HP = 10;
 	uint constant internal KNIGHT_DEFAULT_BUFF_DAMAGE = 5;
 	
+	// 기록
+	uint constant internal RECORD_BUILD					= 0;
+	uint constant internal RECORD_UPGRADE_HQ			= 1;
+	uint constant internal RECORD_CREATE_ARMY			= 2;
+	uint constant internal RECORD_ADD_UNITS				= 3;
+	uint constant internal RECORD_MOVE_ARMY				= 4;
+	uint constant internal RECORD_MERGE_ARMY			= 5;
+	uint constant internal RECORD_MOVE_AND_ATTACK		= 6;
+	uint constant internal RECORD_RANGED_ATTACK			= 7;
+	uint constant internal RECORD_CREATE_ITEM			= 8;
+	uint constant internal RECORD_ATTACH_ITEM			= 9;
+	uint constant internal RECORD_ATTACH_KNIGHT_ITEM	= 10;
+	
 	ERC20 internal wood;
 	ERC20 internal stone;
 	ERC20 internal iron;
@@ -196,9 +209,9 @@ contract DelightBase is DelightInterface, NetworkChecker {
 		}));
 		
 		// 0번지는 사용하지 않습니다.
-		history.push(Record({
+		/*history.push(Record({
 			kind : 99
-		}));
+		}));*/
 		
 		units[UNIT_SWORDSMAN] = Unit({
 			hp : 100,
