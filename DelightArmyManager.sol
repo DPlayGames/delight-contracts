@@ -8,17 +8,17 @@ contract DelightArmyManager is DelightBase {
 	using SafeMath for uint;
 	
 	// 부대를 이동시키고, 해당 지역에 적이 있으면 공격합니다.
-	function moveAndAttack(uint col, uint row, uint toCol, uint toRow) internal {
+	function moveAndAttack(uint fromCol, uint fromRow, uint toCol, uint toRow) internal {
 		
 		// 올바른 범위인지 체크합니다.
-		require(col < COL_RANGE && row < ROW_RANGE);
+		require(fromCol < COL_RANGE && fromRow < ROW_RANGE);
 		require(toCol < COL_RANGE && toRow < ROW_RANGE);
 		
 		// 부대의 소유주를 확인합니다.
-		require(getArmyOwnerByPosition(col, row) == msg.sender);
+		require(getArmyOwnerByPosition(fromCol, fromRow) == msg.sender);
 		
 		// 거리 계산
-		uint distance = (col < toCol ? toCol - col : col - toCol) + (row < toRow ? toRow - row : row - toRow);
+		uint distance = (fromCol < toCol ? toCol - fromCol : fromCol - toCol) + (fromRow < toRow ? toRow - fromRow : fromRow - toRow);
 		
 		// 전리품
 		Material memory rewardMaterial = Material({
@@ -30,7 +30,7 @@ contract DelightArmyManager is DelightBase {
 		
 		address targetArmyOwner = getArmyOwnerByPosition(toCol, toRow);
 		
-		uint[] storage armyIds = positionToArmyIds[col][row];
+		uint[] storage armyIds = positionToArmyIds[fromCol][fromRow];
 		uint[] storage targetArmyIds = positionToArmyIds[toCol][toRow];
 		
 		// 아군이 위치한 곳이면 부대를 합병합니다.
@@ -73,12 +73,17 @@ contract DelightArmyManager is DelightBase {
 									owner : msg.sender,
 									createTime : now
 								})).sub(1);
+								
+								emit MoveArmy(msg.sender, armyIds[i], targetArmyIds[army.unitKind], MAX_POSITION_UNIT_COUNT.sub(totalUnitCount));
 							}
 							
 							// 비어있지 않으면 합병합니다.
 							else {
+								
 								targetArmy.unitCount = targetArmy.unitCount.add(MAX_POSITION_UNIT_COUNT.sub(totalUnitCount));
 								army.unitCount = army.unitCount.sub(MAX_POSITION_UNIT_COUNT.sub(totalUnitCount));
+								
+								emit MoveArmy(msg.sender, armyIds[i], targetArmyIds[i], MAX_POSITION_UNIT_COUNT.sub(totalUnitCount));
 							}
 						}
 					}
@@ -89,6 +94,8 @@ contract DelightArmyManager is DelightBase {
 						if (targetArmy.unitCount == 0) {
 							
 							targetArmyIds[i] = armyIds[i];
+							
+							emit MoveArmy(msg.sender, armyIds[i], targetArmyIds[i], army.unitCount);
 							
 							delete armyIds[i];
 						}
@@ -101,11 +108,15 @@ contract DelightArmyManager is DelightBase {
 							army.unitCount = 0;
 							army.owner = address(0x0);
 							
+							emit MoveArmy(msg.sender, armyIds[i], targetArmyIds[i], army.unitCount);
+							
 							delete armyIds[i];
 						}
 					}
 				}
 			}
+			
+			emit Move(msg.sender, fromCol, fromRow, toCol, toRow);
 		}
 		
 		// 적군이 위치한 곳이면 공격합니다.
@@ -208,6 +219,8 @@ contract DelightArmyManager is DelightBase {
 					if (army.unitCount == 0) {
 						army.owner = address(0x0);
 					}
+					
+					emit DeadUnits(msg.sender, armyIds[i], deadUnitCount);
 				}
 				
 				// 아군이 적군을 공격합니다.
@@ -248,6 +261,8 @@ contract DelightArmyManager is DelightBase {
 					if (enemyArmy.unitCount == 0) {
 						enemyArmy.owner = address(0x0);
 					}
+					
+					emit DeadUnits(targetArmyOwner, targetArmyIds[i], deadEnemyUnitCount);
 				}
 			}
 			
@@ -274,11 +289,50 @@ contract DelightArmyManager is DelightBase {
 					}
 				}
 				
+				// 만약 건물이 존재하면, 건물을 파괴합니다.
+				if (positionToBuildingId[toCol][toRow] != 0) {
+					
+					uint buildingKind = buildings[positionToBuildingId[toCol][toRow]].kind;
+					
+					// 전리품을 추가합니다.
+					Material memory buildingMaterial = buildingMaterials[buildingKind];
+					rewardMaterial.wood = rewardMaterial.wood.add(buildingMaterial.wood);
+					rewardMaterial.stone = rewardMaterial.wood.add(buildingMaterial.stone);
+					rewardMaterial.iron = rewardMaterial.wood.add(buildingMaterial.iron);
+					rewardMaterial.ducat = rewardMaterial.wood.add(buildingMaterial.ducat);
+					
+					// 본부인 경우, 본부 목록에서 제거합니다.
+					if (buildingKind == BUILDING_HQ) {
+						
+						uint[] storage hqIds = ownerToHQIds[targetArmyOwner];
+						
+						for (uint i = hqIds.length - 1; i > 0; i -= 1) {
+							
+							if (hqIds[i - 1] == positionToBuildingId[toCol][toRow]) {
+								hqIds[i - 1] = hqIds[i];
+								break;
+							} else {
+								hqIds[i - 1] = hqIds[i];
+							}
+						}
+						
+						hqIds.length -= 1;
+					}
+					
+					// 건물을 파괴합니다.
+					delete buildings[positionToBuildingId[toCol][toRow]];
+					delete positionToBuildingId[toCol][toRow];
+					
+					emit DestroyBuilding(targetArmyOwner, positionToBuildingId[toCol][toRow], buildingKind, toCol, toRow);
+				}
+				
 				// 전리품을 취득합니다.
 				wood.transferFrom(address(this), msg.sender, rewardMaterial.wood);
 				stone.transferFrom(address(this), msg.sender, rewardMaterial.stone);
 				iron.transferFrom(address(this), msg.sender, rewardMaterial.iron);
 				ducat.transferFrom(address(this), msg.sender, rewardMaterial.ducat);
+				
+				emit Win(msg.sender, targetArmyOwner, fromCol, fromRow, toCol, toRow, rewardMaterial.wood, rewardMaterial.stone, rewardMaterial.iron, rewardMaterial.ducat);
 			}
 			
 			// 패배
@@ -289,19 +343,21 @@ contract DelightArmyManager is DelightBase {
 				stone.transferFrom(address(this), targetArmyOwner, rewardMaterial.stone);
 				iron.transferFrom(address(this), targetArmyOwner, rewardMaterial.iron);
 				ducat.transferFrom(address(this), targetArmyOwner, rewardMaterial.ducat);
+				
+				emit Lose(msg.sender, targetArmyOwner, fromCol, fromRow, toCol, toRow, rewardMaterial.wood, rewardMaterial.stone, rewardMaterial.iron, rewardMaterial.ducat);
 			}
 		}
 	}
 	
 	// 원거리 유닛으로 특정 지역을 공격합니다.
-	function rangedAttack(uint col, uint row, uint toCol, uint toRow) internal {
+	function rangedAttack(uint fromCol, uint fromRow, uint toCol, uint toRow) internal {
 		
 		// 올바른 범위인지 체크합니다.
-		require(col < COL_RANGE && row < ROW_RANGE);
+		require(fromCol < COL_RANGE && fromRow < ROW_RANGE);
 		require(toCol < COL_RANGE && toRow < ROW_RANGE);
 		
 		// 부대의 소유주를 확인합니다.
-		require(getArmyOwnerByPosition(col, row) == msg.sender);
+		require(getArmyOwnerByPosition(fromCol, fromRow) == msg.sender);
 		
 		address targetArmyOwner = getArmyOwnerByPosition(toCol, toRow);
 		
@@ -309,13 +365,29 @@ contract DelightArmyManager is DelightBase {
 		require(targetArmyOwner != msg.sender);
 		
 		// 거리 계산
-		uint distance = (col < toCol ? toCol - col : col - toCol) + (row < toRow ? toRow - row : row - toRow);
+		uint distance = (fromCol < toCol ? toCol - fromCol : fromCol - toCol) + (fromRow < toRow ? toRow - fromRow : fromRow - toRow);
 		
-		uint[] storage armyIds = positionToArmyIds[col][row];
+		uint[] storage armyIds = positionToArmyIds[fromCol][fromRow];
 		uint[] storage targetArmyIds = positionToArmyIds[toCol][toRow];
 		
 		uint totalDamage = 0;
 		uint totalEnemyDamage = 0;
+		
+		// 돌려받을 자원
+		Material memory returnMaterial = Material({
+			wood : 0,
+			stone : 0,
+			iron : 0,
+			ducat : 0
+		});
+		
+		// 적이 돌려받을 자원
+		Material memory enemyReturnMaterial = Material({
+			wood : 0,
+			stone : 0,
+			iron : 0,
+			ducat : 0
+		});
 		
 		// 총 공격력을 계산합니다.
 		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
@@ -399,17 +471,19 @@ contract DelightArmyManager is DelightBase {
 				// 적의 총 공격력을 낮춥니다.
 				totalEnemyDamage = totalEnemyDamage <= deadUnitCount.mul(units[army.unitKind].hp) ? 0 : totalEnemyDamage.sub(deadUnitCount.mul(units[army.unitKind].hp));
 				
-				// 일방적인 공격일 경우 자원을 그대로 돌려받습니다.
-				wood.transferFrom(address(this), msg.sender, unitMaterials[army.unitKind].wood.mul(deadUnitCount));
-				stone.transferFrom(address(this), msg.sender, unitMaterials[army.unitKind].stone.mul(deadUnitCount));
-				iron.transferFrom(address(this), msg.sender, unitMaterials[army.unitKind].iron.mul(deadUnitCount));
-				ducat.transferFrom(address(this), msg.sender, unitMaterials[army.unitKind].ducat.mul(deadUnitCount));
+				// 돌려받을 자원을 계산합니다.
+				returnMaterial.wood = returnMaterial.wood.add(unitMaterials[army.unitKind].wood.mul(deadUnitCount));
+				returnMaterial.stone = returnMaterial.wood.add(unitMaterials[army.unitKind].stone.mul(deadUnitCount));
+				returnMaterial.iron = returnMaterial.wood.add(unitMaterials[army.unitKind].iron.mul(deadUnitCount));
+				returnMaterial.ducat = returnMaterial.wood.add(unitMaterials[army.unitKind].ducat.mul(deadUnitCount));
 				
 				// 남은 병사 숫자를 저장합니다.
 				army.unitCount = remainUnitCount;
 				if (army.unitCount == 0) {
 					army.owner = address(0x0);
 				}
+				
+				emit DeadUnits(msg.sender, armyIds[i], deadUnitCount);
 			}
 			
 			// 아군이 적군을 공격합니다.
@@ -439,19 +513,33 @@ contract DelightArmyManager is DelightBase {
 				// 아군의 총 공격력을 낮춥니다.
 				totalDamage = totalDamage <= deadEnemyUnitCount.mul(units[enemyArmy.unitKind].hp) ? 0 : totalDamage.sub(deadEnemyUnitCount.mul(units[enemyArmy.unitKind].hp));
 				
-				// 일방적인 공격일 경우 자원을 그대로 돌려받습니다.
-				wood.transferFrom(address(this), targetArmyOwner, unitMaterials[army.unitKind].wood.mul(deadEnemyUnitCount));
-				stone.transferFrom(address(this), targetArmyOwner, unitMaterials[army.unitKind].stone.mul(deadEnemyUnitCount));
-				iron.transferFrom(address(this), targetArmyOwner, unitMaterials[army.unitKind].iron.mul(deadEnemyUnitCount));
-				ducat.transferFrom(address(this), targetArmyOwner, unitMaterials[army.unitKind].ducat.mul(deadEnemyUnitCount));
+				// 돌려받을 자원을 계산합니다.
+				enemyReturnMaterial.wood = enemyReturnMaterial.wood.add(unitMaterials[enemyArmy.unitKind].wood.mul(deadEnemyUnitCount));
+				enemyReturnMaterial.stone = enemyReturnMaterial.wood.add(unitMaterials[enemyArmy.unitKind].stone.mul(deadEnemyUnitCount));
+				enemyReturnMaterial.iron = enemyReturnMaterial.wood.add(unitMaterials[enemyArmy.unitKind].iron.mul(deadEnemyUnitCount));
+				enemyReturnMaterial.ducat = enemyReturnMaterial.wood.add(unitMaterials[enemyArmy.unitKind].ducat.mul(deadEnemyUnitCount));
 				
 				// 남은 병사 숫자를 저장합니다.
 				enemyArmy.unitCount = remainEnemyUnitCount;
 				if (enemyArmy.unitCount == 0) {
 					enemyArmy.owner = address(0x0);
 				}
+				
+				emit DeadUnits(targetArmyOwner, targetArmyIds[i], deadEnemyUnitCount);
 			}
 		}
+		
+		// 자원을 돌려받습니다.
+		wood.transferFrom(address(this), msg.sender, returnMaterial.wood);
+		stone.transferFrom(address(this), msg.sender, returnMaterial.stone);
+		iron.transferFrom(address(this), msg.sender, returnMaterial.iron);
+		ducat.transferFrom(address(this), msg.sender, returnMaterial.ducat);
+		wood.transferFrom(address(this), targetArmyOwner, enemyReturnMaterial.wood);
+		stone.transferFrom(address(this), targetArmyOwner, enemyReturnMaterial.stone);
+		iron.transferFrom(address(this), targetArmyOwner, enemyReturnMaterial.iron);
+		ducat.transferFrom(address(this), targetArmyOwner, enemyReturnMaterial.ducat);
+		
+		emit RangedAttack(msg.sender, targetArmyOwner, fromCol, fromRow, toCol, toRow, returnMaterial.wood, returnMaterial.stone, returnMaterial.iron, returnMaterial.ducat, enemyReturnMaterial.wood, enemyReturnMaterial.stone, enemyReturnMaterial.iron, enemyReturnMaterial.ducat);
 	}
 	
 	// 부대에 아이템을 장착합니다.
@@ -562,6 +650,8 @@ contract DelightArmyManager is DelightBase {
 		
 		// 아이템을 Delight로 이전합니다.
 		itemContract.transferFrom(msg.sender, address(this), unitCount);
+		
+		emit AttachItem(msg.sender, armyIds[unitKind], itemKind, unitCount);
 	}
 	
 	// 기사에 아이템을 장착합니다.
@@ -586,5 +676,7 @@ contract DelightArmyManager is DelightBase {
 		
 		// 아이템을 Delight로 이전합니다.
 		knightItem.transferFrom(msg.sender, address(this), itemId);
+		
+		emit AttackKnightItem(msg.sender, armyId, itemId);
 	}
 }

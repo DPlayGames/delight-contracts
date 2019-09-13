@@ -23,5 +23,7 @@ contract DelightItemManager is DelightBase {
 		DelightItem itemContract = getItemContract(kind);
 		
 		itemContract.assemble(msg.sender, count);
+		
+		emit CreateItem(msg.sender, kind, count);
 	}
 }

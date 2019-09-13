@@ -126,9 +126,6 @@ contract DelightBase is DelightInterface, NetworkChecker {
 	
 	mapping(address => uint[]) internal ownerToHQIds;
 	
-	mapping(uint => address) internal buildingIdToOwner;
-	mapping(uint => address) internal armyIdToOwner;
-	
 	// 특정 위치에 존재하는 부대의 소유주를 가져옵니다.
 	function getArmyOwnerByPosition(uint col, uint row) view internal returns (address) {
 		

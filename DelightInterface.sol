@@ -14,8 +14,9 @@ interface DelightInterface {
     event Move				(address indexed owner, uint fromCol, uint fromRow, uint toCol, uint toRow);
     event MoveArmy			(address indexed owner, uint fromArmyId, uint toArmyId, uint unitCount);
     
-    event MoveAndAttack		(address indexed owner, uint fromCol, uint fromRow, uint toCol, uint toRow, uint wood, uint stone, uint iron, uint ducat);
-    event RangedAttack		(address indexed owner, uint fromCol, uint fromRow, uint toCol, uint toRow, uint wood, uint stone, uint iron, uint ducat, uint enemyWood, uint enemyStone, uint enemyIron, uint enemyDucat);
+    event Win				(address indexed owner, address indexed enemy, uint fromCol, uint fromRow, uint toCol, uint toRow, uint wood, uint stone, uint iron, uint ducat);
+    event Lose				(address indexed owner, address indexed enemy, uint fromCol, uint fromRow, uint toCol, uint toRow, uint wood, uint stone, uint iron, uint ducat);
+    event RangedAttack		(address indexed owner, address indexed enemy, uint fromCol, uint fromRow, uint toCol, uint toRow, uint wood, uint stone, uint iron, uint ducat, uint enemyWood, uint enemyStone, uint enemyIron, uint enemyDucat);
     event DeadUnits			(address indexed owner, uint armyId, uint unitCount);
     
     event CreateItem		(address indexed owner, uint itemKind, uint count);

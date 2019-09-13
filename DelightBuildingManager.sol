@@ -88,11 +88,13 @@ contract DelightBuildingManager is DelightBase {
 		Building storage building = buildings[buildingId];
 		
 		require(building.kind == BUILDING_HQ);
+		
+		// 최대 레벨은 2입니다. (0 ~ 2)
 		require(building.level < 2);
 		
 		building.level += 1;
 		
-		//emit UpgradeHQ(buildingId);
+		emit UpgradeHQ(building.owner, buildingId, building.level, building.col, building.row);
 	}
 	
 	// 건물에서 부대를 생산합니다.
@@ -161,6 +163,7 @@ contract DelightBuildingManager is DelightBase {
 		// 기존에 부대가 존재하면 부대원의 숫자 증가
 		uint originArmyId = armyIds[unitKind];
 		uint newArmyId;
+		uint createTime;
 		
 		if (originArmyId != 0) {
 			armies[originArmyId].unitCount = armies[originArmyId].unitCount.add(unitCount);
@@ -169,6 +172,8 @@ contract DelightBuildingManager is DelightBase {
 		// 새 부대 생성
 		else {
 			
+			createTime = now;
+			
 			newArmyId = armies.push(Army({
 				unitKind : unitKind,
 				unitCount : unitCount,
@@ -176,7 +181,7 @@ contract DelightBuildingManager is DelightBase {
 				col : building.col,
 				row : building.row,
 				owner : msg.sender,
-				createTime : now
+				createTime : createTime
 			})).sub(1);
 			
 			armyIds[unitKind] = newArmyId;
@@ -190,14 +195,14 @@ contract DelightBuildingManager is DelightBase {
 		
 		if (originArmyId != 0) {
 			
-			//emit MergeArmy(originArmyId);
+			emit AddUnits(msg.sender, originArmyId, unitKind, unitCount, building.col, building.row);
 			
 			return originArmyId;
 		}
 		
 		else {
 			
-			//emit CreateArmy(newArmyId);
+			emit CreateArmy(msg.sender, newArmyId, unitKind, unitCount, building.col, building.row, createTime);
 			
 			return newArmyId;
 		}
