@@ -7,7 +7,7 @@ contract DelightBuildingManager is DelightBase {
 	using SafeMath for uint;
 	
 	// 건물을 짓습니다.
-	function build(uint kind, uint col, uint row) internal returns (uint) {
+	function build(uint kind, uint col, uint row) external returns (uint) {
 		
 		// 올바른 범위인지 체크합니다.
 		require(col < COL_RANGE && row < ROW_RANGE);
@@ -130,7 +130,7 @@ contract DelightBuildingManager is DelightBase {
 	}
 	
 	// 본부를 업그레이드합니다.
-	function upgradeHQ(uint buildingId) internal {
+	function upgradeHQ(uint buildingId) external {
 		
 		Building storage building = buildings[buildingId];
 		
@@ -193,7 +193,7 @@ contract DelightBuildingManager is DelightBase {
 	}
 	
 	// 건물에서 부대를 생산합니다.
-	function createArmy(uint buildingId, uint unitCount) internal returns (uint) {
+	function createArmy(uint buildingId, uint unitCount) external returns (uint) {
 		
 		Building memory building = buildings[buildingId];
 		
