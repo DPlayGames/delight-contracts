@@ -1,11 +1,12 @@
 pragma solidity ^0.5.9;
 
 import "./DelightWorldInterface.sol";
-import "./DelightSub.sol";
+import "./DelightBase.sol";
+import "./DelightHistoryInterface.sol";
 import "./Util/SafeMath.sol";
 
 // 월드 관련 처리
-contract DelightWorld is DelightWorldInterface, DelightSub {
+contract DelightWorld is DelightWorldInterface, DelightBase {
 	using SafeMath for uint;
 	
 	// Events
@@ -21,6 +22,16 @@ contract DelightWorld is DelightWorldInterface, DelightSub {
     event AttachItem		(address indexed owner, uint armyId, uint itemKind, uint count);
     event AttackKnightItem	(address indexed owner, uint armyId, uint itemId);
 	
+	/*
+	event MoveArmy			(address indexed owner, uint fromArmyId, uint toCol, uint toRow, uint unitCount);
+	event MergeArmy			(address indexed owner, uint fromArmyId, uint toArmyId, uint unitCount);
+    
+    event Win				(address indexed owner, address indexed enemy, uint fromCol, uint fromRow, uint toCol, uint toRow, uint wood, uint stone, uint iron, uint ducat);
+    event Lose				(address indexed owner, address indexed enemy, uint fromCol, uint fromRow, uint toCol, uint toRow, uint wood, uint stone, uint iron, uint ducat);
+    event RangedAttack		(address indexed owner, address indexed enemy, uint fromCol, uint fromRow, uint toCol, uint toRow, uint wood, uint stone, uint iron, uint ducat, uint enemyWood, uint enemyStone, uint enemyIron, uint enemyDucat);
+    event DeadUnits			(address indexed owner, uint armyId, uint unitCount);
+	*/
+	
 	Building[] internal buildings;
 	Army[] internal armies;
 	
@@ -29,24 +40,40 @@ contract DelightWorld is DelightWorldInterface, DelightSub {
 	
 	mapping(address => uint[]) internal ownerToHQIds;
 	
-	// Delight Battle 주소
-	address public delightBattle;
+	// Delight 주소
+	address public delight;
 	
-	function setDelightBattleOnce(address addr) external {
+	function setDelightOnce(address addr) external {
 		
 		// 비어있는 주소인 경우에만
-		require(delightBattle == address(0));
+		require(delight == address(0));
 		
-		delightBattle = addr;
+		delight = addr;
 	}
 	
-	// Sender가 Delight Battle일때만 실행
-	modifier onlyDelightBattle() {
-		require(msg.sender == delightBattle);
+	// Sender가 Delight일때만 실행
+	modifier onlyDelight() {
+		require(msg.sender == delight);
 		_;
 	}
 	
-	constructor() DelightSub() public {
+	DelightHistoryInterface internal delightHistory;
+	
+	constructor() DelightBase() public {
+		
+		// DPlay History 스마트 계약을 불러옵니다.
+		if (network == Network.Mainnet) {
+			//TODO
+		} else if (network == Network.Kovan) {
+			//TODO
+			delightHistory = DelightHistoryInterface(0x0);
+		} else if (network == Network.Ropsten) {
+			//TODO
+		} else if (network == Network.Rinkeby) {
+			//TODO
+		} else {
+			revert();
+		}
 		
 		// 0번지는 사용하지 않습니다.
 		buildings.push(Building({
@@ -104,8 +131,8 @@ contract DelightWorld is DelightWorldInterface, DelightSub {
 			uint hqRow = building.row;
 			
 			if (
-				(col < hqCol ? hqCol - col : col - hqCol) +
-				(row < hqRow ? hqRow - row : row - hqRow) <= 5 + building.level.mul(2)
+			(col < hqCol ? hqCol - col : col - hqCol) +
+			(row < hqRow ? hqRow - row : row - hqRow) <= 5 + building.level.mul(2)
 			) {
 				existsHQAround = true;
 				break;
@@ -488,12 +515,338 @@ contract DelightWorld is DelightWorldInterface, DelightSub {
 		emit AttackKnightItem(owner, armyId, itemId);
 	}
 	
+	/*
 	// 부대의 위치를 이전합니다.
-	function moveArmy();
+	function moveArmy(uint fromCol, uint fromRow, uint toCol, uint toRow) onlyDelight external {
+		
+		// 거리 계산
+		uint distance = (fromCol < toCol ? toCol - fromCol : fromCol - toCol) + (fromRow < toRow ? toRow - fromRow : fromRow - toRow);
+		
+		uint[] storage armyIds = positionToArmyIds[fromCol][fromRow];
+		uint[] storage targetArmyIds = positionToArmyIds[toCol][toRow];
+		
+		targetArmyIds.length = UNIT_KIND_COUNT;
+		
+		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+			
+			Army storage army = armies[armyIds[i]];
+			
+			if (
+			// 유닛의 개수가 0개 이상이어야 합니다.
+			army.unitCount > 0 &&
+			
+			// 이동이 가능한 거리인지 확인합니다.
+			distance <= units[army.unitKind].movableDistance) {
+				
+				targetArmyIds[i] = armyIds[i];
+				
+				// 상세 기록을 저장합니다.
+				delightHistory.addArmyRecordDetail(
+					delightHistory.getRecordCount(),
+					army.owner,
+					armyIds[i],
+					army.unitKind,
+					army.unitCount
+				);
+				
+				// 이벤트 발생
+				emit MoveArmy(army.owner, armyIds[i], toCol, toRow, army.unitCount);
+				
+				delete armyIds[i];
+			}
+		}
+	}
 	
-	// 두 부대를 병합합니다.
-	function mergeArmy();
+	// 부대를 병합합니다.
+	function mergeArmy(uint fromCol, uint fromRow, uint toCol, uint toRow) onlyDelight external {
+		
+		uint[] storage armyIds = positionToArmyIds[fromCol][fromRow];
+		uint[] storage targetArmyIds = positionToArmyIds[toCol][toRow];
+		
+		targetArmyIds.length = UNIT_KIND_COUNT;
+		
+		// 병합할 위치에 존재하는 총 유닛 숫자를 계산합니다.
+		uint totalUnitCount = 0;
+		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+			totalUnitCount = totalUnitCount.add(armies[targetArmyIds[i]].unitCount);
+		}
+		
+		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+			
+			Army storage army = armies[armyIds[i]];
+			
+			if (
+			// 유닛의 개수가 0개 이상이어야 합니다.
+			army.unitCount > 0 &&
+			
+			// 이동이 가능한 거리인지 확인합니다.
+			(fromCol < toCol ? toCol - fromCol : fromCol - toCol) +
+			(fromRow < toRow ? toRow - fromRow : fromRow - toRow) <= units[army.unitKind].movableDistance) {
+				
+				Army storage targetArmy = armies[targetArmyIds[i]];
+				
+				// 그대로 이동했을 때 존재할 수 있는 최대 유닛의 숫자를 넘는 경우
+				if (totalUnitCount.add(army.unitCount) > MAX_POSITION_UNIT_COUNT) {
+					
+					uint movableUnitCount = MAX_POSITION_UNIT_COUNT.sub(totalUnitCount);
+					
+					// 비어있는 곳이면 새 부대를 생성합니다.
+					if (targetArmy.unitCount == 0) {
+						
+						targetArmyIds[army.unitKind] = armies.push(Army({
+							unitKind : army.unitKind,
+							unitCount : movableUnitCount,
+							knightItemId : 0,
+							col : toCol,
+							row : toRow,
+							owner : army.owner,
+							createTime : now
+						})).sub(1);
+						
+						// 상세 기록을 저장합니다.
+						delightHistory.addTargetArmyRecordDetail(
+							delightHistory.getRecordCount(),
+							army.owner,
+							armyIds[i],
+							targetArmyIds[i],
+							army.unitKind,
+							movableUnitCount
+						);
+						
+						// 이벤트 발생
+						emit MergeArmy(army.owner, armyIds[i], targetArmyIds[i], movableUnitCount);
+					}
+					
+					// 비어있지 않으면 병합합니다.
+					else {
+						
+						targetArmy.unitCount = targetArmy.unitCount.add(movableUnitCount);
+						army.unitCount = army.unitCount.sub(movableUnitCount);
+						
+						// 상세 기록을 저장합니다.
+						delightHistory.addTargetArmyRecordDetail(
+							delightHistory.getRecordCount(),
+							army.owner,
+							armyIds[i],
+							targetArmyIds[i],
+							army.unitKind,
+							movableUnitCount
+						);
+						
+						// 이벤트 발생
+						emit MergeArmy(army.owner, armyIds[i], targetArmyIds[i], movableUnitCount);
+					}
+				}
+				
+				// 그대로 이동 가능할 때
+				else {
+					
+					// 비어있는 곳이면 이전합니다.
+					if (targetArmy.unitCount == 0) {
+						
+						targetArmyIds[i] = armyIds[i];
+						
+						// 상세 기록을 저장합니다.
+						delightHistory.addTargetArmyRecordDetail(
+							delightHistory.getRecordCount(),
+							army.owner,
+							armyIds[i],
+							targetArmyIds[i],
+							army.unitKind,
+							army.unitCount
+						);
+						
+						// 이벤트 발생
+						emit MergeArmy(army.owner, armyIds[i], targetArmyIds[i], army.unitCount);
+						
+						delete armyIds[i];
+					}
+					
+					// 비어있지 않으면 합병합니다.
+					else {
+						
+						targetArmy.unitCount = targetArmy.unitCount.add(army.unitCount);
+						
+						// 상세 기록을 저장합니다.
+						delightHistory.addTargetArmyRecordDetail(
+							delightHistory.getRecordCount(),
+							army.owner,
+							armyIds[i],
+							targetArmyIds[i],
+							army.unitKind,
+							army.unitCount
+						);
+						
+						// 이벤트 발생
+						emit MergeArmy(army.owner, armyIds[i], targetArmyIds[i], army.unitCount);
+						
+						army.unitCount = 0;
+						army.owner = address(0x0);
+						
+						delete armyIds[i];
+					}
+				}
+			}
+		}
+	}
+	*/
 	
+	/*
+	// 전체 데미지를 가져옵니다.
+	function getTotalDamage(uint distance, uint col, uint row) view external returns (uint) {
+		
+		uint[] memory armyIds = positionToArmyIds[col][row];
+		
+		uint totalDamage = 0;
+		
+		// 총 공격력을 계산합니다.
+		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+			
+			Army memory army = armies[armyIds[i]];
+			
+			if (
+			// 유닛의 개수가 0개 이상이어야 합니다.
+			army.unitCount > 0 &&
+			
+			// 이동이 가능한 거리인지 확인합니다.
+			distance <= units[army.unitKind].movableDistance) {
+				
+				// 아군의 공격력 추가
+				totalDamage = totalDamage.add(
+					units[army.unitKind].damage.add(
+						
+						// 기사인 경우 기사 아이템의 공격력을 추가합니다.
+						i == UNIT_KNIGHT ? knightItem.getItemDamage(army.knightItemId) : (
+							
+							// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
+							armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
+						)
+						
+					).mul(army.unitCount)
+				);
+			}
+		}
+		
+		return totalDamage;
+	}
+	
+	// 전체 원거리 데미지를 가져옵니다.
+	function getTotalRangedDamage(uint distance, uint col, uint row) view external returns (uint) {
+		
+		uint[] memory armyIds = positionToArmyIds[col][row];
+		
+		uint totalDamage = 0;
+		
+		// 총 공격력을 계산합니다.
+		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+			
+			Army memory army = armies[armyIds[i]];
+			
+			if (
+			// 유닛의 개수가 0개 이상이어야 합니다.
+			army.unitCount > 0 &&
+			
+			// 공격이 가능한 거리인지 확인합니다.
+			distance <= units[army.unitKind].attackableDistance) {
+				
+				// 아군의 공격력 추가
+				totalDamage = totalDamage.add(
+					units[army.unitKind].damage.add(
+						
+						// 기사인 경우 기사 아이템의 공격력을 추가합니다.
+						i == UNIT_KNIGHT ? knightItem.getItemDamage(army.knightItemId) : (
+							
+							// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
+							armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
+						)
+						
+					).mul(army.unitCount)
+				);
+			}
+		}
+		
+		return totalDamage;
+	}
+	*/
+	
+	/*
 	// 부대를 공격합니다.
-	function attackArmy();
+	function attack(uint damage, uint distance, uint col, uint row) onlyDelight external {
+		
+		uint usedDamage = 0;
+		
+		uint[] storage armyIds = positionToArmyIds[col][row];
+		
+		// 전리품
+		Material memory rewardMaterial = Material({
+			wood : 0,
+			stone : 0,
+			iron : 0,
+			ducat : 0
+		});
+		
+		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+			
+			Army storage army = armies[armyIds[i]];
+			
+			if (
+			// 유닛의 개수가 0개 이상이어야 합니다.
+			army.unitCount > 0 &&
+			
+			// 이동이 가능한 거리인지 확인합니다.
+			distance <= units[army.unitKind].movableDistance) {
+				
+				// 아군의 체력을 계산합니다.
+				uint armyHP = units[army.unitKind].hp.add(
+					
+					// 기사인 경우 기사 아이템의 HP를 추가합니다.
+					i == UNIT_KNIGHT ? knightItem.getItemHP(army.knightItemId) : (
+						
+						// 기사가 아닌 경우 기사의 버프 HP를 추가합니다.
+						armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
+					)
+					
+				).mul(army.unitCount);
+				
+				armyHP = armyHP <= damage ? 0 : armyHP.sub(damage);
+				
+				// 전투 결과를 계산합니다.
+				uint remainUnitCount = armyHP.add(armyHP % units[army.unitKind].hp).div(units[army.unitKind].hp);
+				uint deadUnitCount = army.unitCount.sub(remainUnitCount);
+				
+				// 적의 총 공격력을 낮춥니다.
+				usedDamage = usedDamage.add(deadUnitCount.mul(units[army.unitKind].hp));
+				
+				// 전리품을 계산합니다.
+				Material memory unitMaterial = unitMaterials[army.unitKind];
+				rewardMaterial.wood = rewardMaterial.wood.add(unitMaterial.wood.mul(deadUnitCount));
+				rewardMaterial.stone = rewardMaterial.wood.add(unitMaterial.stone.mul(deadUnitCount));
+				rewardMaterial.iron = rewardMaterial.wood.add(unitMaterial.iron.mul(deadUnitCount));
+				rewardMaterial.ducat = rewardMaterial.wood.add(unitMaterial.ducat.mul(deadUnitCount));
+				
+				// 남은 병사 숫자를 저장합니다.
+				army.unitCount = remainUnitCount;
+				if (army.unitCount == 0) {
+					army.owner = address(0x0);
+				}
+				
+				// 상세 기록을 저장합니다.
+				delightHistory.addArmyRecordDetail(
+					delightHistory.getRecordCount(),
+					army.owner,
+					armyIds[i],
+					army.unitKind,
+					deadUnitCount
+				);
+				
+				// 이벤트 발생
+				emit DeadUnits(army.owner, armyIds[i], deadUnitCount);
+			}
+		}
+	}
+	
+	// 원거리 공격을 개시합니다.
+	function rangedAttack(address owner, address enemy, uint fromCol, uint fromRow, uint toCol, uint toRow) onlyDelight external {
+	}
+	*/
 }

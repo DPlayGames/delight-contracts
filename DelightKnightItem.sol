@@ -23,30 +23,19 @@ contract DelightKnightItem is ERC721 {
 	mapping(uint => address) private itemIdToApproved;
 	mapping(address => mapping(address => bool)) private ownerToOperatorToIsApprovedForAll;
 	
-	// Delight World 주소
-	address public delightWorld;
-	
-	// Delight Battle 주소
-	address public delightBattle;
+	// Delight 아이템 관리자 주소
+	address public delightItemManager;
 	
 	// The address of DPlay trading post
 	// DPlay 교역소 주소
 	address public dplayTradingPost;
 	
-	function setDelightWorldOnce(address addr) external {
+	function setDelightItemManagerOnce(address addr) external {
 		
 		// 비어있는 주소인 경우에만
-		require(delightWorld == address(0));
+		require(delightItemManager == address(0));
 		
-		delightWorld = addr;
-	}
-	
-	function setDelightBattleOnce(address addr) external {
-		
-		// 비어있는 주소인 경우에만
-		require(delightBattle == address(0));
-		
-		delightBattle = addr;
+		delightItemManager = addr;
 	}
 	
 	// Sets the address of DPlay trading post. (Done only once.)
@@ -375,8 +364,7 @@ contract DelightKnightItem is ERC721 {
 			msg.sender == ownerOf(itemId) ||
 			msg.sender == getApproved(itemId) ||
 			isApprovedForAll(ownerOf(itemId), msg.sender) == true ||
-			msg.sender == delightWorld ||
-			msg.sender == delightBattle ||
+			msg.sender == delightItemManager ||
 			msg.sender == dplayTradingPost
 		);
 		_;

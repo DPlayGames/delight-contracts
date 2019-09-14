@@ -15,16 +15,6 @@ contract DelightSub is DelightBase {
     event RangedAttack		(address indexed owner, address indexed enemy, uint fromCol, uint fromRow, uint toCol, uint toRow, uint wood, uint stone, uint iron, uint ducat, uint enemyWood, uint enemyStone, uint enemyIron, uint enemyDucat);
     event DeadUnits			(address indexed owner, uint armyId, uint unitCount);
 	
-	// 지형의 범위
-	uint constant internal COL_RANGE = 100;
-	uint constant internal ROW_RANGE = 100;
-	
-	// 올바른 범위인지 체크합니다.
-	modifier checkRange(uint col, uint row) {
-		require(col < COL_RANGE && row < ROW_RANGE);
-		_;
-	}
-	
 	// 한 위치에 존재할 수 있는 최대 유닛 수
 	uint constant internal MAX_POSITION_UNIT_COUNT = 50;
 	

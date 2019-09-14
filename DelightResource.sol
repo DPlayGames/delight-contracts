@@ -21,19 +21,41 @@ contract DelightResource is ERC20, ERC165 {
 	// The two addresses below are the addresses of the trusted smart contract, and don't need to be allowed.
 	// 아래 두 주소는 신뢰하는 스마트 계약의 주소로 허락받을 필요가 없습니다.
 	
-	// Delight 주소
-	address public delight;
+	// Delight 건물 관리자 주소
+	address public delightBuildingManager;
+	
+	// Delight 부대 관리자 주소
+	address public delightArmyManager;
+	
+	// Delight 아이템 관리자 주소
+	address public delightItemManager;
 	
 	// The address of DPlay trading post
 	// DPlay 교역소 주소
 	address public dplayTradingPost;
 	
-	function setDelightOnce(address addr) external {
+	function setDelightBuildingManagerOnce(address addr) external {
 		
 		// 비어있는 주소인 경우에만
-		require(delight == address(0));
+		require(delightBuildingManager == address(0));
 		
-		delight = addr;
+		delightBuildingManager = addr;
+	}
+	
+	function setDelightArmyManagerOnce(address addr) external {
+		
+		// 비어있는 주소인 경우에만
+		require(delightArmyManager == address(0));
+		
+		delightArmyManager = addr;
+	}
+	
+	function setDelightItemManagerOnce(address addr) external {
+		
+		// 비어있는 주소인 경우에만
+		require(delightItemManager == address(0));
+		
+		delightItemManager = addr;
 	}
 	
 	// Sets the address of DPlay trading post. (Done only once.)
@@ -120,7 +142,9 @@ contract DelightResource is ERC20, ERC165 {
 		
 		if (
 		// Delight와 DPlay 교역소는 모든 토큰을 전송할 수 있습니다.
-		spender == delight ||
+		spender == delightBuildingManager ||
+		spender == delightArmyManager ||
+		spender == delightItemManager ||
 		spender == dplayTradingPost) {
 			return balances[user];
 		}
@@ -140,7 +164,9 @@ contract DelightResource is ERC20, ERC165 {
 		
 		require(
 			// Delight와 DPlay 교역소는 모든 토큰을 전송할 수 있습니다.
-			msg.sender == delight ||
+			msg.sender == delightBuildingManager ||
+			msg.sender == delightArmyManager ||
+			msg.sender == delightItemManager ||
 			msg.sender == dplayTradingPost ||
 			
 			amount <= allowed[from][msg.sender]

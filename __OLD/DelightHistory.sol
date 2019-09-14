@@ -14,6 +14,7 @@ contract DelightHistory is DelightHistoryInterface, DelightBase {
 	uint constant internal RECORD_CREATE_ARMY			= 2;
 	uint constant internal RECORD_ADD_UNITS				= 3;
 	uint constant internal RECORD_MOVE_ARMY				= 4;
+	uint constant internal RECORD_MERGE_ARMY			= 5;
 	uint constant internal RECORD_WIN					= 6;
 	uint constant internal RECORD_LOSE					= 7;
 	uint constant internal RECORD_RANGED_ATTACK			= 8;
@@ -429,6 +430,48 @@ contract DelightHistory is DelightHistoryInterface, DelightBase {
 		
 		return history.push(Record({
 			kind : RECORD_MOVE_ARMY,
+			
+			owner : owner,
+			enemy : address(0x0),
+			
+			col : fromCol,
+			row : fromRow,
+			toCol : toCol,
+			toRow : toRow,
+			
+			buildingId : 0,
+			buildingKind : 0,
+			buildingLevel : 0,
+			
+			armyId : 0,
+			unitKind : 0,
+			unitCount : 0,
+			
+			itemId : 0,
+			itemKind : 0,
+			itemCount : 0,
+			
+			wood : 0,
+			stone : 0,
+			iron : 0,
+			ducat : 0,
+			
+			time : now
+		})).sub(1);
+	}
+	
+	// 부대가 병합하는 기록을 저장합니다.
+	function recordMergeArmy(
+		
+		address owner,
+		
+		// 위치 정보
+		uint fromCol, uint fromRow, uint toCol, uint toRow
+		
+	) onlyDelight external returns (uint) {
+		
+		return history.push(Record({
+			kind : RECORD_MERGE_ARMY,
 			
 			owner : owner,
 			enemy : address(0x0),

@@ -22,4 +22,16 @@ interface DelightWorldInterface {
 	
 	// 기사에 아이템을 장착합니다.
 	function attachKnightItem(address owner, uint armyId, uint itemId) external;
+	
+	// 부대의 위치를 이전합니다.
+	//function moveArmy(uint fromCol, uint fromRow, uint toCol, uint toRow) external;
+	
+	// 부대를 병합합니다.
+	//function mergeArmy(uint fromCol, uint fromRow, uint toCol, uint toRow) external;
+	
+	// 전체 데미지를 가져옵니다.
+	//function getTotalDamage(uint distance, uint col, uint row) view external returns (uint);
+	
+	// 전체 원거리 데미지를 가져옵니다.
+	//function getTotalRangedDamage(uint distance, uint col, uint row) view external returns (uint);
 }

@@ -107,7 +107,6 @@ interface DelightHistoryInterface {
 		uint enemyDucat;
 	}
 	
-	
 	// 건물 짓는 기록을 저장합니다.
 	function recordBuild(
 		
@@ -221,6 +220,16 @@ interface DelightHistoryInterface {
 		
 	) external returns (uint);
 	
+	// 부대가 병합하는 기록을 저장합니다.
+	function recordMergeArmy(
+		
+		address owner,
+		
+		// 위치 정보
+		uint fromCol, uint fromRow, uint toCol, uint toRow
+		
+	) external returns (uint);
+	
 	// 승리 기록을 저장합니다.
 	function recordWin(
 		
@@ -303,63 +312,4 @@ interface DelightHistoryInterface {
 		uint enemyWood, uint enemyStone, uint enemyIron, uint enemyDucat
 		
 	) external;
-	
-	// 기록의 개수를 반환합니다.
-	function getRecordCount() external view returns (uint);
-	
-	// 기록을 반환합니다.
-	function getRecord(uint recordId) external view returns (
-		
-		uint kind,
-		
-		address owner,
-		address enemy,
-		
-		uint col,
-		uint row,
-		uint toCol,
-		uint toRow,
-		
-		uint buildingId,
-		uint buildingKind,
-		uint buildingLevel,
-		
-		uint armyId,
-		uint unitKind,
-		uint unitCount,
-		
-		uint itemId,
-		uint itemKind,
-		uint itemCount,
-		
-		uint wood,
-		uint stone,
-		uint iron,
-		uint ducat,
-		
-		uint time
-	);
-	
-	// 세부 기록의 개수를 반환합니다.
-	function getRecordDetailCount(uint recordId) external view returns (uint);
-	
-	// 세부 기록을 반환합니다.
-	function getRecordDetail(uint recordId, uint recordDetailId) external view returns (
-		
-		address owner, 
-		
-		uint armyId,
-		uint targetArmyId,
-		
-		uint unitKind,
-		uint unitCount,
-		
-		uint buildingId,
-		uint buildingKind,
-		
-		uint enemyWood,
-		uint enemyStone,
-		uint enemyIron,
-		uint enemyDucat
-	);
 }
