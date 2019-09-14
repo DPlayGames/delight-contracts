@@ -31,41 +31,7 @@ contract DelightItemManager is DelightBase {
 		itemContract.assemble(msg.sender, count);
 		
 		// 기록을 저장합니다.
-		history.push(Record({
-			kind : RECORD_CREATE_ITEM,
-			
-			owner : msg.sender,
-			enemy : address(0x0),
-			
-			col : 0,
-			row : 0,
-			toCol : 0,
-			toRow : 0,
-			
-			buildingId : 0,
-			buildingKind : 0,
-			buildingLevel : 0,
-			
-			armyId : 0,
-			unitKind : 0,
-			unitCount : 0,
-			
-			itemId : 0,
-			itemKind : kind,
-			itemCount : count,
-			
-			wood : material.wood,
-			stone : material.stone,
-			iron : material.iron,
-			ducat : material.ducat,
-			
-			enemyWood : 0,
-			enemyStone : 0,
-			enemyIron : 0,
-			enemyDucat : 0,
-			
-			time : now
-		}));
+		
 		
 		// 이벤트 발생
 		emit CreateItem(msg.sender, kind, count, material.wood, material.stone, material.iron, material.ducat);

@@ -87,41 +87,7 @@ contract DelightBuildingManager is DelightBase {
 		ducat.transferFrom(msg.sender, address(this), material.ducat);
 		
 		// 기록을 저장합니다.
-		history.push(Record({
-			kind : RECORD_BUILD,
-			
-			owner : msg.sender,
-			enemy : address(0x0),
-			
-			col : col,
-			row : row,
-			toCol : 0,
-			toRow : 0,
-			
-			buildingId : buildingId,
-			buildingKind : kind,
-			buildingLevel : 0,
-			
-			armyId : 0,
-			unitKind : 0,
-			unitCount : 0,
-			
-			itemId : 0,
-			itemKind : 0,
-			itemCount : 0,
-			
-			wood : material.wood,
-			stone : material.stone,
-			iron : material.iron,
-			ducat : material.ducat,
-			
-			enemyWood : 0,
-			enemyStone : 0,
-			enemyIron : 0,
-			enemyDucat : 0,
-			
-			time : bulidTime
-		}));
+		
 		
 		// 이벤트 발생
 		emit Build(msg.sender, buildingId, kind, col, row, bulidTime, material.wood, material.stone, material.iron, material.ducat);
@@ -152,41 +118,7 @@ contract DelightBuildingManager is DelightBase {
 		building.level += 1;
 		
 		// 기록을 저장합니다.
-		history.push(Record({
-			kind : RECORD_UPGRADE_HQ,
-			
-			owner : address(0x0),
-			enemy : address(0x0),
-			
-			col : building.col,
-			row : building.row,
-			toCol : 0,
-			toRow : 0,
-			
-			buildingId : buildingId,
-			buildingKind : building.kind,
-			buildingLevel : building.level,
-			
-			armyId : 0,
-			unitKind : 0,
-			unitCount : 0,
-			
-			itemId : 0,
-			itemKind : 0,
-			itemCount : 0,
-			
-			wood : material.wood,
-			stone : material.stone,
-			iron : material.iron,
-			ducat : material.ducat,
-			
-			enemyWood : 0,
-			enemyStone : 0,
-			enemyIron : 0,
-			enemyDucat : 0,
-			
-			time : now
-		}));
+		
 		
 		// 이벤트 발생
 		emit UpgradeHQ(building.owner, buildingId, building.level, building.col, building.row, material.wood, material.stone, material.iron, material.ducat);
@@ -297,41 +229,6 @@ contract DelightBuildingManager is DelightBase {
 		if (originArmyId != 0) {
 			
 			// 기록을 저장합니다.
-			history.push(Record({
-				kind : RECORD_ADD_UNITS,
-				
-				owner : msg.sender,
-				enemy : address(0x0),
-				
-				col : building.col,
-				row : building.row,
-				toCol : 0,
-				toRow : 0,
-				
-				buildingId : buildingId,
-				buildingKind : building.kind,
-				buildingLevel : building.level,
-				
-				armyId : originArmyId,
-				unitKind : unitKind,
-				unitCount : unitCount,
-				
-				itemId : 0,
-				itemKind : 0,
-				itemCount : 0,
-				
-				wood : material.wood,
-				stone : material.stone,
-				iron : material.iron,
-				ducat : material.ducat,
-				
-				enemyWood : 0,
-				enemyStone : 0,
-				enemyIron : 0,
-				enemyDucat : 0,
-				
-				time : now
-			}));
 			
 			// 이벤트 발생
 			emit AddUnits(msg.sender, originArmyId, unitKind, unitCount, building.col, building.row, material.wood, material.stone, material.iron, material.ducat);
@@ -342,41 +239,7 @@ contract DelightBuildingManager is DelightBase {
 		else {
 			
 			// 기록을 저장합니다.
-			history.push(Record({
-				kind : RECORD_CREATE_ARMY,
-				
-				owner : msg.sender,
-				enemy : address(0x0),
-				
-				col : building.col,
-				row : building.row,
-				toCol : 0,
-				toRow : 0,
-				
-				buildingId : buildingId,
-				buildingKind : building.kind,
-				buildingLevel : building.level,
-				
-				armyId : newArmyId,
-				unitKind : unitKind,
-				unitCount : unitCount,
-				
-				itemId : 0,
-				itemKind : 0,
-				itemCount : 0,
-				
-				wood : material.wood,
-				stone : material.stone,
-				iron : material.iron,
-				ducat : material.ducat,
-				
-				enemyWood : 0,
-				enemyStone : 0,
-				enemyIron : 0,
-				enemyDucat : 0,
-				
-				time : createTime
-			}));
+			
 			
 			// 이벤트 발생
 			emit CreateArmy(msg.sender, newArmyId, unitKind, unitCount, building.col, building.row, createTime, material.wood, material.stone, material.iron, material.ducat);

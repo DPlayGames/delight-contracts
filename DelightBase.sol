@@ -39,4 +39,12 @@ contract DelightBase {
 	uint constant internal ITEM_CATAPULT	= 6;
 	uint constant internal ITEM_CAMEL		= 7;
 	uint constant internal ITEM_ELEPHANT	= 8;
+	
+	// 자원 정보
+	struct Resource {
+		uint wood;
+		uint stone;
+		uint iron;
+		uint ducat;
+	}
 }
