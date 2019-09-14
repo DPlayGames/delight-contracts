@@ -55,6 +55,41 @@ contract DelightHistory is DelightHistoryInterface, DelightBase {
 		_;
 	}
 	
+	constructor() DelightBase() public {
+		
+		// 0번지는 사용하지 않습니다.
+		history.push(Record({
+			kind : 99,
+			
+			owner : address(0x0),
+			enemy : address(0x0),
+			
+			col : 0,
+			row : 0,
+			toCol : 0,
+			toRow : 0,
+			
+			buildingId : 0,
+			buildingKind : 0,
+			buildingLevel : 0,
+			
+			armyId : 0,
+			unitKind : 0,
+			unitCount : 0,
+			
+			itemId : 0,
+			itemKind : 0,
+			itemCount : 0,
+			
+			wood : 0,
+			stone : 0,
+			iron : 0,
+			ducat : 0,
+			
+			time : now
+		}));
+	}
+	
 	// 건물 짓는 기록을 저장합니다.
 	function recordBuild(
 		
@@ -148,7 +183,7 @@ contract DelightHistory is DelightHistoryInterface, DelightBase {
 	}
 	
 	// 유닛을 추가하는 기록을 저장합니다.
-	function recordUpgradeHQ(
+	function recordAddUnits(
 		
 		address owner,
 		

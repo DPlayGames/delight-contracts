@@ -137,7 +137,7 @@ interface DelightHistoryInterface {
 	) external returns (uint);
 	
 	// 유닛을 추가하는 기록을 저장합니다.
-	function recordUpgradeHQ(
+	function recordAddUnits(
 		
 		address owner,
 		
