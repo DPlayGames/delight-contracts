@@ -1,10 +1,11 @@
 pragma solidity ^0.5.9;
 
+import "./DelightWorldInterface.sol";
 import "./DelightSub.sol";
 import "./Util/SafeMath.sol";
 
 // 월드 관련 처리
-contract DelightWorld is DelightSub {
+contract DelightWorld is DelightWorldInterface, DelightSub {
 	using SafeMath for uint;
 	
 	// Events
@@ -16,12 +17,9 @@ contract DelightWorld is DelightSub {
     event CreateArmy		(address indexed owner, uint armyId, uint unitKind, uint unitCount, uint col, uint row, uint createTime, uint wood, uint stone, uint iron, uint ducat);
     event AddUnits			(address indexed owner, uint armyId, uint unitKind, uint unitCount, uint col, uint row, uint wood, uint stone, uint iron, uint ducat);
     
-	// 지형의 범위
-	uint constant internal COL_RANGE = 100;
-	uint constant internal ROW_RANGE = 100;
-	
-	// 한 위치에 존재할 수 있는 최대 유닛 수
-	uint constant internal MAX_POSITION_UNIT_COUNT = 50;
+    event CreateItem		(address indexed owner, uint itemKind, uint count, uint wood, uint stone, uint iron, uint ducat);
+    event AttachItem		(address indexed owner, uint armyId, uint itemKind, uint count);
+    event AttackKnightItem	(address indexed owner, uint armyId, uint itemId);
 	
 	Building[] internal buildings;
 	Army[] internal armies;
@@ -31,9 +29,20 @@ contract DelightWorld is DelightSub {
 	
 	mapping(address => uint[]) internal ownerToHQIds;
 	
-	// 올바른 범위인지 체크합니다.
-	modifier checkRange(uint col, uint row) {
-		require(col < COL_RANGE && row < ROW_RANGE);
+	// Delight Battle 주소
+	address public delightBattle;
+	
+	function setDelightBattleOnce(address addr) external {
+		
+		// 비어있는 주소인 경우에만
+		require(delightBattle == address(0));
+		
+		delightBattle = addr;
+	}
+	
+	// Sender가 Delight Battle일때만 실행
+	modifier onlyDelightBattle() {
+		require(msg.sender == delightBattle);
 		_;
 	}
 	
@@ -62,7 +71,7 @@ contract DelightWorld is DelightSub {
 	}
 	
 	// 특정 위치에 존재하는 부대의 소유주를 가져옵니다.
-	function getArmyOwnerByPosition(uint col, uint row) view internal returns (address) {
+	function getArmyOwnerByPosition(uint col, uint row) view public returns (address) {
 		
 		uint[] memory armyIds = positionToArmyIds[col][row];
 		
@@ -164,7 +173,7 @@ contract DelightWorld is DelightSub {
 	}
 	
 	// 본부를 업그레이드합니다.
-	function upgradeHQ(address owner, uint buildingId) external {
+	function upgradeHQ(address owner, uint buildingId) onlyDelight external {
 		
 		Building storage building = buildings[buildingId];
 		
@@ -199,7 +208,7 @@ contract DelightWorld is DelightSub {
 	}
 	
 	// 건물에서 부대를 생산합니다.
-	function createArmy(address owner, uint buildingId, uint unitCount) external returns (uint) {
+	function createArmy(address owner, uint buildingId, uint unitCount) onlyDelight external returns (uint) {
 		
 		// 건물 소유주만 부대 생산이 가능합니다.
 		require(buildings[buildingId].owner == owner);
@@ -304,4 +313,187 @@ contract DelightWorld is DelightSub {
 		
 		return armyIds[unitKind];
 	}
+	
+	// 아이템을 생성합니다.
+	function createItem(address owner, uint kind, uint count) onlyDelight external returns (uint) {
+		
+		Material memory itemMaterial = itemMaterials[kind];
+		Material memory material = Material({
+			wood : itemMaterial.wood.mul(count),
+			stone : itemMaterial.stone.mul(count),
+			iron : itemMaterial.iron.mul(count),
+			ducat : itemMaterial.ducat.mul(count)
+		});
+		
+		// 아이템을 생산하는데 필요한 자원이 충분한지 확인합니다.
+		require(
+			wood.balanceOf(owner) >= material.wood &&
+			stone.balanceOf(owner) >= material.stone &&
+			iron.balanceOf(owner) >= material.iron &&
+			ducat.balanceOf(owner) >= material.ducat
+		);
+		
+		DelightItem itemContract = getItemContract(kind);
+		
+		itemContract.assemble(owner, count);
+		
+		// 기록을 저장합니다.
+		delightHistory.recordCreateItem(owner, kind, count, material.wood, material.stone, material.iron, material.ducat);
+		
+		// 이벤트 발생
+		emit CreateItem(owner, kind, count, material.wood, material.stone, material.iron, material.ducat);
+	}
+	
+	// 부대에 아이템을 장착합니다.
+	function attachItem(address owner, uint armyId, uint itemKind, uint unitCount) onlyDelight external {
+		
+		Army storage army = armies[armyId];
+		
+		// 부대의 소유주를 확인합니다.
+		require(army.owner == owner);
+		
+		// 유닛 수가 충분한지 확인합니다.
+		require(army.unitCount >= unitCount);
+		
+		DelightItem itemContract = getItemContract(itemKind);
+		
+		// 아이템 수가 충분한지 확인합니다.
+		require(itemContract.balanceOf(owner) >= unitCount);
+		
+		// 부대의 성격과 아이템의 성격이 일치한지 확인합니다.
+		require(
+			// 검병
+			(
+				army.unitKind == UNIT_SWORDSMAN &&
+				(
+					itemKind == ITEM_AXE ||
+					itemKind == ITEM_SPEAR ||
+					itemKind == ITEM_SHIELD ||
+					itemKind == ITEM_HOOD
+				)
+			) ||
+			
+			// 궁수
+			(
+				army.unitKind == UNIT_ARCHER &&
+				(
+					itemKind == ITEM_CROSSBOW ||
+					itemKind == ITEM_BALLISTA ||
+					itemKind == ITEM_CATAPULT
+				)
+			) ||
+			
+			// 기마병
+			(
+				army.unitKind == UNIT_CAVALY &&
+				(
+					itemKind == ITEM_CAMEL ||
+					itemKind == ITEM_ELEPHANT
+				)
+			)
+		);
+		
+		// 유닛의 일부를 변경하여 새로운 부대를 생성합니다.
+		
+		// 새 부대 유닛의 성격
+		uint unitKind;
+		
+		if (itemKind == ITEM_AXE) {
+			unitKind = UNIT_AXEMAN;
+		} else if (itemKind == ITEM_SPEAR) {
+			unitKind = UNIT_SPEARMAN;
+		} else if (itemKind == ITEM_SHIELD) {
+			unitKind = UNIT_SHIELDMAN;
+		} else if (itemKind == ITEM_HOOD) {
+			unitKind = UNIT_SPY;
+		}
+		
+		else if (itemKind == ITEM_CROSSBOW) {
+			unitKind = UNIT_CROSSBOWMAN;
+		} else if (itemKind == ITEM_BALLISTA) {
+			unitKind = UNIT_BALLISTA;
+		} else if (itemKind == ITEM_CATAPULT) {
+			unitKind = UNIT_CATAPULT;
+		}
+		
+		else if (itemKind == ITEM_CAMEL) {
+			unitKind = UNIT_CAMELRY;
+		} else if (itemKind == ITEM_ELEPHANT) {
+			unitKind = UNIT_WAR_ELEPHANT;
+		}
+		
+		army.unitCount = army.unitCount.sub(unitCount);
+		
+		uint[] storage armyIds = positionToArmyIds[army.col][army.row];
+		
+		armyIds.length = UNIT_KIND_COUNT;
+		
+		// 기존에 부대가 존재하면 부대원의 숫자 증가
+		uint originArmyId = armyIds[unitKind];
+		if (originArmyId != 0) {
+			armies[originArmyId].unitCount = armies[originArmyId].unitCount.add(unitCount);
+		}
+		
+		// 새 부대 생성
+		else {
+			
+			armyIds[unitKind] = armies.push(Army({
+				unitKind : unitKind,
+				unitCount : unitCount,
+				knightItemId : 0,
+				col : army.col,
+				row : army.row,
+				owner : owner,
+				createTime : now
+			})).sub(1);
+		}
+		
+		// 아이템을 Delight로 이전합니다.
+		itemContract.transferFrom(owner, address(this), unitCount);
+		
+		// 기록을 저장합니다.
+		delightHistory.recordAttachItem(owner, itemKind, unitCount, armyIds[unitKind], unitKind, army.col, army.row);
+		
+		// 이벤트 발생
+		emit AttachItem(owner, armyIds[unitKind], itemKind, unitCount);
+	}
+	
+	// 기사에 아이템을 장착합니다.
+	function attachKnightItem(address owner, uint armyId, uint itemId) onlyDelight external {
+		
+		Army storage army = armies[armyId];
+		
+		// 부대의 소유주를 확인합니다.
+		require(army.owner == owner);
+		
+		// 기사인지 확인합니다.
+		require(army.unitKind == UNIT_KNIGHT);
+		
+		// 기사가 아이템을 장착하고 있지 않은지 확인합니다.
+		require(army.knightItemId == 0);
+		
+		// 아이템을 소유하고 있는지 확인합니다.
+		require(knightItem.ownerOf(itemId) == owner);
+		
+		// 기사 아이템을 지정합니다.
+		army.knightItemId = itemId;
+		
+		// 아이템을 Delight로 이전합니다.
+		knightItem.transferFrom(owner, address(this), itemId);
+		
+		// 기록을 저장합니다.
+		delightHistory.recordAttachKnightItem(owner, itemId, armyId, army.col, army.row);
+		
+		// 이벤트 발생
+		emit AttackKnightItem(owner, armyId, itemId);
+	}
+	
+	// 부대의 위치를 이전합니다.
+	function moveArmy();
+	
+	// 두 부대를 병합합니다.
+	function mergeArmy();
+	
+	// 부대를 공격합니다.
+	function attackArmy();
 }
