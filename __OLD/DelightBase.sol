@@ -10,65 +10,6 @@ import "./Util/SafeMath.sol";
 contract DelightBase is DelightInterface, NetworkChecker {
 	using SafeMath for uint;
 	
-	// 지형의 범위
-	uint constant internal COL_RANGE = 100;
-	uint constant internal ROW_RANGE = 100;
-	
-	// 한 위치에 존재할 수 있는 최대 유닛 수
-	uint constant internal MAX_POSITION_UNIT_COUNT = 50;
-	
-	// 건물
-	uint constant internal BUILDING_HQ				= 0;
-	uint constant internal BUILDING_TRAINING_CENTER	= 1;
-	uint constant internal BUILDING_ARCHERY_RANGE	= 2;
-	uint constant internal BUILDING_STABLE			= 3;
-	uint constant internal BUILDING_WALL			= 4;
-	uint constant internal BUILDING_GATE			= 5;
-	
-	// 유닛
-	uint constant internal UNIT_SWORDSMAN		= 4;
-	uint constant internal UNIT_AXEMAN			= 2;
-	uint constant internal UNIT_SPEARMAN		= 6;
-	uint constant internal UNIT_SHIELDMAN		= 0;
-	uint constant internal UNIT_SPY				= 11;
-	uint constant internal UNIT_ARCHER			= 8;
-	uint constant internal UNIT_CROSSBOWMAN		= 7;
-	uint constant internal UNIT_BALLISTA		= 10;
-	uint constant internal UNIT_CATAPULT		= 9;
-	uint constant internal UNIT_CAVALY			= 5;
-	uint constant internal UNIT_CAMELRY			= 3;
-	uint constant internal UNIT_WAR_ELEPHANT	= 1;
-	uint constant internal UNIT_KNIGHT			= 12;
-	uint constant internal UNIT_KIND_COUNT		= 13;
-	
-	// 아이템
-	uint constant internal ITEM_AXE			= 0;
-	uint constant internal ITEM_SPEAR		= 1;
-	uint constant internal ITEM_SHIELD		= 2;
-	uint constant internal ITEM_HOOD		= 3;
-	uint constant internal ITEM_CROSSBOW	= 4;
-	uint constant internal ITEM_BALLISTA	= 5;
-	uint constant internal ITEM_CATAPULT	= 6;
-	uint constant internal ITEM_CAMEL		= 7;
-	uint constant internal ITEM_ELEPHANT	= 8;
-	
-	// 기사의 기본 버프
-	uint constant internal KNIGHT_DEFAULT_BUFF_HP = 10;
-	uint constant internal KNIGHT_DEFAULT_BUFF_DAMAGE = 5;
-	
-	// 기록
-	uint constant internal RECORD_BUILD					= 0;
-	uint constant internal RECORD_UPGRADE_HQ			= 1;
-	uint constant internal RECORD_CREATE_ARMY			= 2;
-	uint constant internal RECORD_ADD_UNITS				= 3;
-	uint constant internal RECORD_MOVE_ARMY				= 4;
-	uint constant internal RECORD_WIN					= 6;
-	uint constant internal RECORD_LOSE					= 7;
-	uint constant internal RECORD_RANGED_ATTACK			= 8;
-	uint constant internal RECORD_CREATE_ITEM			= 9;
-	uint constant internal RECORD_ATTACH_ITEM			= 10;
-	uint constant internal RECORD_ATTACH_KNIGHT_ITEM	= 11;
-	
 	ERC20 internal wood;
 	ERC20 internal stone;
 	ERC20 internal iron;

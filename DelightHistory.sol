@@ -1,10 +1,11 @@
 pragma solidity ^0.5.9;
 
-import "./DelightSub.sol";
+import "./DelightHistoryInterface.sol";
+import "./DelightBase.sol";
 import "./Util/SafeMath.sol";
 
 // 기록 관련 처리
-contract DelightHistory is DelightSub {
+contract DelightHistory is DelightHistoryInterface, DelightBase {
 	using SafeMath for uint;
 	
 	// 기록의 종류
@@ -20,62 +21,39 @@ contract DelightHistory is DelightSub {
 	uint constant internal RECORD_ATTACH_ITEM			= 10;
 	uint constant internal RECORD_ATTACH_KNIGHT_ITEM	= 11;
 	
-	// 기록 정보
-	struct Record {
-		
-		uint kind;
-		
-		address owner;
-		address enemy;
-		
-		uint col;
-		uint row;
-		uint toCol;
-		uint toRow;
-		
-		uint buildingId;
-		uint buildingKind;
-		uint buildingLevel;
-		
-		uint armyId;
-		uint unitKind;
-		uint unitCount;
-		
-		uint itemId;
-		uint itemKind;
-		uint itemCount;
-		
-		uint wood;
-		uint stone;
-		uint iron;
-		uint ducat;
-		
-		uint time;
-	}
-	
-	// 기록 상세 정보
-	struct RecordDetail {
-		
-		uint recordId;
-		address owner;
-		
-		uint armyId;
-		uint targetArmyId;
-		
-		uint unitKind;
-		uint unitCount;
-		
-		uint buildingId;
-		uint buildingKind;
-		
-		uint enemyWood;
-		uint enemyStone;
-		uint enemyIron;
-		uint enemyDucat;
-	}
-	
 	Record[] private history;
 	mapping(uint => RecordDetail[]) private recordIdToDetails;
+	
+	// Delight World 주소
+	address public delightWorld;
+	
+	// Delight Battle 주소
+	address public delightBattle;
+	
+	function setDelightWorldOnce(address addr) external {
+		
+		// 비어있는 주소인 경우에만
+		require(delightWorld == address(0));
+		
+		delightWorld = addr;
+	}
+	
+	function setDelightBattleOnce(address addr) external {
+		
+		// 비어있는 주소인 경우에만
+		require(delightBattle == address(0));
+		
+		delightBattle = addr;
+	}
+	
+	// Sender가 Delight일때만 실행
+	modifier onlyDelight() {
+		require(
+			msg.sender == delightWorld ||
+			msg.sender == delightBattle
+		);
+		_;
+	}
 	
 	// 건물 짓는 기록을 저장합니다.
 	function recordBuild(
@@ -89,9 +67,9 @@ contract DelightHistory is DelightSub {
 		// 재료
 		uint wood, uint stone, uint iron, uint ducat
 		
-	) onlyDelight external {
+	) onlyDelight external returns (uint) {
 		
-		history.push(Record({
+		return history.push(Record({
 			kind : RECORD_BUILD,
 			
 			owner : owner,
@@ -120,7 +98,7 @@ contract DelightHistory is DelightSub {
 			ducat : ducat,
 			
 			time : now
-		}));
+		})).sub(1);
 	}
 	
 	// 본부를 업그레이드하는 기록을 저장합니다.
@@ -135,9 +113,9 @@ contract DelightHistory is DelightSub {
 		// 재료
 		uint wood, uint stone, uint iron, uint ducat
 		
-	) onlyDelight external {
+	) onlyDelight external returns (uint) {
 		
-		history.push(Record({
+		return history.push(Record({
 			kind : RECORD_UPGRADE_HQ,
 			
 			owner : owner,
@@ -166,7 +144,7 @@ contract DelightHistory is DelightSub {
 			ducat : ducat,
 			
 			time : now
-		}));
+		})).sub(1);
 	}
 	
 	// 유닛을 추가하는 기록을 저장합니다.
@@ -184,9 +162,9 @@ contract DelightHistory is DelightSub {
 		// 재료
 		uint wood, uint stone, uint iron, uint ducat
 		
-	) onlyDelight external {
+	) onlyDelight external returns (uint) {
 		
-		history.push(Record({
+		return history.push(Record({
 			kind : RECORD_ADD_UNITS,
 			
 			owner : owner,
@@ -215,7 +193,7 @@ contract DelightHistory is DelightSub {
 			ducat : ducat,
 			
 			time : now
-		}));
+		})).sub(1);
 	}
 	
 	// 부대를 생성하는 기록을 저장합니다.
@@ -233,9 +211,9 @@ contract DelightHistory is DelightSub {
 		// 재료
 		uint wood, uint stone, uint iron, uint ducat
 		
-	) onlyDelight external {
+	) onlyDelight external returns (uint) {
 		
-		history.push(Record({
+		return history.push(Record({
 			kind : RECORD_CREATE_ARMY,
 			
 			owner : owner,
@@ -264,7 +242,7 @@ contract DelightHistory is DelightSub {
 			ducat : ducat,
 			
 			time : now
-		}));
+		})).sub(1);
 	}
 	
 	// 아이템을 생성하는 기록을 저장합니다.
@@ -278,9 +256,9 @@ contract DelightHistory is DelightSub {
 		// 재료
 		uint wood, uint stone, uint iron, uint ducat
 		
-	) onlyDelight external {
+	) onlyDelight external returns (uint) {
 		
-		history.push(Record({
+		return history.push(Record({
 			kind : RECORD_CREATE_ITEM,
 			
 			owner : owner,
@@ -309,7 +287,7 @@ contract DelightHistory is DelightSub {
 			ducat : ducat,
 			
 			time : now
-		}));
+		})).sub(1);
 	}
 	
 	// 아이템을 장착하는 기록을 저장합니다.
@@ -324,9 +302,9 @@ contract DelightHistory is DelightSub {
 		uint armyId, uint unitKind,
 		uint col, uint row
 		
-	) onlyDelight external {
+	) onlyDelight external returns (uint) {
 		
-		history.push(Record({
+		return history.push(Record({
 			kind : RECORD_ATTACH_ITEM,
 			
 			owner : owner,
@@ -355,7 +333,7 @@ contract DelightHistory is DelightSub {
 			ducat : 0,
 			
 			time : now
-		}));
+		})).sub(1);
 	}
 	
 	// 기사 아이템을 장착하는 기록을 저장합니다.
@@ -370,9 +348,9 @@ contract DelightHistory is DelightSub {
 		uint armyId,
 		uint col, uint row
 		
-	) onlyDelight external {
+	) onlyDelight external returns (uint) {
 		
-		history.push(Record({
+		return history.push(Record({
 			kind : RECORD_ATTACH_KNIGHT_ITEM,
 			
 			owner : owner,
@@ -401,7 +379,7 @@ contract DelightHistory is DelightSub {
 			ducat : 0,
 			
 			time : now
-		}));
+		})).sub(1);
 	}
 	
 	// 부대가 이동하는 기록을 저장합니다.
@@ -412,9 +390,9 @@ contract DelightHistory is DelightSub {
 		// 위치 정보
 		uint fromCol, uint fromRow, uint toCol, uint toRow
 		
-	) onlyDelight external {
+	) onlyDelight external returns (uint) {
 		
-		history.push(Record({
+		return history.push(Record({
 			kind : RECORD_MOVE_ARMY,
 			
 			owner : owner,
@@ -443,7 +421,7 @@ contract DelightHistory is DelightSub {
 			ducat : 0,
 			
 			time : now
-		}));
+		})).sub(1);
 	}
 	
 	// 승리 기록을 저장합니다.
@@ -457,9 +435,9 @@ contract DelightHistory is DelightSub {
 		// 전리품
 		uint wood, uint stone, uint iron, uint ducat
 		
-	) onlyDelight external {
+	) onlyDelight external returns (uint) {
 		
-		history.push(Record({
+		return history.push(Record({
 			kind : RECORD_WIN,
 			
 			owner : owner,
@@ -488,7 +466,7 @@ contract DelightHistory is DelightSub {
 			ducat : ducat,
 			
 			time : now
-		}));
+		})).sub(1);
 	}
 	
 	// 패배 기록을 저장합니다.
@@ -502,9 +480,9 @@ contract DelightHistory is DelightSub {
 		// 전리품
 		uint wood, uint stone, uint iron, uint ducat
 		
-	) onlyDelight external {
+	) onlyDelight external returns (uint) {
 		
-		history.push(Record({
+		return history.push(Record({
 			kind : RECORD_LOSE,
 			
 			owner : owner,
@@ -533,7 +511,7 @@ contract DelightHistory is DelightSub {
 			ducat : ducat,
 			
 			time : now
-		}));
+		})).sub(1);
 	}
 	
 	// 원거리 공격 기록을 저장합니다.
@@ -547,9 +525,9 @@ contract DelightHistory is DelightSub {
 		// 돌려받을 자원
 		uint wood, uint stone, uint iron, uint ducat
 		
-	) onlyDelight external {
+	) onlyDelight external returns (uint) {
 		
-		history.push(Record({
+		return history.push(Record({
 			kind : RECORD_RANGED_ATTACK,
 			
 			owner : owner,
@@ -578,7 +556,7 @@ contract DelightHistory is DelightSub {
 			ducat : ducat,
 			
 			time : now
-		}));
+		})).sub(1);
 	}
 	
 	// 부대와 관련된 상세 기록을 추가합니다.
@@ -592,9 +570,8 @@ contract DelightHistory is DelightSub {
 		
 	) onlyDelight external {
 		
-		recordIdToDetails[history.length].push(RecordDetail({
+		recordIdToDetails[recordId].push(RecordDetail({
 			
-			recordId : recordId,
 			owner : owner,
 			
 			armyId : armyId,
@@ -623,9 +600,8 @@ contract DelightHistory is DelightSub {
 		
 	) onlyDelight external {
 		
-		recordIdToDetails[history.length].push(RecordDetail({
+		recordIdToDetails[recordId].push(RecordDetail({
 			
-			recordId : recordId,
 			owner : owner,
 			
 			armyId : armyId,
@@ -654,9 +630,8 @@ contract DelightHistory is DelightSub {
 		
 	) onlyDelight external {
 		
-		recordIdToDetails[history.length].push(RecordDetail({
+		recordIdToDetails[recordId].push(RecordDetail({
 			
-			recordId : recordId,
 			owner : owner,
 			
 			armyId : 0,
@@ -685,9 +660,8 @@ contract DelightHistory is DelightSub {
 		
 	) onlyDelight external {
 		
-		recordIdToDetails[history.length].push(RecordDetail({
+		recordIdToDetails[recordId].push(RecordDetail({
 			
-			recordId : recordId,
 			owner : enemy,
 			
 			armyId : 0,
