@@ -3,6 +3,7 @@ pragma solidity ^0.5.9;
 import "./DelightSub.sol";
 import "./Util/SafeMath.sol";
 
+// 기록 관련 처리
 contract DelightHistory is DelightSub {
 	using SafeMath for uint;
 	

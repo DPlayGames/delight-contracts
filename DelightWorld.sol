@@ -1,9 +1,10 @@
 pragma solidity ^0.5.9;
 
-import "./DelightBase.sol";
+import "./DelightSub.sol";
 import "./Util/SafeMath.sol";
 
-contract DelightWorld is DelightBase {
+// 월드 관련 처리
+contract DelightWorld is DelightSub {
 	using SafeMath for uint;
 	
 	// 지형의 범위
