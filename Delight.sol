@@ -28,6 +28,7 @@ contract Delight is DelightBase, NetworkChecker {
 		uint param4;
 		uint kill;
 		uint death;
+		bool isWin;
 		uint time;
 	}
 	
@@ -102,6 +103,7 @@ contract Delight is DelightBase, NetworkChecker {
 				delightArmyManager.moveArmy(fromCol, fromRow, toCol, toRow);
 				delightArmyManager.destroyBuilding(battleId, toCol, toRow);
 				delightArmyManager.win(battleId, msg.sender);
+				record.isWin = true;
 			}
 			
 			// 상대가 승리했습니다.
@@ -148,6 +150,7 @@ contract Delight is DelightBase, NetworkChecker {
 				param4 : params4[i],
 				kill : 0,
 				death : 0,
+				isWin : false,
 				time : now
 			});
 			
