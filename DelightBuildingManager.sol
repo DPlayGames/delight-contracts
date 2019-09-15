@@ -50,10 +50,20 @@ contract DelightBuildingManager is DelightManager {
 		uint buildTime;
 	}
 	
-	Building[] internal buildings;
+	Building[] private buildings;
 	
-	mapping(uint => mapping(uint => uint)) internal positionToBuildingId;
-	mapping(address => uint[]) internal ownerToHQIds;
+	mapping(uint => mapping(uint => uint)) private positionToBuildingId;
+	mapping(address => uint[]) private ownerToHQIds;
+	
+	// 특정 위치의 건물 ID를 반환합니다.
+	function getPositionBuildingId(uint col, uint row) view external returns (uint) {
+		return positionToBuildingId[col][row];
+	}
+	
+	// 특정 위치의 건물의 주인을 반환합니다.
+	function getPositionBuildingOwner(uint col, uint row) view external returns (address) {
+		return buildings[positionToBuildingId[col][row]].owner;
+	}
 	
 	// 건물을 짓습니다.
 	function build(address owner, uint kind, uint col, uint row) onlyDelight external {
@@ -236,18 +246,26 @@ contract DelightBuildingManager is DelightManager {
 			}
 			
 			hqIds.length -= 1;
+			
+			// 본부 업그레이드 비용을 반환합니다.
+			for (uint i = 1; i <= building.level; i += 1) {
+				
+				// 반환할 재료를 추가합니다.
+				wood = wood.add(info.getHQUpgradeMaterialWood(buildingKind));
+				stone = stone.add(info.getHQUpgradeMaterialStone(buildingKind));
+				iron = iron.add(info.getHQUpgradeMaterialIron(buildingKind));
+				ducat = ducat.add(info.getHQUpgradeMaterialDucat(buildingKind));
+			}
 		}
+		
+		// 반환할 재료를 추가합니다.
+		wood = wood.add(info.getBuildingMaterialWood(buildingKind));
+		stone = stone.add(info.getBuildingMaterialStone(buildingKind));
+		iron = iron.add(info.getBuildingMaterialIron(buildingKind));
+		ducat = ducat.add(info.getBuildingMaterialDucat(buildingKind));
 		
 		// 건물을 파괴합니다.
 		delete buildings[buildingId];
 		delete positionToBuildingId[col][row];
-		
-		// 재료를 반환합니다.
-		return (
-			info.getBuildingMaterialWood(buildingKind),
-			info.getBuildingMaterialStone(buildingKind),
-			info.getBuildingMaterialIron(buildingKind),
-			info.getBuildingMaterialDucat(buildingKind)
-		);
 	}
 }

@@ -15,6 +15,16 @@ contract DelightArmyManager is DelightManager {
 	uint constant internal KNIGHT_DEFAULT_BUFF_HP = 10;
 	uint constant internal KNIGHT_DEFAULT_BUFF_DAMAGE = 5;
 	
+	// 보상
+	struct Reward {
+		uint wood;
+		uint stone;
+		uint iron;
+		uint ducat;
+	}
+	
+	mapping(uint => Reward) private battleIdToReward;
+	
 	// Delight 건물 관리자
 	DelightBuildingManager public delightBuildingManager;
 	
@@ -470,16 +480,42 @@ contract DelightArmyManager is DelightManager {
 		return totalDamage;
 	}
 	
+	function getItemKindByUnitKind(uint unitKind) pure private returns (uint) {
+		
+		if (unitKind == UNIT_AXEMAN) {
+			return ITEM_AXE;
+		} else if (unitKind == UNIT_SPEARMAN) {
+			return ITEM_SPEAR;
+		} else if (unitKind == UNIT_SHIELDMAN) {
+			return ITEM_SHIELD;
+		} else if (unitKind == UNIT_SPY) {
+			return ITEM_HOOD;
+		}
+		
+		else if (unitKind == UNIT_CROSSBOWMAN) {
+			return ITEM_CROSSBOW;
+		} else if (unitKind == UNIT_BALLISTA) {
+			return ITEM_BALLISTA;
+		} else if (unitKind == UNIT_CATAPULT) {
+			return ITEM_CATAPULT;
+		}
+		
+		else if (unitKind == UNIT_CAMELRY) {
+			return ITEM_CAMEL;
+		} else if (unitKind == UNIT_WAR_ELEPHANT) {
+			return ITEM_ELEPHANT;
+		}
+		
+		return 0;
+	}
+	
 	// 부대를 공격합니다.
-	function attack(address owner, address enemy, uint totalDamage, uint distance, uint col, uint row) onlyDelight external {
+	function attack(uint battleId, uint totalDamage, uint distance, uint col, uint row) onlyDelight external returns (uint totalDeadUnitCount) {
 		
 		uint damage = totalDamage;
 		
 		// 전리품
-		uint rewardWood = 0;
-		uint rewardStone = 0;
-		uint rewardIron = 0;
-		uint rewardDucat = 0;
+		Reward storage reward = battleIdToReward[battleId];
 		
 		uint[] storage armyIds = positionToArmyIds[col][row];
 		
@@ -515,54 +551,74 @@ contract DelightArmyManager is DelightManager {
 				// 적의 총 공격력을 낮춥니다.
 				damage = damage <= deadUnitCount.mul(info.getUnitHP(army.unitKind)) ? 0 : damage.sub(deadUnitCount.mul(info.getUnitHP(army.unitKind)));
 				
-				// 전리품을 계산합니다.
-				rewardWood = rewardWood.add(info.getUnitMaterialWood(army.unitKind).mul(deadUnitCount));
-				rewardStone = rewardStone.add(info.getUnitMaterialStone(army.unitKind).mul(deadUnitCount));
-				rewardIron = rewardIron.add(info.getUnitMaterialIron(army.unitKind).mul(deadUnitCount));
-				rewardDucat = rewardDucat.add(info.getUnitMaterialDucat(army.unitKind).mul(deadUnitCount));
+				// 전리품을 추가합니다.
+				reward.wood = reward.wood.add(info.getUnitMaterialWood(army.unitKind).mul(deadUnitCount));
+				reward.stone = reward.stone.add(info.getUnitMaterialStone(army.unitKind).mul(deadUnitCount));
+				reward.iron = reward.iron.add(info.getUnitMaterialIron(army.unitKind).mul(deadUnitCount));
+				reward.ducat = reward.ducat.add(info.getUnitMaterialDucat(army.unitKind).mul(deadUnitCount));
+				
+				// 장착한 아이템을 분해합니다.
+				uint itemKind = getItemKindByUnitKind(army.unitKind);
+				if (itemKind != 0) {
+					delightItemManager.disassembleItem(itemKind, deadUnitCount);
+				}
 				
 				// 남은 병사 숫자를 저장합니다.
 				army.unitCount = remainUnitCount;
 				
-				// 병사가 전멸했습니다.
+				// 부대가 전멸했습니다.
 				if (army.unitCount == 0) {
 					delete armies[armyIds[i]];
 					delete armyIds[i];
 				}
+				
+				// 총 사망 병사 숫자에 추가합니다.
+				totalDeadUnitCount = deadUnitCount;
 			}
-		}
-		
-		// 승리
-		if (damage >= 0) {
-			
-			// 전리품을 얻습니다.
-			wood.transferFrom(delight, owner, rewardWood);
-			stone.transferFrom(delight, owner, rewardStone);
-			iron.transferFrom(delight, owner, rewardIron);
-			ducat.transferFrom(delight, owner, rewardDucat);
-		}
-		
-		// 패배
-		else {
-			
-			// 전리품을 얻습니다.
-			wood.transferFrom(delight, enemy, rewardWood);
-			stone.transferFrom(delight, enemy, rewardStone);
-			iron.transferFrom(delight, enemy, rewardIron);
-			ducat.transferFrom(delight, enemy, rewardDucat);
 		}
 	}
 	
+	// 건물을 파괴합니다.
+	function destroyBuilding(uint battleId, uint col, uint row) onlyDelight external {
+		
+		// 건물이 존재하는 경우에만
+		if (delightBuildingManager.getPositionBuildingId(col, row) != 0) {
+			
+			// 전리품
+			Reward storage reward = battleIdToReward[battleId];
+			
+			(
+				uint wood,
+				uint stone,
+				uint iron,
+				uint ducat
+			) = delightBuildingManager.destroyBuilding(col, row);
+			
+			// 전리품에 추가합니다.
+			reward.wood = reward.wood.add(wood);
+			reward.stone = reward.stone.add(stone);
+			reward.iron = reward.iron.add(iron);
+			reward.ducat = reward.ducat.add(ducat);
+		}
+	}
+	
+	// 전투에서 승리했습니다.
+	function win(uint battleId, address winner) onlyDelight external {
+		
+		// 전리품
+		Reward memory reward = battleIdToReward[battleId];
+		
+		// 승리자는 전리품을 취합니다.
+		wood.transferFrom(delight, winner, reward.wood);
+		stone.transferFrom(delight, winner, reward.stone);
+		iron.transferFrom(delight, winner, reward.iron);
+		ducat.transferFrom(delight, winner, reward.ducat);
+	}
+	
 	// 부대를 원거리에서 공격합니다.
-	function rangedAttack(address enemy, uint totalDamage, uint distance, uint col, uint row) onlyDelight external {
+	function rangedAttack(uint totalDamage, uint distance, uint col, uint row) onlyDelight external returns (uint totalDeadUnitCount) {
 		
 		uint damage = totalDamage;
-		
-		// 돌려받을 재료들
-		uint returnWood = 0;
-		uint returnStone = 0;
-		uint returnIron = 0;
-		uint returnDucat = 0;
 		
 		uint[] storage armyIds = positionToArmyIds[col][row];
 		
@@ -598,27 +654,30 @@ contract DelightArmyManager is DelightManager {
 				// 적의 총 공격력을 낮춥니다.
 				damage = damage <= deadUnitCount.mul(info.getUnitHP(army.unitKind)) ? 0 : damage.sub(deadUnitCount.mul(info.getUnitHP(army.unitKind)));
 				
-				// 돌려받을 재료들을 계산합니다.
-				returnWood = returnWood.add(info.getUnitMaterialWood(army.unitKind).mul(deadUnitCount));
-				returnStone = returnStone.add(info.getUnitMaterialStone(army.unitKind).mul(deadUnitCount));
-				returnIron = returnIron.add(info.getUnitMaterialIron(army.unitKind).mul(deadUnitCount));
-				returnDucat = returnDucat.add(info.getUnitMaterialDucat(army.unitKind).mul(deadUnitCount));
+				// 재료들을 돌려받습니다.
+				wood.transferFrom(delight, army.owner, info.getUnitMaterialWood(army.unitKind).mul(deadUnitCount));
+				stone.transferFrom(delight, army.owner, info.getUnitMaterialStone(army.unitKind).mul(deadUnitCount));
+				iron.transferFrom(delight, army.owner, info.getUnitMaterialIron(army.unitKind).mul(deadUnitCount));
+				ducat.transferFrom(delight, army.owner, info.getUnitMaterialDucat(army.unitKind).mul(deadUnitCount));
+				
+				// 장착한 아이템을 분해합니다.
+				uint itemKind = getItemKindByUnitKind(army.unitKind);
+				if (itemKind != 0) {
+					delightItemManager.disassembleItem(itemKind, deadUnitCount);
+				}
 				
 				// 남은 병사 숫자를 저장합니다.
 				army.unitCount = remainUnitCount;
 				
-				// 병사가 전멸했습니다.
+				// 부대가 전멸했습니다.
 				if (army.unitCount == 0) {
 					delete armies[armyIds[i]];
 					delete armyIds[i];
 				}
+				
+				// 총 사망 병사 숫자에 추가합니다.
+				totalDeadUnitCount = deadUnitCount;
 			}
 		}
-		
-		// 재료들을 돌려받습니다.
-		wood.transferFrom(delight, enemy, returnWood);
-		stone.transferFrom(delight, enemy, returnStone);
-		iron.transferFrom(delight, enemy, returnIron);
-		ducat.transferFrom(delight, enemy, returnDucat);
 	}
 }

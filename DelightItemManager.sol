@@ -140,25 +140,12 @@ contract DelightItemManager is DelightManager {
 	}
 	
 	// 아이템을 분해합니다.
-	function disassembleItem(uint kind, uint count) onlyDelight external returns (
-		uint wood,
-		uint stone,
-		uint iron,
-		uint ducat
-	) {
+	function disassembleItem(uint kind, uint count) onlyDelight external {
 		
 		DelightItem itemContract = getItemContract(kind);
 		
 		// 아이템을 분해합니다.
 		itemContract.disassemble(count);
-		
-		// 재료를 반환합니다.
-		return (
-			info.getItemMaterialWood(kind).mul(count),
-			info.getItemMaterialStone(kind).mul(count),
-			info.getItemMaterialIron(kind).mul(count),
-			info.getItemMaterialDucat(kind).mul(count)
-		);
 	}
 	
 	// 기사에 아이템을 장착합니다.

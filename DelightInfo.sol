@@ -268,6 +268,69 @@ contract DelightInfo is DelightBase {
 			iron : 100,
 			ducat : 300
 		});
+		
+		unitMaterials[UNIT_AXEMAN] = Material({
+			wood	: unitMaterials[UNIT_SWORDSMAN].wood	+ itemMaterials[ITEM_AXE].wood,
+			stone	: unitMaterials[UNIT_SWORDSMAN].stone	+ itemMaterials[ITEM_AXE].stone,
+			iron	: unitMaterials[UNIT_SWORDSMAN].iron	+ itemMaterials[ITEM_AXE].iron,
+			ducat	: unitMaterials[UNIT_SWORDSMAN].ducat	+ itemMaterials[ITEM_AXE].ducat
+		});
+		
+		unitMaterials[UNIT_SPEARMAN] = Material({
+			wood	: unitMaterials[UNIT_SWORDSMAN].wood	+ itemMaterials[ITEM_SPEAR].wood,
+			stone	: unitMaterials[UNIT_SWORDSMAN].stone	+ itemMaterials[ITEM_SPEAR].stone,
+			iron	: unitMaterials[UNIT_SWORDSMAN].iron	+ itemMaterials[ITEM_SPEAR].iron,
+			ducat	: unitMaterials[UNIT_SWORDSMAN].ducat	+ itemMaterials[ITEM_SPEAR].ducat
+		});
+		
+		unitMaterials[UNIT_SHIELDMAN] = Material({
+			wood	: unitMaterials[UNIT_SWORDSMAN].wood	+ itemMaterials[ITEM_SHIELD].wood,
+			stone	: unitMaterials[UNIT_SWORDSMAN].stone	+ itemMaterials[ITEM_SHIELD].stone,
+			iron	: unitMaterials[UNIT_SWORDSMAN].iron	+ itemMaterials[ITEM_SHIELD].iron,
+			ducat	: unitMaterials[UNIT_SWORDSMAN].ducat	+ itemMaterials[ITEM_SHIELD].ducat
+		});
+		
+		unitMaterials[UNIT_SPY] = Material({
+			wood	: unitMaterials[UNIT_SWORDSMAN].wood	+ itemMaterials[ITEM_HOOD].wood,
+			stone	: unitMaterials[UNIT_SWORDSMAN].stone	+ itemMaterials[ITEM_HOOD].stone,
+			iron	: unitMaterials[UNIT_SWORDSMAN].iron	+ itemMaterials[ITEM_HOOD].iron,
+			ducat	: unitMaterials[UNIT_SWORDSMAN].ducat	+ itemMaterials[ITEM_HOOD].ducat
+		});
+		
+		unitMaterials[UNIT_CROSSBOWMAN] = Material({
+			wood	: unitMaterials[UNIT_ARCHER].wood	+ itemMaterials[ITEM_CROSSBOW].wood,
+			stone	: unitMaterials[UNIT_ARCHER].stone	+ itemMaterials[ITEM_CROSSBOW].stone,
+			iron	: unitMaterials[UNIT_ARCHER].iron	+ itemMaterials[ITEM_CROSSBOW].iron,
+			ducat	: unitMaterials[UNIT_ARCHER].ducat	+ itemMaterials[ITEM_CROSSBOW].ducat
+		});
+		
+		unitMaterials[UNIT_BALLISTA] = Material({
+			wood	: unitMaterials[UNIT_ARCHER].wood	+ itemMaterials[ITEM_BALLISTA].wood,
+			stone	: unitMaterials[UNIT_ARCHER].stone	+ itemMaterials[ITEM_BALLISTA].stone,
+			iron	: unitMaterials[UNIT_ARCHER].iron	+ itemMaterials[ITEM_BALLISTA].iron,
+			ducat	: unitMaterials[UNIT_ARCHER].ducat	+ itemMaterials[ITEM_BALLISTA].ducat
+		});
+		
+		unitMaterials[UNIT_CATAPULT] = Material({
+			wood	: unitMaterials[UNIT_ARCHER].wood	+ itemMaterials[ITEM_CATAPULT].wood,
+			stone	: unitMaterials[UNIT_ARCHER].stone	+ itemMaterials[ITEM_CATAPULT].stone,
+			iron	: unitMaterials[UNIT_ARCHER].iron	+ itemMaterials[ITEM_CATAPULT].iron,
+			ducat	: unitMaterials[UNIT_ARCHER].ducat	+ itemMaterials[ITEM_CATAPULT].ducat
+		});
+		
+		unitMaterials[UNIT_CAMELRY] = Material({
+			wood	: unitMaterials[UNIT_CAVALY].wood	+ itemMaterials[ITEM_CAMEL].wood,
+			stone	: unitMaterials[UNIT_CAVALY].stone	+ itemMaterials[ITEM_CAMEL].stone,
+			iron	: unitMaterials[UNIT_CAVALY].iron	+ itemMaterials[ITEM_CAMEL].iron,
+			ducat	: unitMaterials[UNIT_CAVALY].ducat	+ itemMaterials[ITEM_CAMEL].ducat
+		});
+		
+		unitMaterials[UNIT_WAR_ELEPHANT] = Material({
+			wood	: unitMaterials[UNIT_CAVALY].wood	+ itemMaterials[ITEM_ELEPHANT].wood,
+			stone	: unitMaterials[UNIT_CAVALY].stone	+ itemMaterials[ITEM_ELEPHANT].stone,
+			iron	: unitMaterials[UNIT_CAVALY].iron	+ itemMaterials[ITEM_ELEPHANT].iron,
+			ducat	: unitMaterials[UNIT_CAVALY].ducat	+ itemMaterials[ITEM_ELEPHANT].ducat
+		});
 	}
 	
 	function getUnitHP					(uint kind) view external returns (uint) { return units[kind].hp; }

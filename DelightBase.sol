@@ -31,13 +31,13 @@ contract DelightBase {
 	uint constant internal UNIT_KIND_COUNT		= 13;
 	
 	// 아이템
-	uint constant internal ITEM_AXE			= 0;
-	uint constant internal ITEM_SPEAR		= 1;
-	uint constant internal ITEM_SHIELD		= 2;
-	uint constant internal ITEM_HOOD		= 3;
-	uint constant internal ITEM_CROSSBOW	= 4;
-	uint constant internal ITEM_BALLISTA	= 5;
-	uint constant internal ITEM_CATAPULT	= 6;
-	uint constant internal ITEM_CAMEL		= 7;
-	uint constant internal ITEM_ELEPHANT	= 8;
+	uint constant internal ITEM_AXE			= 1;
+	uint constant internal ITEM_SPEAR		= 2;
+	uint constant internal ITEM_SHIELD		= 3;
+	uint constant internal ITEM_HOOD		= 4;
+	uint constant internal ITEM_CROSSBOW	= 5;
+	uint constant internal ITEM_BALLISTA	= 6;
+	uint constant internal ITEM_CATAPULT	= 7;
+	uint constant internal ITEM_CAMEL		= 8;
+	uint constant internal ITEM_ELEPHANT	= 9;
 }

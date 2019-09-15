@@ -19,6 +19,20 @@ contract Delight is DelightBase, NetworkChecker {
 	uint constant private ORDER_MOVE_AND_ATTACK		= 6;
 	uint constant private ORDER_RANGED_ATTACK		= 7;
 	
+	struct Record {
+		uint order;
+		address account;
+		uint param1;
+		uint param2;
+		uint param3;
+		uint param4;
+		uint kill;
+		uint death;
+		uint time;
+	}
+	
+	Record[] private history;
+	
 	DelightBuildingManager internal delightBuildingManager;
 	DelightArmyManager internal delightArmyManager;
 	DelightItemManager internal delightItemManager;
@@ -50,7 +64,7 @@ contract Delight is DelightBase, NetworkChecker {
 	}
 	
 	// 부대를 이동시키고, 해당 지역에 적이 있으면 공격합니다.
-	function moveAndAttack(uint fromCol, uint fromRow, uint toCol, uint toRow) internal {
+	function moveAndAttack(uint fromCol, uint fromRow, uint toCol, uint toRow, Record memory record) internal {
 		
 		require(fromCol < COL_RANGE && fromCol < ROW_RANGE);
 		require(toCol < COL_RANGE && toCol < ROW_RANGE);
@@ -78,13 +92,27 @@ contract Delight is DelightBase, NetworkChecker {
 			uint totalDamage = delightArmyManager.getTotalDamage(distance, fromCol, fromRow);
 			uint totalEnemyDamage = delightArmyManager.getTotalDamage(0, toCol, toRow);
 			
-			delightArmyManager.attack(msg.sender, enemy, totalDamage, 0, toCol, toRow);
-			delightArmyManager.attack(enemy, msg.sender, totalEnemyDamage, distance, fromCol, fromRow);
+			uint battleId = history.length;
+			
+			record.kill = delightArmyManager.attack(battleId, totalDamage, 0, toCol, toRow);
+			record.death = delightArmyManager.attack(battleId, totalEnemyDamage, distance, fromCol, fromRow);
+			
+			// 적진을 점령했다면, 병사들을 이동시킵니다.
+			if (delightArmyManager.getPositionOwner(toCol, toRow) == address(0x0)) {
+				delightArmyManager.moveArmy(fromCol, fromRow, toCol, toRow);
+				delightArmyManager.destroyBuilding(battleId, toCol, toRow);
+				delightArmyManager.win(battleId, msg.sender);
+			}
+			
+			// 상대가 승리했습니다.
+			else {
+				delightArmyManager.win(battleId, enemy);
+			}
 		}
 	}
 	
 	// 원거리 유닛으로 특정 지역을 공격합니다.
-	function rangedAttack(uint fromCol, uint fromRow, uint toCol, uint toRow) internal {
+	function rangedAttack(uint fromCol, uint fromRow, uint toCol, uint toRow, Record memory record) internal {
 		
 		require(fromCol < COL_RANGE && fromCol < ROW_RANGE);
 		require(toCol < COL_RANGE && toCol < ROW_RANGE);
@@ -102,14 +130,26 @@ contract Delight is DelightBase, NetworkChecker {
 		uint totalDamage = delightArmyManager.getTotalRangedDamage(distance, fromCol, fromRow);
 		uint totalEnemyDamage = delightArmyManager.getTotalRangedDamage(distance, toCol, toRow);
 		
-		delightArmyManager.rangedAttack(enemy, totalDamage, distance, toCol, toRow);
-		delightArmyManager.rangedAttack(msg.sender, totalEnemyDamage, distance, fromCol, fromRow);
+		record.kill = delightArmyManager.rangedAttack(totalDamage, distance, toCol, toRow);
+		record.death = delightArmyManager.rangedAttack(totalEnemyDamage, distance, fromCol, fromRow);
 	}
 	
 	// 명령 큐를 실행합니다.
 	function runOrderQueue(uint[] calldata orders, uint[] calldata params1, uint[] calldata params2, uint[] calldata params3, uint[] calldata params4) external {
 		
 		for (uint i = 0; i < orders.length; i += 1) {
+			
+			Record memory record = Record({
+				order : orders[i],
+				account : msg.sender,
+				param1 : params1[i],
+				param2 : params2[i],
+				param3 : params3[i],
+				param4 : params4[i],
+				kill : 0,
+				death : 0,
+				time : now
+			});
 			
 			// 건물을 짓습니다.
 			if (orders[i] == ORDER_BUILD) {
@@ -143,13 +183,20 @@ contract Delight is DelightBase, NetworkChecker {
 			
 			// 부대를 이동시키고, 해당 지역에 적이 있으면 공격합니다.
 			else if (orders[i] == ORDER_MOVE_AND_ATTACK) {
-				moveAndAttack(params1[i], params2[i], params3[i], params4[i]);
+				moveAndAttack(params1[i], params2[i], params3[i], params4[i], record);
 			}
 			
 			// 원거리 유닛으로 특정 지역을 공격합니다.
 			else if (orders[i] == ORDER_RANGED_ATTACK) {
-				rangedAttack(params1[i], params2[i], params3[i], params4[i]);
+				rangedAttack(params1[i], params2[i], params3[i], params4[i], record);
 			}
+			
+			else {
+				revert();
+			}
+			
+			// 기록을 추가합니다.
+			history.push(record);
 		}
 	}
 }
