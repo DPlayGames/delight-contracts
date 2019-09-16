@@ -1,24 +1,9 @@
 pragma solidity ^0.5.9;
 
+import "./DelightInfoInterface.sol";
 import "./DelightBase.sol";
 
-contract DelightInfo is DelightBase {
-	
-	// 유닛 정보
-	struct Unit {
-		uint hp;
-		uint damage;
-		uint movableDistance;
-		uint attackableDistance;
-	}
-	
-	// 재료 정보
-	struct Material {
-		uint wood;
-		uint stone;
-		uint iron;
-		uint ducat;
-	}
+contract DelightInfo is DelightInfoInterface, DelightBase {
 	
 	// 유닛 정보
 	mapping(uint => Unit) internal units;

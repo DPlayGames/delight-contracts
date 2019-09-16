@@ -1,11 +1,12 @@
 pragma solidity ^0.5.9;
 
+import "./DelightArmyManagerInterface.sol";
 import "./DelightManager.sol";
 import "./DelightBuildingManager.sol";
 import "./DelightItemManager.sol";
 import "./Util/SafeMath.sol";
 
-contract DelightArmyManager is DelightManager {
+contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	using SafeMath for uint;
 	
 	// 한 위치에 존재할 수 있는 최대 유닛 수
@@ -14,16 +15,6 @@ contract DelightArmyManager is DelightManager {
 	// 기사의 기본 버프
 	uint constant internal KNIGHT_DEFAULT_BUFF_HP = 10;
 	uint constant internal KNIGHT_DEFAULT_BUFF_DAMAGE = 5;
-	
-	// 보상
-	struct Reward {
-		uint wood;
-		uint stone;
-		uint iron;
-		uint ducat;
-	}
-	
-	mapping(uint => Reward) private battleIdToReward;
 	
 	// Delight 건물 관리자
 	DelightBuildingManager public delightBuildingManager;
@@ -85,23 +76,46 @@ contract DelightArmyManager is DelightManager {
 		}
 	}
 	
-	// 부대 정보
-	struct Army {
-		uint unitKind;
-		uint unitCount;
-		uint knightItemId;
-		uint col;
-		uint row;
-		address owner;
-		uint createTime;
-	}
-	
 	Army[] internal armies;
 	
 	mapping(uint => mapping(uint => uint[])) internal positionToArmyIds;
+	mapping(uint => Reward) private battleIdToReward;
+	
+	// 부대의 총 개수를 반환합니다.
+	function getArmyCount() view external returns (uint) {
+		return armies.length;
+	}
+	
+	// 부대의 정보를 반환합니다.
+	function getArmyInfo(uint armyId) view external returns (
+		uint unitKind,
+		uint unitCount,
+		uint knightItemId,
+		uint col,
+		uint row,
+		address owner,
+		uint createTime
+	) {
+		Army memory army = armies[armyId];
+		
+		return (
+			army.unitKind,
+			army.unitCount,
+			army.knightItemId,
+			army.col,
+			army.row,
+			army.owner,
+			army.createTime
+		);
+	}
+	
+	// 특정 위치에 존재하는 부대의 ID들을 가져옵니다.
+	function getPositionArmyIds(uint col, uint row) view external returns (uint[] memory) {
+		return positionToArmyIds[col][row];
+	}
 	
 	// 특정 위치에 존재하는 부대의 소유주를 가져옵니다.
-	function getPositionOwner(uint col, uint row) view public returns (address) {
+	function getPositionOwner(uint col, uint row) view external returns (address) {
 		
 		uint[] memory armyIds = positionToArmyIds[col][row];
 		

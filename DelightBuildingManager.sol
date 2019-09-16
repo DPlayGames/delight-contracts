@@ -1,11 +1,12 @@
 pragma solidity ^0.5.9;
 
+import "./DelightBuildingManagerInterface.sol";
 import "./DelightManager.sol";
 import "./DelightArmyManager.sol";
 import "./DelightItemManager.sol";
 import "./Util/SafeMath.sol";
 
-contract DelightBuildingManager is DelightManager {
+contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManager {
 	using SafeMath for uint;
 	
 	// Delight 부대 관리자
@@ -40,20 +41,36 @@ contract DelightBuildingManager is DelightManager {
 		_;
 	}
 	
-	// 건물 정보
-	struct Building {
-		uint kind;
-		uint level;
-		uint col;
-		uint row;
-		address owner;
-		uint buildTime;
-	}
-	
 	Building[] private buildings;
 	
 	mapping(uint => mapping(uint => uint)) private positionToBuildingId;
 	mapping(address => uint[]) private ownerToHQIds;
+	
+	// 건물의 총 개수를 반환합니다.
+	function getBuildingCount() view external returns (uint) {
+		return buildings.length;
+	}
+	
+	// 건물의 정보를 반환합니다.
+	function getBuildingInfo(uint buildingId) view external returns (
+		uint kind,
+		uint level,
+		uint col,
+		uint row,
+		address owner,
+		uint buildTime
+	) {
+		Building memory building = buildings[buildingId];
+		
+		return (
+			building.kind,
+			building.level,
+			building.col,
+			building.row,
+			building.owner,
+			building.buildTime
+		);
+	}
 	
 	// 특정 위치의 건물 ID를 반환합니다.
 	function getPositionBuildingId(uint col, uint row) view external returns (uint) {

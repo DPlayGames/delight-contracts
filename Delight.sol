@@ -1,5 +1,6 @@
 pragma solidity ^0.5.9;
 
+import "./DelightInterface.sol";
 import "./DelightBase.sol";
 import "./DelightBuildingManager.sol";
 import "./DelightArmyManager.sol";
@@ -7,7 +8,7 @@ import "./DelightItemManager.sol";
 import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
-contract Delight is DelightBase, NetworkChecker {
+contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	using SafeMath for uint;
     
 	uint constant private ORDER_BUILD				= 0;
@@ -18,19 +19,6 @@ contract Delight is DelightBase, NetworkChecker {
 	uint constant private ORDER_ATTACH_KNIGHT_ITEM	= 5;
 	uint constant private ORDER_MOVE_AND_ATTACK		= 6;
 	uint constant private ORDER_RANGED_ATTACK		= 7;
-	
-	struct Record {
-		uint order;
-		address account;
-		uint param1;
-		uint param2;
-		uint param3;
-		uint param4;
-		uint kill;
-		uint death;
-		bool isWin;
-		uint time;
-	}
 	
 	Record[] private history;
 	
