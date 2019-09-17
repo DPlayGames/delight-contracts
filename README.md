@@ -10,5 +10,16 @@
 ## Knight Item
 ERC-721
 
+## 스마트 계약 배포 순서
+- Delight Info
+- Delight Resource들
+- Delight Item들
+- Delight Knight Item
+- Delight Building Manager
+- Delight Army Manager
+- Delight Item Manager
+- Delight
+- Delight Owner
+
 ## License
 [MIT](LICENSE)
