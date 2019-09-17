@@ -42,15 +42,15 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		else if (network == Network.Kovan) {
 			
 			// 정보
-			info = DelightInfoInterface(0x27dd4D781d69b0739Cd6bFb77A9cBc0419171167);
+			info = DelightInfoInterface(0x23A006145E4Ea87850423ac3a7343dC37D9354F2);
 			
 			// 기사 아이템
-			knightItem = DelightKnightItem(0x0c3ad341A711ECC43Ce5f18f0337F20A5861a60B);
+			knightItem = DelightKnightItem(0x493620441D6A3f19cab31b1DDad965eD99E4e8E0);
 			
 			// 관리자들
-			buildingManager	= DelightBuildingManager(0x0f3B145F0C104C42d522f9c188faE90239c2B2Bd);
-			armyManager		= DelightArmyManager(0xB1cA4eE80181E196F1dA39D44299D180B63b8018);
-			itemManager		= DelightItemManager(0xfc3e9D36FD84040299800D02f5bFa4d7e41313C2);
+			buildingManager	= DelightBuildingManager(0x473836e9e02526596fD8B793e0a86e811AEDe719);
+			armyManager		= DelightArmyManager(0x14E8581e2a46688934953f118F33a9693D80743A);
+			itemManager		= DelightItemManager(0x676A687c0574DB1d5f16E5915fD519A7E7C0317F);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -66,6 +66,40 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		}
 	}
 	
+	// 기록의 총 개수를 반환합니다.
+	function getRecordCount() view external returns (uint) {
+		return history.length;
+	}
+	
+	// 기록을 반환합니다.
+	function getRecord(uint recordId) view external returns (
+		uint order,
+		address account,
+		uint param1,
+		uint param2,
+		uint param3,
+		uint param4,
+		uint kill,
+		uint death,
+		bool isWin,
+		uint time
+	) {
+		Record memory record = history[recordId];
+		
+		return (
+			record.order,
+			record.account,
+			record.param1,
+			record.param2,
+			record.param3,
+			record.param4,
+			record.kill,
+			record.death,
+			record.isWin,
+			record.time
+		);
+	}
+	
 	// 전체 데미지를 가져옵니다.
 	function getTotalDamage(uint distance, uint col, uint row) view public returns (uint) {
 		
@@ -73,52 +107,49 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		
 		uint[] memory armyIds = armyManager.getPositionArmyIds(col, row);
 		
-		if (armyIds.length == UNIT_KIND_COUNT) {
+		(
+			,
+			,
+			uint knightItemId,
+			,
+			,
+			,
+			
+		) = armyManager.getArmyInfo(armyIds[UNIT_KNIGHT]);
+		
+		// 총 공격력을 계산합니다.
+		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
 			
 			(
-				,
-				,
-				uint knightItemId,
+				uint armyUnitKind,
+				uint armyUnitCount,
+				uint armyKnightItemId,
 				,
 				,
 				,
 				
-			) = armyManager.getArmyInfo(armyIds[UNIT_KNIGHT]);
+			) = armyManager.getArmyInfo(armyIds[i]);
 			
-			// 총 공격력을 계산합니다.
-			for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+			if (
+			// 유닛의 개수가 0개 이상이어야 합니다.
+			armyUnitCount > 0 &&
+			
+			// 이동이 가능한 거리인지 확인합니다.
+			distance <= info.getUnitMovableDistance(armyUnitKind)) {
 				
-				(
-					uint armyUnitKind,
-					uint armyUnitCount,
-					uint armyKnightItemId,
-					,
-					,
-					,
-					
-				) = armyManager.getArmyInfo(armyIds[i]);
-				
-				if (
-				// 유닛의 개수가 0개 이상이어야 합니다.
-				armyUnitCount > 0 &&
-				
-				// 이동이 가능한 거리인지 확인합니다.
-				distance <= info.getUnitMovableDistance(armyUnitKind)) {
-					
-					// 아군의 공격력 추가
-					totalDamage = totalDamage.add(
-						info.getUnitDamage(armyUnitKind).add(
+				// 아군의 공격력 추가
+				totalDamage = totalDamage.add(
+					info.getUnitDamage(armyUnitKind).add(
+						
+						// 기사인 경우 기사 아이템의 공격력을 추가합니다.
+						i == UNIT_KNIGHT ? knightItem.getItemDamage(armyKnightItemId) : (
 							
-							// 기사인 경우 기사 아이템의 공격력을 추가합니다.
-							i == UNIT_KNIGHT ? knightItem.getItemDamage(armyKnightItemId) : (
-								
-								// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
-								armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(knightItemId) : 0
-							)
-							
-						).mul(armyUnitCount)
-					);
-				}
+							// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
+							armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(knightItemId) : 0
+						)
+						
+					).mul(armyUnitCount)
+				);
 			}
 		}
 		
@@ -132,52 +163,49 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		
 		uint[] memory armyIds = armyManager.getPositionArmyIds(col, row);
 		
-		if (armyIds.length == UNIT_KIND_COUNT) {
+		(
+			,
+			,
+			uint knightItemId,
+			,
+			,
+			,
+			
+		) = armyManager.getArmyInfo(armyIds[UNIT_KNIGHT]);
+		
+		// 총 공격력을 계산합니다.
+		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
 			
 			(
-				,
-				,
-				uint knightItemId,
+				uint armyUnitKind,
+				uint armyUnitCount,
+				uint armyKnightItemId,
 				,
 				,
 				,
 				
-			) = armyManager.getArmyInfo(armyIds[UNIT_KNIGHT]);
+			) = armyManager.getArmyInfo(armyIds[i]);
 			
-			// 총 공격력을 계산합니다.
-			for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+			if (
+			// 유닛의 개수가 0개 이상이어야 합니다.
+			armyUnitCount > 0 &&
+			
+			// 공격이 가능한 거리인지 확인합니다.
+			distance <= info.getUnitAttackableDistance(armyUnitKind)) {
 				
-				(
-					uint armyUnitKind,
-					uint armyUnitCount,
-					uint armyKnightItemId,
-					,
-					,
-					,
-					
-				) = armyManager.getArmyInfo(armyIds[i]);
-				
-				if (
-				// 유닛의 개수가 0개 이상이어야 합니다.
-				armyUnitCount > 0 &&
-				
-				// 공격이 가능한 거리인지 확인합니다.
-				distance <= info.getUnitAttackableDistance(armyUnitKind)) {
-					
-					// 아군의 공격력 추가
-					totalDamage = totalDamage.add(
-						info.getUnitDamage(armyUnitKind).add(
+				// 아군의 공격력 추가
+				totalDamage = totalDamage.add(
+					info.getUnitDamage(armyUnitKind).add(
+						
+						// 기사인 경우 기사 아이템의 공격력을 추가합니다.
+						i == UNIT_KNIGHT ? knightItem.getItemDamage(armyKnightItemId) : (
 							
-							// 기사인 경우 기사 아이템의 공격력을 추가합니다.
-							i == UNIT_KNIGHT ? knightItem.getItemDamage(armyKnightItemId) : (
-								
-								// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
-								armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(knightItemId) : 0
-							)
-							
-						).mul(armyUnitCount)
-					);
-				}
+							// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
+							armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(knightItemId) : 0
+						)
+						
+					).mul(armyUnitCount)
+				);
 			}
 		}
 		
@@ -280,7 +308,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			}
 			
 			// 본부를 업그레이드합니다.
-			if (orders[i] == ORDER_UPGRADE_HQ) {
+			else if (orders[i] == ORDER_UPGRADE_HQ) {
 				buildingManager.upgradeHQ(msg.sender, params1[i]);
 			}
 			

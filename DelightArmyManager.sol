@@ -56,10 +56,8 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		}
 		
 		else if (network == Network.Kovan) {
-			//TODO
-			
 			// 기사 아이템
-			knightItem	= DelightKnightItem(0x0c3ad341A711ECC43Ce5f18f0337F20A5861a60B);
+			knightItem	= DelightKnightItem(0x493620441D6A3f19cab31b1DDad965eD99E4e8E0);
 		}
 		
 		else if (network == Network.Ropsten) {

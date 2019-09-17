@@ -85,6 +85,7 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 	// 건물을 짓습니다.
 	function build(address owner, uint kind, uint col, uint row) onlyDelight external {
 		
+		// 범위를 체크합니다.
 		require(col < COL_RANGE && row < ROW_RANGE);
 		
 		// 필드에 건물이 존재하면 안됩니다.

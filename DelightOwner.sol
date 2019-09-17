@@ -9,8 +9,8 @@ import "./Util/SafeMath.sol";
 contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 	using SafeMath for uint;
 	
-	DelightBuildingManager private delightBuildingManager;
-	DelightArmyManager private delightArmyManager;
+	DelightBuildingManager private buildingManager;
+	DelightArmyManager private armyManager;
 	
 	constructor() NetworkChecker() public {
 		
@@ -19,9 +19,8 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		}
 		
 		else if (network == Network.Kovan) {
-			//TODO
-			delightBuildingManager	= DelightBuildingManager(0x0f3B145F0C104C42d522f9c188faE90239c2B2Bd);
-			delightArmyManager		= DelightArmyManager(0xB1cA4eE80181E196F1dA39D44299D180B63b8018);
+			buildingManager	= DelightBuildingManager(0x473836e9e02526596fD8B793e0a86e811AEDe719);
+			armyManager		= DelightArmyManager(0x14E8581e2a46688934953f118F33a9693D80743A);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -42,7 +41,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		
 		uint buildingCount = 0;
 		
-		for (uint i = 0; i < delightBuildingManager.getBuildingCount(); i += 1) {
+		for (uint i = 0; i < buildingManager.getBuildingCount(); i += 1) {
 			
 			(
 				,
@@ -51,7 +50,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 				,
 				address buildingOwner,
 				
-			) = delightBuildingManager.getBuildingInfo(i);
+			) = buildingManager.getBuildingInfo(i);
 			
 			if (buildingOwner == owner) {
 				buildingCount += 1;
@@ -61,7 +60,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		uint[] memory buildingIds = new uint[](buildingCount);
 		uint j = 0;
 		
-		for (uint i = 0; i < delightBuildingManager.getBuildingCount(); i += 1) {
+		for (uint i = 0; i < buildingManager.getBuildingCount(); i += 1) {
 			
 			(
 				,
@@ -70,7 +69,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 				,
 				address buildingOwner,
 				
-			) = delightBuildingManager.getBuildingInfo(i);
+			) = buildingManager.getBuildingInfo(i);
 			
 			if (buildingOwner == owner) {
 				buildingIds[j] = i;
@@ -86,7 +85,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		
 		uint armyCount = 0;
 		
-		for (uint i = 0; i < delightArmyManager.getArmyCount(); i += 1) {
+		for (uint i = 0; i < armyManager.getArmyCount(); i += 1) {
 			
 			(
 				,
@@ -96,7 +95,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 				,
 				address armyOwner,
 				
-			) = delightArmyManager.getArmyInfo(i);
+			) = armyManager.getArmyInfo(i);
 			
 			if (armyOwner == owner) {
 				armyCount += 1;
@@ -106,7 +105,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		uint[] memory armyIds = new uint[](armyCount);
 		uint j = 0;
 		
-		for (uint i = 0; i < delightArmyManager.getArmyCount(); i += 1) {
+		for (uint i = 0; i < armyManager.getArmyCount(); i += 1) {
 			
 			(
 				,
@@ -116,7 +115,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 				,
 				address armyOwner,
 				
-			) = delightArmyManager.getArmyInfo(i);
+			) = armyManager.getArmyInfo(i);
 			
 			if (armyOwner == owner) {
 				armyIds[j] = i;

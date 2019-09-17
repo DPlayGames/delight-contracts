@@ -175,7 +175,14 @@ contract DelightResource is ERC20, ERC165 {
 		balances[from] = balances[from].sub(amount);
 		balances[to] = balances[to].add(amount);
 		
-		allowed[from][msg.sender] = allowed[from][msg.sender].sub(amount);
+		if (
+			msg.sender != delightBuildingManager &&
+			msg.sender != delightArmyManager &&
+			msg.sender != delightItemManager &&
+			msg.sender != dplayTradingPost)
+		{
+			allowed[from][msg.sender] = allowed[from][msg.sender].sub(amount);
+		}
 		
 		emit Transfer(from, to, amount);
 		
