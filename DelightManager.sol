@@ -1,8 +1,8 @@
 pragma solidity ^0.5.9;
 
 import "./DelightBase.sol";
-import "./DelightInfo.sol";
 import "./DelightResource.sol";
+import "./DelightInfoInterface.sol";
 import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
@@ -10,7 +10,7 @@ contract DelightManager is DelightBase, NetworkChecker {
 	using SafeMath for uint;
 	
 	// Delight 주소
-	address public delight;
+	address internal delight;
 	
 	function setDelightOnce(address addr) external {
 		
@@ -20,7 +20,7 @@ contract DelightManager is DelightBase, NetworkChecker {
 		delight = addr;
 	}
 	
-	DelightInfo internal info;
+	DelightInfoInterface internal info;
 	
 	DelightResource internal wood;
 	DelightResource internal stone;
@@ -37,13 +37,13 @@ contract DelightManager is DelightBase, NetworkChecker {
 			//TODO
 			
 			// 정보
-			info	= DelightInfo(0x50f28E3a2c31458a919089C94C45b39eB792f06D);
+			info	= DelightInfoInterface(0x27dd4D781d69b0739Cd6bFb77A9cBc0419171167);
 			
 			// 자원들
-			wood	= DelightResource(0x12e086D2697FC4B2DE25237Fa8e89CEEae8e949b);
-			stone	= DelightResource(0xdd77021e84Fff63bB7685ab18560434C4E5eE201);
-			iron	= DelightResource(0x1191E043a9c0DE374fb2e7ed8f3f10e7a4004DcE);
-			ducat	= DelightResource(0x585111f181632271Ffc29d2E633cECBe53A9886D);
+			wood	= DelightResource(0xb201C0BE2E5aC35a3c951756abE9BCb6D51B4787);
+			stone	= DelightResource(0x9709442cA271f9D1AEe8a5d6DdD33699B533DfdA);
+			iron	= DelightResource(0x12FE1071Ea32ea211a90b1d8b9C182CF51bB26fc);
+			ducat	= DelightResource(0xc9e8985208923883b4150Fa48c1F87607F08B789);
 		}
 		
 		else if (network == Network.Ropsten) {

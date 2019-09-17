@@ -10,10 +10,10 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 	using SafeMath for uint;
 	
 	// Delight 부대 관리자
-	DelightArmyManager public delightArmyManager;
+	DelightArmyManager private delightArmyManager;
 	
 	// Delight 아이템 관리자
-	DelightItemManager public delightItemManager;
+	DelightItemManager private delightItemManager;
 	
 	function setDelightArmyManagerOnce(address addr) external {
 		

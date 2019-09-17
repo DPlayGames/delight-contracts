@@ -9,8 +9,8 @@ import "./Util/SafeMath.sol";
 contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 	using SafeMath for uint;
 	
-	DelightBuildingManager internal delightBuildingManager;
-	DelightArmyManager internal delightArmyManager;
+	DelightBuildingManager private delightBuildingManager;
+	DelightArmyManager private delightArmyManager;
 	
 	constructor() NetworkChecker() public {
 		

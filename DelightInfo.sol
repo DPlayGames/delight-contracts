@@ -6,13 +6,13 @@ import "./DelightBase.sol";
 contract DelightInfo is DelightInfoInterface, DelightBase {
 	
 	// 유닛 정보
-	mapping(uint => Unit) internal units;
+	mapping(uint => Unit) private units;
 	
 	// 재료 정보
-	mapping(uint => Material) internal buildingMaterials;
-	mapping(uint => Material) internal hpUpgradeMaterials;
-	mapping(uint => Material) internal unitMaterials;
-	mapping(uint => Material) internal itemMaterials;
+	mapping(uint => Material) private buildingMaterials;
+	mapping(uint => Material) private hpUpgradeMaterials;
+	mapping(uint => Material) private unitMaterials;
+	mapping(uint => Material) private itemMaterials;
 	
 	constructor() public {
 		

@@ -9,7 +9,7 @@ contract DelightItemManager is DelightManager {
 	using SafeMath for uint;
 	
 	// Delight 부대 관리자 주소
-	address public delightArmyManager;
+	address private delightArmyManager;
 	
 	function setDelightArmyManagerOnce(address addr) external {
 		
@@ -28,15 +28,15 @@ contract DelightItemManager is DelightManager {
 		_;
 	}
 	
-	DelightItem private axe;
-	DelightItem private spear;
-	DelightItem private shield;
-	DelightItem private hood;
-	DelightItem private crossbow;
-	DelightItem private ballista;
-	DelightItem private catapult;
-	DelightItem private camel;
-	DelightItem private elephant;
+	DelightItem public axe;
+	DelightItem public spear;
+	DelightItem public shield;
+	DelightItem public hood;
+	DelightItem public crossbow;
+	DelightItem public ballista;
+	DelightItem public catapult;
+	DelightItem public camel;
+	DelightItem public elephant;
 	
 	function getItemContract(uint kind) view private returns (DelightItem) {
 		if (kind == ITEM_AXE) {
@@ -72,18 +72,18 @@ contract DelightItemManager is DelightManager {
 			//TODO
 			
 			// 아이템
-			axe			= DelightItem(0x8c187Fa9ec4cc00A102E87380a9527A35fe047D0);
-			ballista	= DelightItem(0x5bfF20BdA2D7f564A0D8AC1eC9578fc319a778EC);
-			camel		= DelightItem(0x282E3D0562106a1c4DA99B8b011129fb7E20a91e);
-			catapult	= DelightItem(0x9C6e4f3e0E018D5f6Dca4031d549E897eAdE550d);
-			crossbow	= DelightItem(0xC27E3a48ee6a1632DD62e385D9CbfCCe4fd22cF6);
-			elephant	= DelightItem(0xCb9B9a16884470775390C03aCa68722D2671F69f);
-			hood		= DelightItem(0x60D9e720840e6844DA04BD9Ebf42e63FA6EDeF97);
-			shield		= DelightItem(0xe8f92B5eB1F67441f85956793793A9471c3f5BE0);
-			spear		= DelightItem(0x9891c504Bc4F557c0B90BB51B3F21F57705e3db7);
+			axe			= DelightItem(0x7bCdb36779B17987324A050441B8f506c6DdD49c);
+			ballista	= DelightItem(0xe86B229A1dC5ba11EDcFbfE8fF15C5fd4Ac72B44);
+			camel		= DelightItem(0xbfA610F99d8d460A42F38CE09403Fe6116931868);
+			catapult	= DelightItem(0xD024d003AdB9a4cE6E62d8676e6B963F928aA3D7);
+			crossbow	= DelightItem(0x63E00C3BBEB8C76D81F60EF5ae4199814d2597a5);
+			elephant	= DelightItem(0x3e1b2837Bb47D32DC40E92F0074E8c046CaDCc4d);
+			hood		= DelightItem(0xfb4Ca4E139ab0426A0cE7c4A2CDa1e7eAeBB4902);
+			shield		= DelightItem(0x7790F666A7736BcE7D748bE48d3B20ab7fe4b3c7);
+			spear		= DelightItem(0x675214d5987b3e98496F22C6b98519E734c47aE8);
 			
 			// 기사 아이템
-			knightItem	= DelightKnightItem(0x0c3ad341A711ECC43Ce5f18f0337F20A5861a60B);
+			knightItem	= DelightKnightItem(0x48585Fe59B3dCf241404C8caD091a1145e54bdfF);
 		}
 		
 		else if (network == Network.Ropsten) {

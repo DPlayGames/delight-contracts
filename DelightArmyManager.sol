@@ -12,15 +12,14 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	// 한 위치에 존재할 수 있는 최대 유닛 수
 	uint constant private MAX_POSITION_UNIT_COUNT = 50;
 	
-	// 기사의 기본 버프
-	uint constant internal KNIGHT_DEFAULT_BUFF_HP = 10;
-	uint constant internal KNIGHT_DEFAULT_BUFF_DAMAGE = 5;
+	// 기사의 기본 버프 HP
+	uint constant private KNIGHT_DEFAULT_BUFF_HP = 10;
 	
 	// Delight 건물 관리자
-	DelightBuildingManager public delightBuildingManager;
+	DelightBuildingManager private delightBuildingManager;
 	
 	// Delight 아이템 관리자
-	DelightItemManager public delightItemManager;
+	DelightItemManager private delightItemManager;
 	
 	function setDelightBuildingManagerOnce(address addr) external {
 		
@@ -416,82 +415,6 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				}
 			}
 		}
-	}
-	
-	// 전체 데미지를 가져옵니다.
-	function getTotalDamage(uint distance, uint col, uint row) view external returns (uint) {
-		
-		uint[] memory armyIds = positionToArmyIds[col][row];
-		
-		uint totalDamage = 0;
-		
-		// 총 공격력을 계산합니다.
-		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
-			
-			Army memory army = armies[armyIds[i]];
-			
-			if (
-			// 유닛의 개수가 0개 이상이어야 합니다.
-			army.unitCount > 0 &&
-			
-			// 이동이 가능한 거리인지 확인합니다.
-			distance <= info.getUnitMovableDistance(army.unitKind)) {
-				
-				// 아군의 공격력 추가
-				totalDamage = totalDamage.add(
-					info.getUnitDamage(army.unitKind).add(
-						
-						// 기사인 경우 기사 아이템의 공격력을 추가합니다.
-						i == UNIT_KNIGHT ? knightItem.getItemDamage(army.knightItemId) : (
-							
-							// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
-							armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
-						)
-						
-					).mul(army.unitCount)
-				);
-			}
-		}
-		
-		return totalDamage;
-	}
-	
-	// 전체 원거리 데미지를 가져옵니다.
-	function getTotalRangedDamage(uint distance, uint col, uint row) view external returns (uint) {
-		
-		uint[] memory armyIds = positionToArmyIds[col][row];
-		
-		uint totalDamage = 0;
-		
-		// 총 공격력을 계산합니다.
-		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
-			
-			Army memory army = armies[armyIds[i]];
-			
-			if (
-			// 유닛의 개수가 0개 이상이어야 합니다.
-			army.unitCount > 0 &&
-			
-			// 공격이 가능한 거리인지 확인합니다.
-			distance <= info.getUnitAttackableDistance(army.unitKind)) {
-				
-				// 아군의 공격력 추가
-				totalDamage = totalDamage.add(
-					info.getUnitDamage(army.unitKind).add(
-						
-						// 기사인 경우 기사 아이템의 공격력을 추가합니다.
-						i == UNIT_KNIGHT ? knightItem.getItemDamage(army.knightItemId) : (
-							
-							// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
-							armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
-						)
-						
-					).mul(army.unitCount)
-				);
-			}
-		}
-		
-		return totalDamage;
 	}
 	
 	function getItemKindByUnitKind(uint unitKind) pure private returns (uint) {
