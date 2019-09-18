@@ -24,8 +24,6 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	// 기사의 기본 버프 데미지
 	uint constant private KNIGHT_DEFAULT_BUFF_DAMAGE = 5;
 	
-	Record[] private history;
-	
 	DelightInfoInterface private info;
 	DelightKnightItem private knightItem;
 	
@@ -42,15 +40,15 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		else if (network == Network.Kovan) {
 			
 			// 정보
-			info = DelightInfoInterface(0x23A006145E4Ea87850423ac3a7343dC37D9354F2);
+			info = DelightInfoInterface(0x132F0De950621Bb042AC198DfB8D9d4599DE0D81);
 			
 			// 기사 아이템
-			knightItem = DelightKnightItem(0x493620441D6A3f19cab31b1DDad965eD99E4e8E0);
+			knightItem = DelightKnightItem(0x09F0419cC8C65df3C309dd511fF0296394dCF6cc);
 			
 			// 관리자들
-			buildingManager	= DelightBuildingManager(0x473836e9e02526596fD8B793e0a86e811AEDe719);
-			armyManager		= DelightArmyManager(0x14E8581e2a46688934953f118F33a9693D80743A);
-			itemManager		= DelightItemManager(0x676A687c0574DB1d5f16E5915fD519A7E7C0317F);
+			buildingManager	= DelightBuildingManager(0x86aE09f8127d674e72E1774C514413a58eE4DEDB);
+			armyManager		= DelightArmyManager(0xe11863C011Ae99F63DC28c0458443Eae69B4D67e);
+			itemManager		= DelightItemManager(0x4b541BDDEced237B8933ec653e913e2dDb6060a0);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -65,6 +63,8 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			revert();
 		}
 	}
+	
+	Record[] private history;
 	
 	// 기록의 총 개수를 반환합니다.
 	function getRecordCount() view external returns (uint) {

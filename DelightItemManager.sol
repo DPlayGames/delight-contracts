@@ -8,26 +8,6 @@ import "./Util/SafeMath.sol";
 contract DelightItemManager is DelightManager {
 	using SafeMath for uint;
 	
-	// Delight 부대 관리자 주소
-	address private delightArmyManager;
-	
-	function setDelightArmyManagerOnce(address addr) external {
-		
-		// 비어있는 주소인 경우에만
-		require(delightArmyManager == address(0));
-		
-		delightArmyManager = addr;
-	}
-	
-	// Sender가 Delight일때만 실행
-	modifier onlyDelight() {
-		require(
-			msg.sender == delight ||
-			msg.sender == delightArmyManager
-		);
-		_;
-	}
-	
 	DelightItem public axe;
 	DelightItem public spear;
 	DelightItem public shield;
@@ -37,6 +17,44 @@ contract DelightItemManager is DelightManager {
 	DelightItem public catapult;
 	DelightItem public camel;
 	DelightItem public elephant;
+	
+	DelightKnightItem private knightItem;
+	
+	constructor() DelightManager() public {
+		
+		if (network == Network.Mainnet) {
+			//TODO
+		}
+		
+		else if (network == Network.Kovan) {
+			
+			// 아이템
+			axe			= DelightItem(0xd864d316efeB7eA1Bb26d4f3411343BbF85463FF);
+			ballista	= DelightItem(0x1b152159a3D6F81eA328166998B86d4D2413771F);
+			camel		= DelightItem(0x776EA21523A1bCC182fA6C13cd8757F0b26d2184);
+			catapult	= DelightItem(0xE37185e38DE83d581c6bc4E2952D55cA31A0BDFc);
+			crossbow	= DelightItem(0x2C808637b955b1FB1cd834E30080E6B5ACeFA16A);
+			elephant	= DelightItem(0x88ee0e6D79742B45b757d44a1df1e57b1F9984CF);
+			hood		= DelightItem(0x9BB8B8Bfb044e99176343d287B8Fa65f5c68cE0e);
+			shield		= DelightItem(0x0523B5A2C36f301fd62f51A443a841Cbc4C1cb14);
+			spear		= DelightItem(0x772D409cAfEE9C19ed94FA2912fA688C4893A8ca);
+			
+			// 기사 아이템
+			knightItem	= DelightKnightItem(0x09F0419cC8C65df3C309dd511fF0296394dCF6cc);
+		}
+		
+		else if (network == Network.Ropsten) {
+			//TODO
+		}
+		
+		else if (network == Network.Rinkeby) {
+			//TODO
+		}
+		
+		else {
+			revert();
+		}
+	}
 	
 	function getItemContract(uint kind) view private returns (DelightItem) {
 		if (kind == ITEM_AXE) {
@@ -60,42 +78,24 @@ contract DelightItemManager is DelightManager {
 		}
 	}
 	
-	DelightKnightItem private knightItem;
+	// Delight 부대 관리자 주소
+	address private delightArmyManager;
 	
-	constructor() DelightManager() public {
+	function setDelightArmyManagerOnce(address addr) external {
 		
-		if (network == Network.Mainnet) {
-			//TODO
-		}
+		// 비어있는 주소인 경우에만
+		require(delightArmyManager == address(0));
 		
-		else if (network == Network.Kovan) {
-			
-			// 아이템
-			axe			= DelightItem(0x64cE264C86Ff720bd6B8AD3Bd0D1b1378e1Ec690);
-			ballista	= DelightItem(0xB6cf871358307Fa3eCd5A4CaE225ba1d57ff088D);
-			camel		= DelightItem(0xFd7E1c6734002AbA9b37a17C9B36fAf5Da0acaA4);
-			catapult	= DelightItem(0xC256E5a8149D190Fe98407A96395cAe7Ec770Adb);
-			crossbow	= DelightItem(0x4330230e3B8B24662f016fD4ea09DB51Bc152F14);
-			elephant	= DelightItem(0x525454177Ee05B8E888f4539Fb95574E78309AC4);
-			hood		= DelightItem(0xaDFC2868437fb8e555f391ffD785C9e85F6dAb60);
-			shield		= DelightItem(0x2699485976217570076c2e60eefC853A92876D19);
-			spear		= DelightItem(0xfD396Ce25c3424A95a56Cc6fafe82cCf13F4254A);
-			
-			// 기사 아이템
-			knightItem	= DelightKnightItem(0x493620441D6A3f19cab31b1DDad965eD99E4e8E0);
-		}
-		
-		else if (network == Network.Ropsten) {
-			//TODO
-		}
-		
-		else if (network == Network.Rinkeby) {
-			//TODO
-		}
-		
-		else {
-			revert();
-		}
+		delightArmyManager = addr;
+	}
+	
+	// Sender가 Delight일때만 실행
+	modifier onlyDelight() {
+		require(
+			msg.sender == delight ||
+			msg.sender == delightArmyManager
+		);
+		_;
 	}
 	
 	// 아이템을 생성합니다.

@@ -15,6 +15,33 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	// 기사의 기본 버프 HP
 	uint constant private KNIGHT_DEFAULT_BUFF_HP = 10;
 	
+	DelightKnightItem private knightItem;
+	
+	constructor() DelightManager() public {
+		
+		if (network == Network.Mainnet) {
+			//TODO
+		}
+		
+		else if (network == Network.Kovan) {
+			
+			// 기사 아이템
+			knightItem	= DelightKnightItem(0x09F0419cC8C65df3C309dd511fF0296394dCF6cc);
+		}
+		
+		else if (network == Network.Ropsten) {
+			//TODO
+		}
+		
+		else if (network == Network.Rinkeby) {
+			//TODO
+		}
+		
+		else {
+			revert();
+		}
+	}
+	
 	// Delight 건물 관리자
 	DelightBuildingManager private delightBuildingManager;
 	
@@ -45,32 +72,6 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 			msg.sender == address(delightItemManager)
 		);
 		_;
-	}
-	
-	DelightKnightItem private knightItem;
-	
-	constructor() DelightManager() public {
-		
-		if (network == Network.Mainnet) {
-			//TODO
-		}
-		
-		else if (network == Network.Kovan) {
-			// 기사 아이템
-			knightItem	= DelightKnightItem(0x493620441D6A3f19cab31b1DDad965eD99E4e8E0);
-		}
-		
-		else if (network == Network.Ropsten) {
-			//TODO
-		}
-		
-		else if (network == Network.Rinkeby) {
-			//TODO
-		}
-		
-		else {
-			revert();
-		}
 	}
 	
 	Army[] internal armies;
