@@ -1,11 +1,12 @@
 pragma solidity ^0.5.9;
 
+import "./DelightKnightItemInterface.sol";
 import "./Standard/ERC721.sol";
 import "./Standard/ERC721TokenReceiver.sol";
 import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
-contract DelightKnightItem is ERC721, NetworkChecker {
+contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker {
 	using SafeMath for uint;
 	
 	// The two addresses below are the addresses of the trusted smart contract, and don't need to be allowed.
@@ -324,49 +325,6 @@ contract DelightKnightItem is ERC721, NetworkChecker {
 		emit Transfer(address(0), msg.sender, itemId);
 	}
 	
-	// 아이템의 개수를 반환합니다.
-	function getItemCount() external view returns (uint) {
-		return items.length;
-	}
-	
-	// 아이템의 정보를 반환합니다.
-	function getItemInfo(uint itemId) external view returns (
-		uint hp,
-		uint damage,
-		uint buffHP,
-		uint buffDamage
-	) {
-		
-		KnightItem memory item = items[itemId];
-		
-		return (
-			item.hp,
-			item.damage,
-			item.buffHP,
-			item.buffDamage
-		);
-	}
-	
-	// 아이템의 기사에게 부여하는 HP를 반환합니다.
-	function getItemHP(uint itemId) external view returns (uint) {
-		return items[itemId].hp;
-	}
-	
-	// 아이템의 기사에게 부여하는 데미지를 반환합니다.
-	function getItemDamage(uint itemId) external view returns (uint) {
-		return items[itemId].damage;
-	}
-	
-	// 아이템의 버프 HP를 반환합니다.
-	function getItemBuffHP(uint itemId) external view returns (uint) {
-		return items[itemId].buffHP;
-	}
-	
-	// 아이템의 버프 데미지를 반환합니다.
-	function getItemBuffDamage(uint itemId) external view returns (uint) {
-		return items[itemId].buffDamage;
-	}
-	
 	modifier onlyOwnerOf(uint itemId) {
 		require(msg.sender == ownerOf(itemId));
 		_;
@@ -474,5 +432,48 @@ contract DelightKnightItem is ERC721, NetworkChecker {
 	//ERC721: 오퍼레이터가 거래 권한을 가지고 있는지 확인합니다.
 	function isApprovedForAll(address owner, address operator) view public returns (bool) {
 		return ownerToOperatorToIsApprovedForAll[owner][operator] == true;
+	}
+	
+	// 아이템의 개수를 반환합니다.
+	function getItemCount() external view returns (uint) {
+		return items.length;
+	}
+	
+	// 아이템의 정보를 반환합니다.
+	function getItemInfo(uint itemId) external view returns (
+		uint hp,
+		uint damage,
+		uint buffHP,
+		uint buffDamage
+	) {
+		
+		KnightItem memory item = items[itemId];
+		
+		return (
+			item.hp,
+			item.damage,
+			item.buffHP,
+			item.buffDamage
+		);
+	}
+	
+	// 아이템의 기사에게 부여하는 HP를 반환합니다.
+	function getItemHP(uint itemId) external view returns (uint) {
+		return items[itemId].hp;
+	}
+	
+	// 아이템의 기사에게 부여하는 데미지를 반환합니다.
+	function getItemDamage(uint itemId) external view returns (uint) {
+		return items[itemId].damage;
+	}
+	
+	// 아이템의 버프 HP를 반환합니다.
+	function getItemBuffHP(uint itemId) external view returns (uint) {
+		return items[itemId].buffHP;
+	}
+	
+	// 아이템의 버프 데미지를 반환합니다.
+	function getItemBuffDamage(uint itemId) external view returns (uint) {
+		return items[itemId].buffDamage;
 	}
 }

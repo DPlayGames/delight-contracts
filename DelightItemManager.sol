@@ -2,7 +2,7 @@ pragma solidity ^0.5.9;
 
 import "./DelightManager.sol";
 import "./DelightItem.sol";
-import "./DelightKnightItem.sol";
+import "./DelightKnightItemInterface.sol";
 import "./Util/SafeMath.sol";
 
 contract DelightItemManager is DelightManager {
@@ -20,7 +20,7 @@ contract DelightItemManager is DelightManager {
 	DelightItem public elephant;
 	
 	// 기사 아이템
-	DelightKnightItem private knightItem;
+	DelightKnightItemInterface private knightItem;
 	
 	// Delight 부대 관리자 주소
 	address private delightArmyManager;
@@ -45,7 +45,7 @@ contract DelightItemManager is DelightManager {
 			spear		= DelightItem(0x772D409cAfEE9C19ed94FA2912fA688C4893A8ca);
 			
 			// 기사 아이템
-			knightItem	= DelightKnightItem(0x09F0419cC8C65df3C309dd511fF0296394dCF6cc);
+			knightItem	= DelightKnightItemInterface(0x09F0419cC8C65df3C309dd511fF0296394dCF6cc);
 		}
 		
 		else if (network == Network.Ropsten) {
