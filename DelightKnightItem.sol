@@ -2,26 +2,14 @@ pragma solidity ^0.5.9;
 
 import "./Standard/ERC721.sol";
 import "./Standard/ERC721TokenReceiver.sol";
+import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
-contract DelightKnightItem is ERC721 {
+contract DelightKnightItem is ERC721, NetworkChecker {
 	using SafeMath for uint;
 	
-	// 기사 아이템 정보
-	struct KnightItem {
-		uint hp;
-		uint damage;
-		uint buffHP;
-		uint buffDamage;
-	}
-	
-	KnightItem[] private items;
-	
-	mapping(uint => address) public itemIdToOwner;
-	mapping(address => uint[]) public ownerToItemIds;
-	mapping(uint => uint) internal itemIdToItemIdsIndex;
-	mapping(uint => address) private itemIdToApproved;
-	mapping(address => mapping(address => bool)) private ownerToOperatorToIsApprovedForAll;
+	// The two addresses below are the addresses of the trusted smart contract, and don't need to be allowed.
+	// 아래 두 주소는 신뢰하는 스마트 계약의 주소로 허락받을 필요가 없습니다.
 	
 	// Delight 아이템 관리자 주소
 	address public delightItemManager;
@@ -30,37 +18,27 @@ contract DelightKnightItem is ERC721 {
 	// DPlay 교역소 주소
 	address public dplayTradingPost;
 	
-	function setDelightItemManagerOnce(address addr) external {
+	constructor() NetworkChecker() public {
 		
-		// 비어있는 주소인 경우에만
-		require(delightItemManager == address(0));
+		if (network == Network.Mainnet) {
+			//TODO
+		}
 		
-		delightItemManager = addr;
-	}
-	
-	// Sets the address of DPlay trading post. (Done only once.)
-	// DPlay 교역소 주소를 지정합니다. (단 한번만 가능합니다.)
-	function setDPlayTradingPostOnce(address addr) external {
+		else if (network == Network.Kovan) {
+			dplayTradingPost = address(0x8387E48645EaB0d5d025ffd30BC4e78a3961C431);
+		}
 		
-		// Only an unused address can be used.
-		// 비어있는 주소인 경우에만
-		require(dplayTradingPost == address(0));
+		else if (network == Network.Ropsten) {
+			//TODO
+		}
 		
-		dplayTradingPost = addr;
-	}
-	
-	// 아이템을 생성합니다.
-	function createItem(KnightItem memory item) private {
+		else if (network == Network.Rinkeby) {
+			//TODO
+		}
 		
-		uint itemId = items.push(item).sub(1);
-		
-		itemIdToOwner[itemId] = msg.sender;
-		itemIdToItemIdsIndex[itemId] = ownerToItemIds[msg.sender].push(itemId).sub(1);
-		
-		emit Transfer(address(0), msg.sender, itemId);
-	}
-	
-	constructor() public {
+		else {
+			revert();
+		}
 		
 		// 0번지는 사용하지 않습니다.
 		items.push(KnightItem({
@@ -309,6 +287,41 @@ contract DelightKnightItem is ERC721 {
 			buffHP		: 7,
 			buffDamage	: 7
 		}));
+	}
+	
+	function setDelightItemManagerOnce(address addr) external {
+		
+		// 비어있는 주소인 경우에만
+		require(delightItemManager == address(0));
+		
+		delightItemManager = addr;
+	}
+	
+	// 기사 아이템 정보
+	struct KnightItem {
+		uint hp;
+		uint damage;
+		uint buffHP;
+		uint buffDamage;
+	}
+	
+	KnightItem[] private items;
+	
+	mapping(uint => address) public itemIdToOwner;
+	mapping(address => uint[]) public ownerToItemIds;
+	mapping(uint => uint) internal itemIdToItemIdsIndex;
+	mapping(uint => address) private itemIdToApproved;
+	mapping(address => mapping(address => bool)) private ownerToOperatorToIsApprovedForAll;
+	
+	// 아이템을 생성합니다.
+	function createItem(KnightItem memory item) private {
+		
+		uint itemId = items.push(item).sub(1);
+		
+		itemIdToOwner[itemId] = msg.sender;
+		itemIdToItemIdsIndex[itemId] = ownerToItemIds[msg.sender].push(itemId).sub(1);
+		
+		emit Transfer(address(0), msg.sender, itemId);
 	}
 	
 	// 아이템의 개수를 반환합니다.

@@ -8,6 +8,7 @@ import "./Util/SafeMath.sol";
 contract DelightItemManager is DelightManager {
 	using SafeMath for uint;
 	
+	// 일반 아이템들
 	DelightItem public axe;
 	DelightItem public spear;
 	DelightItem public shield;
@@ -18,7 +19,11 @@ contract DelightItemManager is DelightManager {
 	DelightItem public camel;
 	DelightItem public elephant;
 	
+	// 기사 아이템
 	DelightKnightItem private knightItem;
+	
+	// Delight 부대 관리자 주소
+	address private delightArmyManager;
 	
 	constructor() DelightManager() public {
 		
@@ -77,9 +82,6 @@ contract DelightItemManager is DelightManager {
 			return elephant;
 		}
 	}
-	
-	// Delight 부대 관리자 주소
-	address private delightArmyManager;
 	
 	function setDelightArmyManagerOnce(address addr) external {
 		

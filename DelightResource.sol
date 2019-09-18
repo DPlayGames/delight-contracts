@@ -2,24 +2,14 @@ pragma solidity ^0.5.9;
 
 import "./Standard/ERC20.sol";
 import "./Standard/ERC165.sol";
+import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
-contract DelightResource is ERC20, ERC165 {
+contract DelightResource is ERC20, ERC165, NetworkChecker {
 	using SafeMath for uint;
 	
-	// Token information
-	// 토큰 정보 
-	string internal _name;
-	string internal _symbol;
-	uint internal _totalSupply;
-	
-	uint8 constant private DECIMALS = 0;
-	
-	mapping(address => uint) internal balances;
-	mapping(address => mapping(address => uint)) private allowed;
-	
-	// The two addresses below are the addresses of the trusted smart contract, and don't need to be allowed.
-	// 아래 두 주소는 신뢰하는 스마트 계약의 주소로 허락받을 필요가 없습니다.
+	// The four addresses below are the addresses of the trusted smart contract, and don't need to be allowed.
+	// 아래 네 주소는 신뢰하는 스마트 계약의 주소로 허락받을 필요가 없습니다.
 	
 	// Delight 건물 관리자 주소
 	address public delightBuildingManager;
@@ -33,6 +23,29 @@ contract DelightResource is ERC20, ERC165 {
 	// The address of DPlay trading post
 	// DPlay 교역소 주소
 	address public dplayTradingPost;
+	
+	constructor() NetworkChecker() public {
+		
+		if (network == Network.Mainnet) {
+			//TODO
+		}
+		
+		else if (network == Network.Kovan) {
+			dplayTradingPost = address(0x8387E48645EaB0d5d025ffd30BC4e78a3961C431);
+		}
+		
+		else if (network == Network.Ropsten) {
+			//TODO
+		}
+		
+		else if (network == Network.Rinkeby) {
+			//TODO
+		}
+		
+		else {
+			revert();
+		}
+	}
 	
 	function setDelightBuildingManagerOnce(address addr) external {
 		
@@ -58,16 +71,16 @@ contract DelightResource is ERC20, ERC165 {
 		delightItemManager = addr;
 	}
 	
-	// Sets the address of DPlay trading post. (Done only once.)
-	// DPlay 교역소 주소를 지정합니다. (단 한번만 가능합니다.)
-	function setDPlayTradingPostOnce(address addr) external {
-		
-		// Only an unused address can be used.
-		// 비어있는 주소인 경우에만
-		require(dplayTradingPost == address(0));
-		
-		dplayTradingPost = addr;
-	}
+	// Token information
+	// 토큰 정보 
+	string internal _name;
+	string internal _symbol;
+	uint internal _totalSupply;
+	
+	uint8 constant private DECIMALS = 0;
+	
+	mapping(address => uint) internal balances;
+	mapping(address => mapping(address => uint)) private allowed;
 	
 	// Checks if the address is misued.
 	// 주소를 잘못 사용하는 것인지 체크 
@@ -198,5 +211,14 @@ contract DelightResource is ERC20, ERC165 {
 			// ERC20
 			interfaceID == 0x942e8b22 ||
 			interfaceID == 0x36372b07;
+	}
+	
+	// 테스트용 자원을 생성합니다.
+	function createResourceForTest(uint amount) external {
+		if (network == Network.Mainnet) {
+			revert();
+		} else {
+			balances[msg.sender] += amount;
+		}
 	}
 }

@@ -9,8 +9,10 @@ import "./Util/SafeMath.sol";
 contract DelightManager is DelightBase, NetworkChecker {
 	using SafeMath for uint;
 	
+	// Delight 기본 정보
 	DelightInfoInterface internal info;
 	
+	// 자원들
 	DelightResource internal wood;
 	DelightResource internal stone;
 	DelightResource internal iron;
@@ -24,7 +26,7 @@ contract DelightManager is DelightBase, NetworkChecker {
 		
 		else if (network == Network.Kovan) {
 			
-			// 정보
+			// Delight 기본 정보
 			info	= DelightInfoInterface(0x132F0De950621Bb042AC198DfB8D9d4599DE0D81);
 			
 			// 자원들

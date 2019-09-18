@@ -2,21 +2,11 @@ pragma solidity ^0.5.9;
 
 import "./Standard/ERC20.sol";
 import "./Standard/ERC165.sol";
+import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
-contract DelightItem is ERC20, ERC165 {
+contract DelightItem is ERC20, ERC165, NetworkChecker {
 	using SafeMath for uint;
-	
-	// Token information
-	// 토큰 정보 
-	string internal _name;
-	string internal _symbol;
-	uint private _totalSupply = 0;
-	
-	uint8 constant private DECIMALS = 0;
-	
-	mapping(address => uint) internal balances;
-	mapping(address => mapping(address => uint)) private allowed;
 	
 	// The two addresses below are the addresses of the trusted smart contract, and don't need to be allowed.
 	// 아래 두 주소는 신뢰하는 스마트 계약의 주소로 허락받을 필요가 없습니다.
@@ -28,7 +18,27 @@ contract DelightItem is ERC20, ERC165 {
 	// DPlay 교역소 주소
 	address public dplayTradingPost;
 	
-	constructor() public {
+	constructor() NetworkChecker() public {
+		
+		if (network == Network.Mainnet) {
+			//TODO
+		}
+		
+		else if (network == Network.Kovan) {
+			dplayTradingPost = address(0x8387E48645EaB0d5d025ffd30BC4e78a3961C431);
+		}
+		
+		else if (network == Network.Ropsten) {
+			//TODO
+		}
+		
+		else if (network == Network.Rinkeby) {
+			//TODO
+		}
+		
+		else {
+			revert();
+		}
 		
 		balances[msg.sender] = _totalSupply;
 		
@@ -43,16 +53,16 @@ contract DelightItem is ERC20, ERC165 {
 		delightItemManager = addr;
 	}
 	
-	// Sets the address of DPlay trading post. (Done only once.)
-	// DPlay 교역소 주소를 지정합니다. (단 한번만 가능합니다.)
-	function setDPlayTradingPostOnce(address addr) external {
-		
-		// Only an unused address can be used.
-		// 비어있는 주소인 경우에만
-		require(dplayTradingPost == address(0));
-		
-		dplayTradingPost = addr;
-	}
+	// Token information
+	// 토큰 정보 
+	string internal _name;
+	string internal _symbol;
+	uint private _totalSupply = 0;
+	
+	uint8 constant private DECIMALS = 0;
+	
+	mapping(address => uint) internal balances;
+	mapping(address => mapping(address => uint)) private allowed;
 	
 	// 아이템을 제조하여 특정 유저에게 전달합니다.
 	function assemble(address to, uint amount) external {

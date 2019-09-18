@@ -17,6 +17,15 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	// 기사의 기본 버프 HP
 	uint constant private KNIGHT_DEFAULT_BUFF_HP = 10;
 	
+	// Delight building manager
+	// Delight 건물 관리자
+	DelightBuildingManager private delightBuildingManager;
+	
+	// Delight item manager
+	// Delight 아이템 관리자
+	DelightItemManager private delightItemManager;
+	
+	// 기사 아이템
 	DelightKnightItem private knightItem;
 	
 	constructor() DelightManager() public {
@@ -54,14 +63,6 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 			createTime : 0
 		}));
 	}
-	
-	// Delight building manager
-	// Delight 건물 관리자
-	DelightBuildingManager private delightBuildingManager;
-	
-	// Delight item manager
-	// Delight 아이템 관리자
-	DelightItemManager private delightItemManager;
 	
 	function setDelightBuildingManagerOnce(address addr) external {
 		// The address must be empty.
