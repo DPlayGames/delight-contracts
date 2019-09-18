@@ -380,7 +380,10 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			
 			// Adds a record.
 			// 기록을 추가합니다.
-			history.push(record);
+			uint recordId = history.push(record).sub(1);
+			
+			// 이벤트 발생
+			emit NewRecord(msg.sender, recordId);
 		}
 	}
 }

@@ -208,6 +208,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		stone.transferFrom(owner, delight, materialStone);
 		iron.transferFrom(owner, delight, materialIron);
 		ducat.transferFrom(owner, delight, materialDucat);
+		
+		// 이벤트 발생
+		emit CreateArmy(armyIds[unitKind]);
 	}
 	
 	// Equips items in the army.
@@ -319,6 +322,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				createTime : now
 			})).sub(1);
 		}
+		
+		// 이벤트 발생
+		emit AttachItem(armyId, armyIds[unitKind]);
 	}
 	
 	// Equips an item to a knight.
@@ -346,6 +352,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		// Assigns the knight item.
 		// 기사 아이템을 지정합니다.
 		army.knightItemId = itemId;
+		
+		// 이벤트 발생
+		emit AttachKnightItem(armyId);
 	}
 	
 	// Moves an army.
@@ -374,6 +383,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 			distance <= info.getUnitMovableDistance(army.unitKind)) {
 				
 				targetArmyIds[i] = armyIds[i];
+				
+				// 이벤트 발생
+				emit MoveArmy(armyIds[i]);
 				
 				delete armyIds[i];
 			}
@@ -413,11 +425,13 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 			distance <= info.getUnitMovableDistance(army.unitKind)) {
 				
 				Army storage targetArmy = armies[targetArmyIds[i]];
+				
 				// If the number of units exceeds the maximum number when just moving,
 				// 그대로 이동했을 때 존재할 수 있는 최대 유닛의 숫자를 넘는 경우
 				if (totalUnitCount.add(army.unitCount) > MAX_POSITION_UNIT_COUNT) {
 					
 					uint movableUnitCount = MAX_POSITION_UNIT_COUNT.sub(totalUnitCount);
+					
 					// Creates a new army if it's empty.
 					// 비어있는 곳이면 새 부대를 생성합니다.
 					if (targetArmy.unitCount == 0) {
@@ -440,23 +454,35 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 						targetArmy.unitCount = targetArmy.unitCount.add(movableUnitCount);
 						army.unitCount = army.unitCount.sub(movableUnitCount);
 					}
+					
+					// 이벤트 발생
+					emit MergeArmy(armyIds[i], targetArmyIds[i]);
 				}
+				
 				// If an army can just move, 
 				// 그대로 이동 가능할 때
 				else {
+					
 					// move if the tile is empty.
 					// 비어있는 곳이면 이전합니다.
 					if (targetArmy.unitCount == 0) {
 						
 						targetArmyIds[i] = armyIds[i];
 						
+						// 이벤트 발생
+						emit MergeArmy(armyIds[i], targetArmyIds[i]);
+						
 						delete armyIds[i];
 					}
+					
 					// merge with an existing army if it isn't empty.
 					// 비어있지 않으면 합병합니다.
 					else {
 						
 						targetArmy.unitCount = targetArmy.unitCount.add(army.unitCount);
+						
+						// 이벤트 발생
+						emit MergeArmy(armyIds[i], targetArmyIds[i]);
 						
 						delete armies[armyIds[i]];
 						delete armyIds[i];
@@ -571,6 +597,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				// Adds to the number of total casualties.
 				// 총 사망 병사 숫자에 추가합니다.
 				totalDeadUnitCount = deadUnitCount;
+				
+				// 이벤트 발생
+				emit DeadUnits(armyIds[i]);
 			}
 		}
 	}
@@ -692,6 +721,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				// Adds to the total number of casualties.
 				// 총 사망 병사 숫자에 추가합니다.
 				totalDeadUnitCount = deadUnitCount;
+				
+				// 이벤트 발생
+				emit DeadUnits(armyIds[i]);
 			}
 		}
 	}

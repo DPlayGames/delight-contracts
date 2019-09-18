@@ -2,6 +2,11 @@ pragma solidity ^0.5.9;
 
 interface DelightBuildingManagerInterface {
 	
+	// 이벤트들
+	event Build(uint indexed buildingId);
+	event UpgradeHQ(uint indexed buildingId);
+	event DestroyBuilding(uint indexed buildingId);
+	
 	// 건물 정보
 	struct Building {
 		uint kind;

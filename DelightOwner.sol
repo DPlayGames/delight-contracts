@@ -1,16 +1,18 @@
 pragma solidity ^0.5.9;
 
 import "./DelightOwnerInterface.sol";
-import "./DelightBuildingManager.sol";
-import "./DelightArmyManager.sol";
+import "./DelightInterface.sol";
+import "./DelightBuildingManagerInterface.sol";
+import "./DelightArmyManagerInterface.sol";
 import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
 contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 	using SafeMath for uint;
 	
-	DelightBuildingManager private buildingManager;
-	DelightArmyManager private armyManager;
+	DelightInterface private delight;
+	DelightBuildingManagerInterface private buildingManager;
+	DelightArmyManagerInterface private armyManager;
 	
 	constructor() NetworkChecker() public {
 		
@@ -19,8 +21,9 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		}
 		
 		else if (network == Network.Kovan) {
-			buildingManager	= DelightBuildingManager(0x86aE09f8127d674e72E1774C514413a58eE4DEDB);
-			armyManager		= DelightArmyManager(0xe11863C011Ae99F63DC28c0458443Eae69B4D67e);
+			delight			= DelightInterface(0x58eaacD00F25cF7D183E14e07eD48276964F92e3);
+			buildingManager	= DelightBuildingManagerInterface(0x86aE09f8127d674e72E1774C514413a58eE4DEDB);
+			armyManager		= DelightArmyManagerInterface(0xe11863C011Ae99F63DC28c0458443Eae69B4D67e);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -34,6 +37,58 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		else {
 			revert();
 		}
+	}
+	
+	// 소유주의 기록 ID들을 가져옵니다.
+	function getRecordIds(address owner) view external returns (uint[] memory) {
+		
+		uint recordCount = 0;
+		
+		for (uint i = 0; i < delight.getRecordCount(); i += 1) {
+			
+			(
+				,
+				address account,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				
+			) = delight.getRecord(i);
+			
+			if (account == owner) {
+				recordCount += 1;
+			}
+		}
+		
+		uint[] memory recordIds = new uint[](recordCount);
+		uint j = 0;
+		
+		for (uint i = 0; i < delight.getRecordCount(); i += 1) {
+			
+			(
+				,
+				address account,
+				,
+				,
+				,
+				,
+				,
+				,
+				,
+				
+			) = delight.getRecord(i);
+			
+			if (account == owner) {
+				recordIds[j] = i;
+				j += 1;
+			}
+		}
+		
+		return recordIds;
 	}
 	
 	// 소유주의 건물 ID들을 가져옵니다.

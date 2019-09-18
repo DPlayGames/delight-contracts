@@ -2,6 +2,9 @@ pragma solidity ^0.5.9;
 
 interface DelightInterface {
 	
+	// 이벤트들
+	event NewRecord(address indexed owner, uint indexed recordId);
+	
 	struct Record {
 		uint order;
 		address account;

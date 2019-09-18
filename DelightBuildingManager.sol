@@ -172,6 +172,9 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 		stone.transferFrom(owner, delight, info.getBuildingMaterialStone(kind));
 		iron.transferFrom(owner, delight, info.getBuildingMaterialIron(kind));
 		ducat.transferFrom(owner, delight, info.getBuildingMaterialDucat(kind));
+		
+		// 이벤트 발생
+		emit Build(buildingId);
 	}
 	
 	// 본부를 업그레이드합니다.
@@ -204,6 +207,9 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 		ducat.transferFrom(owner, delight, info.getHQUpgradeMaterialDucat(toLevel));
 		
 		building.level = toLevel;
+		
+		// 이벤트 발생
+		emit UpgradeHQ(buildingId);
 	}
 	
 	// 건물에서 부대를 생산합니다.
@@ -298,5 +304,8 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 		// 건물을 파괴합니다.
 		delete buildings[buildingId];
 		delete positionToBuildingId[col][row];
+		
+		// 이벤트 발생
+		emit DestroyBuilding(buildingId);
 	}
 }
