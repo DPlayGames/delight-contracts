@@ -32,7 +32,7 @@ contract DelightItem is ERC20, ERC165 {
 		
 		balances[msg.sender] = _totalSupply;
 		
-		emit Transfer(address(0x0), msg.sender, _totalSupply);
+		emit Transfer(address(0), msg.sender, _totalSupply);
 	}
 	
 	function setDelightItemManagerOnce(address addr) external {
@@ -73,7 +73,7 @@ contract DelightItem is ERC20, ERC165 {
 		
 		balances[delightItemManager] = balances[delightItemManager].sub(amount);
 		
-		emit Transfer(delightItemManager, address(0x0), amount);
+		emit Transfer(delightItemManager, address(0), amount);
 	}
 	
 	// Checks if the address is misued.

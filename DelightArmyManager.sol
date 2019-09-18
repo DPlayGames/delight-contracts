@@ -40,6 +40,17 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		else {
 			revert();
 		}
+		
+		// 0번지는 사용하지 않습니다.
+		armies.push(Army({
+			unitKind : 99,
+			unitCount : 0,
+			knightItemId : 0,
+			col : COL_RANGE,
+			row : ROW_RANGE,
+			owner : address(0),
+			createTime : 0
+		}));
 	}
 	
 	// Delight 건물 관리자
@@ -120,12 +131,12 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		for (uint i = 0; i < armyIds.length; i += 1) {
 			
 			address owner = armies[armyIds[i]].owner;
-			if (owner != address(0x0)) {
+			if (owner != address(0)) {
 				return owner;
 			}
 		}
 		
-		return address(0x0);
+		return address(0);
 	}
 	
 	// 부대를 생산합니다.

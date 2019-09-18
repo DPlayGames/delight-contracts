@@ -43,6 +43,19 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 	
 	Building[] private buildings;
 	
+	constructor() DelightManager() public {
+		
+		// 0번지는 사용하지 않습니다.
+		buildings.push(Building({
+			kind : 99,
+			level : 0,
+			col : COL_RANGE,
+			row : ROW_RANGE,
+			owner : address(0),
+			buildTime : 0
+		}));
+	}
+	
 	mapping(uint => mapping(uint => uint)) private positionToBuildingId;
 	mapping(address => uint[]) private ownerToHQIds;
 	
@@ -115,11 +128,11 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 		
 		require(
 			
-			// 월드에 본부가 아예 없거나, 본부가 주변에 존재하는지 확인합니다.
-			ownerToHQIds[owner].length == 0 || existsHQAround == true ||
+			// 본부가 주변에 존재하는지 확인합니다.
+			existsHQAround == true ||
 			
-			// 본부인 경우, 내 병사가 있는 위치에 지을 수 있습니다.
-			(kind == BUILDING_HQ && positionOwner == owner)
+			// 본부인 경우, 월드에 본부가 아예 없거나, 내 병사가 있는 위치에 지을 수 있습니다.
+			(kind == BUILDING_HQ && (ownerToHQIds[owner].length == 0 || positionOwner == owner))
 		);
 		
 		// 만약 월드에 본부가 아예 없는 경우, 처음 짓는 곳 주변에 건물이 존재하면 안됩니다.

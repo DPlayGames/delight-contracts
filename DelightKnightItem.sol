@@ -57,7 +57,7 @@ contract DelightKnightItem is ERC721 {
 		itemIdToOwner[itemId] = msg.sender;
 		itemIdToItemIdsIndex[itemId] = ownerToItemIds[msg.sender].push(itemId).sub(1);
 		
-		emit Transfer(address(0x0), msg.sender, itemId);
+		emit Transfer(address(0), msg.sender, itemId);
 	}
 	
 	constructor() public {
@@ -407,7 +407,7 @@ contract DelightKnightItem is ERC721 {
 		
 		// 거래 권한 제거
 		delete itemIdToApproved[itemId];
-		emit Approval(from, address(0x0), itemId);
+		emit Approval(from, address(0), itemId);
 		
 		// 기존 소유주로부터 아이템 제거
 		uint index = itemIdToItemIdsIndex[itemId];

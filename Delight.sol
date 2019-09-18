@@ -223,7 +223,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		address enemy = armyManager.getPositionOwner(toCol, toRow);
 		
 		// 아무도 없는 곳이면 부대를 이동합니다.
-		if (enemy == address(0x0)) {
+		if (enemy == address(0)) {
 			armyManager.moveArmy(fromCol, fromRow, toCol, toRow);
 		}
 		
@@ -247,7 +247,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			record.death = armyManager.attack(battleId, totalEnemyDamage, distance, fromCol, fromRow);
 			
 			// 적진을 점령했다면, 병사들을 이동시킵니다.
-			if (armyManager.getPositionOwner(toCol, toRow) == address(0x0)) {
+			if (armyManager.getPositionOwner(toCol, toRow) == address(0)) {
 				armyManager.moveArmy(fromCol, fromRow, toCol, toRow);
 				armyManager.destroyBuilding(battleId, toCol, toRow);
 				armyManager.win(battleId, msg.sender);
