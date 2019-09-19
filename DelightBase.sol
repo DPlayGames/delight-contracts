@@ -2,7 +2,7 @@ pragma solidity ^0.5.9;
 
 contract DelightBase {
 	
-	// Dimension of the map.
+	// Dimension of the world.
 	// 지형의 범위
 	uint constant internal COL_RANGE = 100;
 	uint constant internal ROW_RANGE = 100;
