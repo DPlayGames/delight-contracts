@@ -27,7 +27,7 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 		}
 		
 		else if (network == Network.Kovan) {
-			dplayTradingPost = address(0x8387E48645EaB0d5d025ffd30BC4e78a3961C431);
+			dplayTradingPost = address(0x96097086b9b75a6A989ddDD7Fc5559901Fb46066);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -51,244 +51,244 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 			buffDamage	: 0
 		}));
 		
-		// Mistilteinn
+		// Hephaestus' Hammer
 		createItem(KnightItem({
-			hp			: 1,
-			damage		: 1,
-			buffHP		: 1,
-			buffDamage	: 1
-		}));
-		
-		// Gungnir
-		createItem(KnightItem({
-			hp			: 2,
-			damage		: 2,
-			buffHP		: 2,
-			buffDamage	: 2
-		}));
-		
-		// Traitor Hero's Straight Sword
-		createItem(KnightItem({
-			hp			: 3,
-			damage		: 3,
-			buffHP		: 3,
-			buffDamage	: 3
-		}));
-		
-		// Sword of Valhalla
-		createItem(KnightItem({
-			hp			: 4,
-			damage		: 4,
-			buffHP		: 4,
-			buffDamage	: 4
-		}));
-		
-		// Ymir's Fragment
-		createItem(KnightItem({
-			hp			: 5,
-			damage		: 5,
-			buffHP		: 5,
-			buffDamage	: 5
-		}));
-		
-		// Hel's Scythe
-		createItem(KnightItem({
-			hp			: 6,
-			damage		: 6,
-			buffHP		: 6,
-			buffDamage	: 6
-		}));
-		
-		// Skull
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Laevateinn
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Jormungand's Canine
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Tyrfing
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Heimdallr's Sword
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Rapier
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Song of the Cherry Blossoms
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Ancient God's Sword
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Undead's Sword
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
+			hp			: 500,
+			damage		: 250,
+			buffHP		: 20,
+			buffDamage	: 10
 		}));
 		
 		// Greek Shield
 		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
+			hp			: 1000,
+			damage		: 170,
+			buffHP		: 50,
+			buffDamage	: 0
 		}));
 		
-		// Nymph's Spear
+		// Undead's Sword
 		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Triaina
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Titan Sword
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Amazonian Dagger
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Hector's Sword
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Rhea's Scythe
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Tyr's Claw
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Kronos' Two Handed Axe
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Oceanus' Axe
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Bone Axe of Typhon
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
-		}));
-		
-		// Helios' Sun Hammer
-		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
+			hp			: 200,
+			damage		: 350,
+			buffHP		: 0,
+			buffDamage	: 40
 		}));
 		
 		// Mace
 		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
+			hp			: 400,
+			damage		: 200,
+			buffHP		: 30,
+			buffDamage	: 30
+		}));
+		
+		// Glass Sword
+		createItem(KnightItem({
+			hp			: 200,
+			damage		: 1750,
+			buffHP		: 30,
+			buffDamage	: 0
+		}));
+		
+		// Slaughter
+		createItem(KnightItem({
+			hp			: 500,
+			damage		: 0,
+			buffHP		: 35,
+			buffDamage	: 35
+		}));
+		
+		// Hel's Scythe
+		createItem(KnightItem({
+			hp			: 0,
+			damage		: 3000,
+			buffHP		: 0,
+			buffDamage	: 0
+		}));
+		
+		// Laevateinn
+		createItem(KnightItem({
+			hp			: 1000,
+			damage		: 500,
+			buffHP		: 30,
+			buffDamage	: 40
+		}));
+		
+		// Crescent Spear
+		createItem(KnightItem({
+			hp			: 500,
+			damage		: 1000,
+			buffHP		: 50,
+			buffDamage	: 30
+		}));
+		
+		// Traitor Hero's Straight Sword
+		createItem(KnightItem({
+			hp			: 1000,
+			damage		: 750,
+			buffHP		: 15,
+			buffDamage	: 60
+		}));
+		
+		// Rapier
+		createItem(KnightItem({
+			hp			: 0,
+			damage		: 1250,
+			buffHP		: 0,
+			buffDamage	: 110
 		}));
 		
 		// Hermes' Staff
 		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
+			hp			: 2100,
+			damage		: 0,
+			buffHP		: 210,
+			buffDamage	: 0
 		}));
 		
-		// Hephaestus' Hammer
+		// Ymir's Fragment
 		createItem(KnightItem({
-			hp			: 7,
-			damage		: 7,
-			buffHP		: 7,
-			buffDamage	: 7
+			hp			: 1100,
+			damage		: 575,
+			buffHP		: 110,
+			buffDamage	: 55
+		}));
+		
+		// Bone Axe of Typhon
+		createItem(KnightItem({
+			hp			: 1150,
+			damage		: 600,
+			buffHP		: 115,
+			buffDamage	: 57
+		}));
+		
+		// Hector's Sword
+		createItem(KnightItem({
+			hp			: 1000,
+			damage		: 730,
+			buffHP		: 0,
+			buffDamage	: 120
+		}));
+		
+		// Tyr's Claw
+		createItem(KnightItem({
+			hp			: 200,
+			damage		: 3400,
+			buffHP		: 125,
+			buffDamage	: 0
+		}));
+		
+		// Jormungand's Canine
+		createItem(KnightItem({
+			hp			: 1300,
+			damage		: 100,
+			buffHP		: 130,
+			buffDamage	: 77
+		}));
+		
+		// Kronos' Two Handed Axe
+		createItem(KnightItem({
+			hp			: 100,
+			damage		: 700,
+			buffHP		: 195,
+			buffDamage	: 0
+		}));
+		
+		// Titan Sword
+		createItem(KnightItem({
+			hp			: 1400,
+			damage		: 725,
+			buffHP		: 140,
+			buffDamage	: 70
+		}));
+		
+		// Sword of Valhalla
+		createItem(KnightItem({
+			hp			: 200,
+			damage		: 750,
+			buffHP		: 20,
+			buffDamage	: 150
+		}));
+		
+		// Ancient God's Sword
+		createItem(KnightItem({
+			hp			: 1000,
+			damage		: 775,
+			buffHP		: 160,
+			buffDamage	: 75
+		}));
+		
+		// Triaina
+		createItem(KnightItem({
+			hp			: 500,
+			damage		: 1400,
+			buffHP		: 100,
+			buffDamage	: 100
+		}));
+		
+		// Helios' Sun Hammer
+		createItem(KnightItem({
+			hp			: 2500,
+			damage		: 200,
+			buffHP		: 220,
+			buffDamage	: 20
+		}));
+		
+		// Heimdallr's Sword
+		createItem(KnightItem({
+			hp			: 1650,
+			damage		: 4200,
+			buffHP		: 165,
+			buffDamage	: 10
+		}));
+		
+		// Gungnir
+		createItem(KnightItem({
+			hp			: 3000,
+			damage		: 3520,
+			buffHP		: 20,
+			buffDamage	: 85
+		}));
+		
+		// Mistilteinn
+		createItem(KnightItem({
+			hp			: 250,
+			damage		: 6100,
+			buffHP		: 175,
+			buffDamage	: 0
+		}));
+		
+		// Song of the Cherry Blossoms
+		createItem(KnightItem({
+			hp			: 1800,
+			damage		: 925,
+			buffHP		: 90,
+			buffDamage	: 270
+		}));
+		
+		// Oceanus' Axe
+		createItem(KnightItem({
+			hp			: 2800,
+			damage		: 450,
+			buffHP		: 400,
+			buffDamage	: 0
+		}));
+		
+		// Tyrfing
+		createItem(KnightItem({
+			hp			: 1900,
+			damage		: 975,
+			buffHP		: 300,
+			buffDamage	: 50
+		}));
+		
+		// Skull
+		createItem(KnightItem({
+			hp			: 2000,
+			damage		: 1000,
+			buffHP		: 200,
+			buffDamage	: 100
 		}));
 	}
 	
@@ -445,10 +445,12 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 		return itemIdToApproved[itemId];
 	}
 	
-	//ERC721: Checks if the operator is approved to trade.
-	//ERC721: 오퍼레이터가 거래 권한을 가지고 있는지 확인합니다.
+	//ERC721: 오퍼레이터가 모든 토큰에 대한 거래 권한을 가지고 있는지 확인합니다.
 	function isApprovedForAll(address owner, address operator) view public returns (bool) {
-		return ownerToOperatorToIsApprovedForAll[owner][operator] == true;
+		return ownerToOperatorToIsApprovedForAll[owner][operator] == true ||
+			// Delight와 DPlay 교역소는 모든 토큰을 전송할 수 있습니다.
+			msg.sender == delightItemManager ||
+			msg.sender == dplayTradingPost;
 	}
 	
 	// Returns the number of items.

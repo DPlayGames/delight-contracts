@@ -35,6 +35,7 @@ contract DelightItemManager is DelightManager {
 		}
 		
 		else if (network == Network.Kovan) {
+			
 			// Items
 			// 아이템
 			axe			= DelightItem(0xd864d316efeB7eA1Bb26d4f3411343BbF85463FF);
@@ -46,6 +47,7 @@ contract DelightItemManager is DelightManager {
 			hood		= DelightItem(0x9BB8B8Bfb044e99176343d287B8Fa65f5c68cE0e);
 			shield		= DelightItem(0x0523B5A2C36f301fd62f51A443a841Cbc4C1cb14);
 			spear		= DelightItem(0x772D409cAfEE9C19ed94FA2912fA688C4893A8ca);
+			
 			// Knight item
 			// 기사 아이템
 			knightItem	= DelightKnightItemInterface(0x09F0419cC8C65df3C309dd511fF0296394dCF6cc);
