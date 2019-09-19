@@ -2,10 +2,12 @@ pragma solidity ^0.5.9;
 
 contract DelightBase {
 	
+	// Dimension of the land.
 	// 지형의 범위
 	uint constant internal COL_RANGE = 100;
 	uint constant internal ROW_RANGE = 100;
 	
+	// Buildings
 	// 건물
 	uint constant internal BUILDING_HQ				= 0;
 	uint constant internal BUILDING_TRAINING_CENTER	= 1;
@@ -14,6 +16,7 @@ contract DelightBase {
 	uint constant internal BUILDING_WALL			= 4;
 	uint constant internal BUILDING_GATE			= 5;
 	
+	// Units
 	// 유닛
 	uint constant internal UNIT_SWORDSMAN		= 4;
 	uint constant internal UNIT_AXEMAN			= 2;
@@ -30,6 +33,7 @@ contract DelightBase {
 	uint constant internal UNIT_KNIGHT			= 12;
 	uint constant internal UNIT_KIND_COUNT		= 13;
 	
+	// Items
 	// 아이템
 	uint constant internal ITEM_AXE			= 1;
 	uint constant internal ITEM_SPEAR		= 2;
