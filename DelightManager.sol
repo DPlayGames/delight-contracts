@@ -9,9 +9,11 @@ import "./Util/SafeMath.sol";
 contract DelightManager is DelightBase, NetworkChecker {
 	using SafeMath for uint;
 	
+	// Delight basic information
 	// Delight 기본 정보
 	DelightInfoInterface internal info;
 	
+	// Resources
 	// 자원들
 	DelightResource internal wood;
 	DelightResource internal stone;
@@ -26,9 +28,11 @@ contract DelightManager is DelightBase, NetworkChecker {
 		
 		else if (network == Network.Kovan) {
 			
+			// Delight basic information
 			// Delight 기본 정보
 			info	= DelightInfoInterface(0x132F0De950621Bb042AC198DfB8D9d4599DE0D81);
 			
+			// Resources
 			// 자원들
 			wood	= DelightResource(0xc5d6B9BEfcEe7Cae97395415cAf5cFc332058363);
 			stone	= DelightResource(0x82254F17cceDDD2214f43C04bb069239c9aF25E2);
@@ -49,11 +53,12 @@ contract DelightManager is DelightBase, NetworkChecker {
 		}
 	}
 	
+	// The address of the Delight.
 	// Delight 주소
 	address internal delight;
 	
 	function setDelightOnce(address addr) external {
-		
+		// The address has to be empty.
 		// 비어있는 주소인 경우에만
 		require(delight == address(0));
 		
