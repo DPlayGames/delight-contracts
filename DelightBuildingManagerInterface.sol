@@ -2,11 +2,13 @@ pragma solidity ^0.5.9;
 
 interface DelightBuildingManagerInterface {
 	
+	// Events
 	// 이벤트들
 	event Build(uint indexed buildingId);
 	event UpgradeHQ(uint indexed buildingId);
 	event DestroyBuilding(uint indexed buildingId);
 	
+	// Building information
 	// 건물 정보
 	struct Building {
 		uint kind;
@@ -17,9 +19,11 @@ interface DelightBuildingManagerInterface {
 		uint buildTime;
 	}
 	
+	// Returns the total number of buildings
 	// 건물의 총 개수를 반환합니다.
 	function getBuildingCount() view external returns (uint);
 	
+	// Returns the information of the building.
 	// 건물의 정보를 반환합니다.
 	function getBuildingInfo(uint buildingId) view external returns (
 		uint kind,
@@ -30,9 +34,11 @@ interface DelightBuildingManagerInterface {
 		uint buildTime
 	);
 	
+	// Returns the Building IDs on a given tile.
 	// 특정 위치의 건물 ID를 반환합니다.
 	function getPositionBuildingId(uint col, uint row) view external returns (uint);
 	
+	// Returns the owner of the building on a given tile.
 	// 특정 위치의 건물의 주인을 반환합니다.
 	function getPositionBuildingOwner(uint col, uint row) view external returns (address);
 }
