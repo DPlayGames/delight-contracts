@@ -11,6 +11,7 @@ contract DelightItem is ERC20, ERC165, NetworkChecker {
 	// The two addresses below are the addresses of the trusted smart contract, and don't need to be allowed.
 	// 아래 두 주소는 신뢰하는 스마트 계약의 주소로 허락받을 필요가 없습니다.
 	
+	// Delight item manager's address.
 	// Delight 아이템 관리자 주소
 	address public delightItemManager;
 	
@@ -46,7 +47,7 @@ contract DelightItem is ERC20, ERC165, NetworkChecker {
 	}
 	
 	function setDelightItemManagerOnce(address addr) external {
-		
+		// The address has to be empty.
 		// 비어있는 주소인 경우에만
 		require(delightItemManager == address(0));
 		
@@ -64,9 +65,11 @@ contract DelightItem is ERC20, ERC165, NetworkChecker {
 	mapping(address => uint) internal balances;
 	mapping(address => mapping(address => uint)) private allowed;
 	
+	// Creates an item and gives to a specific user.
 	// 아이템을 제조하여 특정 유저에게 전달합니다.
 	function assemble(address to, uint amount) external {
 		
+		// This function can only be used by the Delight item manager.
 		// Delight 아이템 관리자만 사용할 수 있는 함수입니다.
 		require(msg.sender == delightItemManager);
 		
@@ -75,9 +78,11 @@ contract DelightItem is ERC20, ERC165, NetworkChecker {
 		emit Transfer(delightItemManager, to, amount);
 	}
 	
+	// Dismantles an item.
 	// 아이템을 분해합니다.
 	function disassemble(uint amount) external {
 		
+		// This function can only be used by the Delight item manager.
 		// Delight 아이템 관리자만 사용할 수 있는 함수입니다.
 		require(msg.sender == delightItemManager);
 		
@@ -178,6 +183,7 @@ contract DelightItem is ERC20, ERC165, NetworkChecker {
 		require(amount <= balances[from]);
 		
 		require(
+			// Delight and DPlay trading post can transmit any tokens.
 			// Delight와 DPlay 교역소는 모든 토큰을 전송할 수 있습니다.
 			msg.sender == delightItemManager ||
 			msg.sender == dplayTradingPost ||
