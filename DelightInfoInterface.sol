@@ -2,6 +2,7 @@ pragma solidity ^0.5.9;
 
 interface DelightInfoInterface {
 	
+	// Unit information
 	// 유닛 정보
 	struct Unit {
 		uint hp;
@@ -10,6 +11,7 @@ interface DelightInfoInterface {
 		uint attackableDistance;
 	}
 	
+	// Material information
 	// 재료 정보
 	struct Material {
 		uint wood;
