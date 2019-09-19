@@ -12,6 +12,7 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 	// The two addresses below are the addresses of the trusted smart contract, and don't need to be allowed.
 	// 아래 두 주소는 신뢰하는 스마트 계약의 주소로 허락받을 필요가 없습니다.
 	
+	// Delight item manager's address
 	// Delight 아이템 관리자 주소
 	address public delightItemManager;
 	
@@ -41,6 +42,7 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 			revert();
 		}
 		
+		// The address 0 is not used.
 		// 0번지는 사용하지 않습니다.
 		items.push(KnightItem({
 			hp			: 0,
@@ -292,12 +294,14 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 	
 	function setDelightItemManagerOnce(address addr) external {
 		
+		// The address has to be empty.
 		// 비어있는 주소인 경우에만
 		require(delightItemManager == address(0));
 		
 		delightItemManager = addr;
 	}
 	
+	// Knight item information
 	// 기사 아이템 정보
 	struct KnightItem {
 		uint hp;
@@ -341,21 +345,25 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 		_;
 	}
 	
+	//ERC721: Gets the number of items.
 	//ERC721: 아이템의 개수를 가져옵니다.
 	function balanceOf(address owner) view public returns (uint) {
 		return ownerToItemIds[owner].length;
 	}
 	
+	//ERC721: Gets the wallet address of the item owner.
 	//ERC721: 아이템 소유주의 지갑 주소를 가져옵니다.
 	function ownerOf(uint itemId) view public returns (address) {
 		return itemIdToOwner[itemId];
 	}
 	
+	//ERC721: If a smart contract is the receiver of the item, executes the function onERC721Received.
 	//ERC721: 아이템을 받는 대상이 스마트 계약인 경우, onERC721Received 함수를 실행합니다.
 	function safeTransferFrom(address from, address to, uint itemId, bytes memory data) payable public {
 		
 		transferFrom(from, to, itemId);
 		
+		// Checks if the given address is a smart contract.
 		// 주어진 주소가 스마트 계약인지 확인합니다.
 		uint32 size;
 		assembly { size := extcodesize(to) }
@@ -365,21 +373,25 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 		}
 	}
 	
+	//ERC721: If a smart contract is the receiver of the item, executes the function onERC721Received.
 	//ERC721: 아이템을 받는 대상이 스마트 계약인 경우, onERC721Received 함수를 실행합니다.
 	function safeTransferFrom(address from, address to, uint itemId) payable external {
 		safeTransferFrom(from, to, itemId, "");
 	}
 	
+	//ERC721: Transfers the item.
 	//ERC721: 아이템을 이전합니다.
 	function transferFrom(address from, address to, uint itemId) onlyApprovedOf(itemId) payable public {
 		
 		require(from == ownerOf(itemId));
 		require(to != ownerOf(itemId));
 		
+		// Delete trading rights.
 		// 거래 권한 제거
 		delete itemIdToApproved[itemId];
 		emit Approval(from, address(0), itemId);
 		
+		// Deletes the item from the original owner.
 		// 기존 소유주로부터 아이템 제거
 		uint index = itemIdToItemIdsIndex[itemId];
 		uint lastIndex = balanceOf(from).sub(1);
@@ -392,6 +404,7 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 		
 		itemIdToItemIdsIndex[lastItemId] = index;
 		
+		// Transfers the item.
 		// 아이템 이전
 		itemIdToOwner[itemId] = to;
 		itemIdToItemIdsIndex[itemId] = ownerToItemIds[to].push(itemId).sub(1);
@@ -399,6 +412,7 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 		emit Transfer(from, to, itemId);
 	}
 	
+	//ERC721: Approves trading to a given contract.
 	//ERC721: 특정 계약에 거래 권한을 부여합니다.
 	function approve(address approved, uint itemId) onlyOwnerOf(itemId) payable external {
 		
@@ -410,6 +424,7 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 		emit Approval(owner, approved, itemId);
 	}
 	
+	//ERC721: Approves or disapproves trading rights to the operator.
 	//ERC721: 오퍼레이터에게 거래 권한을 부여하거나 뺏습니다.
 	function setApprovalForAll(address operator, bool isApproved) external {
 		
@@ -424,21 +439,25 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 		emit ApprovalForAll(msg.sender, operator, isApproved);
 	}
 	
+	//ERC721: Gets the approved wallet address.
 	//ERC721: 아이템 거래 권한이 승인된 지갑 주소를 가져옵니다.
 	function getApproved(uint itemId) public view returns (address) {
 		return itemIdToApproved[itemId];
 	}
 	
+	//ERC721: Checks if the operator is approved to trade.
 	//ERC721: 오퍼레이터가 거래 권한을 가지고 있는지 확인합니다.
 	function isApprovedForAll(address owner, address operator) view public returns (bool) {
 		return ownerToOperatorToIsApprovedForAll[owner][operator] == true;
 	}
 	
+	// Returns the number of items.
 	// 아이템의 개수를 반환합니다.
 	function getItemCount() external view returns (uint) {
 		return items.length;
 	}
 	
+	// Returns the information of an item.
 	// 아이템의 정보를 반환합니다.
 	function getItemInfo(uint itemId) external view returns (
 		uint hp,
@@ -457,21 +476,25 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 		);
 	}
 	
+	// Returns the HP given to the knight of the item.
 	// 아이템의 기사에게 부여하는 HP를 반환합니다.
 	function getItemHP(uint itemId) external view returns (uint) {
 		return items[itemId].hp;
 	}
 	
+	// Returns the damage given to the knight of the item.
 	// 아이템의 기사에게 부여하는 데미지를 반환합니다.
 	function getItemDamage(uint itemId) external view returns (uint) {
 		return items[itemId].damage;
 	}
 	
+	// Returns the buff HP of an item.
 	// 아이템의 버프 HP를 반환합니다.
 	function getItemBuffHP(uint itemId) external view returns (uint) {
 		return items[itemId].buffHP;
 	}
 	
+	// Returns the buff damage of an item.
 	// 아이템의 버프 데미지를 반환합니다.
 	function getItemBuffDamage(uint itemId) external view returns (uint) {
 		return items[itemId].buffDamage;
