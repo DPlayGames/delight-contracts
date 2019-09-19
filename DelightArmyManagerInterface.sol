@@ -2,6 +2,7 @@ pragma solidity ^0.5.9;
 
 interface DelightArmyManagerInterface {
 	
+	// Events
 	// 이벤트들
 	event CreateArmy(uint indexed armyId);
 	event AttachItem(uint indexed armyId, uint indexed newArmyId);
@@ -10,6 +11,7 @@ interface DelightArmyManagerInterface {
 	event MergeArmy(uint indexed fromArmyId, uint indexed toArmyId);
 	event DeadUnits(uint indexed armyId);
 	
+	// Army information
 	// 부대 정보
 	struct Army {
 		uint unitKind;
@@ -21,6 +23,7 @@ interface DelightArmyManagerInterface {
 		uint createTime;
 	}
 	
+	// Reward
 	// 보상
 	struct Reward {
 		uint wood;
@@ -29,9 +32,11 @@ interface DelightArmyManagerInterface {
 		uint ducat;
 	}
 	
+	// Returns the total number of armies
 	// 부대의 총 개수를 반환합니다.
 	function getArmyCount() view external returns (uint);
 	
+	// Returns the information of an army
 	// 부대의 정보를 반환합니다.
 	function getArmyInfo(uint armyId) view external returns (
 		uint unitKind,
@@ -43,9 +48,11 @@ interface DelightArmyManagerInterface {
 		uint createTime
 	);
 	
+	// Gets the IDs of the armies located in a specific tile.
 	// 특정 위치에 존재하는 부대의 ID들을 가져옵니다.
 	function getPositionArmyIds(uint col, uint row) view external returns (uint[] memory);
 	
+	// Gets the owners of the armies located in a specific tile.
 	// 특정 위치에 존재하는 부대의 소유주를 가져옵니다.
 	function getPositionOwner(uint col, uint row) view external returns (address);
 }
