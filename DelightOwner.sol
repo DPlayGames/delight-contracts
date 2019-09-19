@@ -15,6 +15,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 	DelightBuildingManagerInterface private buildingManager;
 	DelightArmyManagerInterface private armyManager;
 	
+	// Knight item
 	// 기사 아이템
 	DelightKnightItemInterface private knightItem;
 	
@@ -30,6 +31,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 			buildingManager	= DelightBuildingManagerInterface(0x86aE09f8127d674e72E1774C514413a58eE4DEDB);
 			armyManager		= DelightArmyManagerInterface(0xe11863C011Ae99F63DC28c0458443Eae69B4D67e);
 			
+			// knight item.
 			// 기사 아이템
 			knightItem		= DelightKnightItemInterface(0x09F0419cC8C65df3C309dd511fF0296394dCF6cc);
 		}
@@ -47,6 +49,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		}
 	}
 	
+	// Gets the record IDs of the owner.
 	// 소유주의 기록 ID들을 가져옵니다.
 	function getRecordIds(address owner) view external returns (uint[] memory) {
 		
@@ -99,6 +102,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		return recordIds;
 	}
 	
+	// Gets the building IDs of the owner.
 	// 소유주의 건물 ID들을 가져옵니다.
 	function getBuildingIds(address owner) view external returns (uint[] memory) {
 		
@@ -143,6 +147,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		return buildingIds;
 	}
 	
+	// Gets the Army IDs of the owner.
 	// 소유주의 부대 ID들을 가져옵니다.
 	function getArmyIds(address owner) view external returns (uint[] memory) {
 		
@@ -189,6 +194,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		return armyIds;
 	}
 	
+	// Gets the knight IDs of the owner.
 	// 소유주의 기사 ID들을 가져옵니다.
 	function getKnightItemIds(address owner) view external returns (uint[] memory) {
 		
