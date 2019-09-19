@@ -27,7 +27,7 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 	}
 	
 	function setDelightItemManagerOnce(address addr) external {
-		
+		// The address has to be empty.
 		// 비어있는 주소인 경우에만
 		require(address(delightItemManager) == address(0));
 		
@@ -190,7 +190,7 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 		iron.transferFrom(owner, delight, info.getBuildingMaterialIron(kind));
 		ducat.transferFrom(owner, delight, info.getBuildingMaterialDucat(kind));
 		
-		// New event.
+		// Emits the event.
 		// 이벤트 발생
 		emit Build(buildingId);
 	}
@@ -231,7 +231,7 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 		
 		building.level = toLevel;
 		
-		// New event.
+		// Emits the event.
 		// 이벤트 발생
 		emit UpgradeHQ(buildingId);
 	}
@@ -342,7 +342,7 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 		delete buildings[buildingId];
 		delete positionToBuildingId[col][row];
 		
-		// New event.
+		// Emits the event.
 		// 이벤트 발생
 		emit DestroyBuilding(buildingId);
 	}
