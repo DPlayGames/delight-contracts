@@ -11,12 +11,15 @@ contract DelightResource is ERC20, ERC165, NetworkChecker {
 	// The four addresses below are the addresses of the trusted smart contract, and don't need to be allowed.
 	// 아래 네 주소는 신뢰하는 스마트 계약의 주소로 허락받을 필요가 없습니다.
 	
+	// Delight building manager's address
 	// Delight 건물 관리자 주소
 	address public delightBuildingManager;
 	
+	// Delight army manager's address
 	// Delight 부대 관리자 주소
 	address public delightArmyManager;
 	
+	// Delight item manager's address
 	// Delight 아이템 관리자 주소
 	address public delightItemManager;
 	
@@ -49,6 +52,7 @@ contract DelightResource is ERC20, ERC165, NetworkChecker {
 	
 	function setDelightBuildingManagerOnce(address addr) external {
 		
+		// The address has to be empty.
 		// 비어있는 주소인 경우에만
 		require(delightBuildingManager == address(0));
 		
@@ -57,6 +61,7 @@ contract DelightResource is ERC20, ERC165, NetworkChecker {
 	
 	function setDelightArmyManagerOnce(address addr) external {
 		
+		// The address has to be empty.
 		// 비어있는 주소인 경우에만
 		require(delightArmyManager == address(0));
 		
@@ -65,6 +70,7 @@ contract DelightResource is ERC20, ERC165, NetworkChecker {
 	
 	function setDelightItemManagerOnce(address addr) external {
 		
+		// The address has to be empty.
 		// 비어있는 주소인 경우에만
 		require(delightItemManager == address(0));
 		
@@ -213,6 +219,7 @@ contract DelightResource is ERC20, ERC165, NetworkChecker {
 			interfaceID == 0x36372b07;
 	}
 	
+	// Creates test resources.
 	// 테스트용 자원을 생성합니다.
 	function createResourceForTest(uint amount) external {
 		if (network == Network.Mainnet) {
