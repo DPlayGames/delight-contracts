@@ -13,8 +13,7 @@ contract DelightBase {
 	uint constant internal BUILDING_TRAINING_CENTER	= 1;
 	uint constant internal BUILDING_ARCHERY_RANGE	= 2;
 	uint constant internal BUILDING_STABLE			= 3;
-	uint constant internal BUILDING_WALL			= 4;
-	uint constant internal BUILDING_GATE			= 5;
+	uint constant internal BUILDING_TOWER			= 4;
 	
 	// Units
 	// 유닛

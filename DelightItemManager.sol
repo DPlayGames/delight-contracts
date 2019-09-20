@@ -26,7 +26,7 @@ contract DelightItemManager is DelightManager {
 	
 	// Delight army manager's address
 	// Delight 부대 관리자 주소
-	address private delightArmyManager;
+	address private armyManager;
 	
 	constructor() DelightManager() public {
 		
@@ -92,9 +92,9 @@ contract DelightItemManager is DelightManager {
 		
 		// The address has to be empty
 		// 비어있는 주소인 경우에만
-		require(delightArmyManager == address(0));
+		require(armyManager == address(0));
 		
-		delightArmyManager = addr;
+		armyManager = addr;
 	}
 	
 	// Excutes only if the Sender is Delight.
@@ -102,7 +102,7 @@ contract DelightItemManager is DelightManager {
 	modifier onlyDelight() {
 		require(
 			msg.sender == delight ||
-			msg.sender == delightArmyManager
+			msg.sender == armyManager
 		);
 		_;
 	}

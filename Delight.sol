@@ -3,6 +3,7 @@ pragma solidity ^0.5.9;
 import "./DelightInterface.sol";
 import "./DelightBase.sol";
 import "./DelightInfoInterface.sol";
+import "./DelightKnightItemInterface.sol";
 import "./DelightBuildingManager.sol";
 import "./DelightArmyManager.sol";
 import "./DelightItemManager.sol";
@@ -26,7 +27,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	uint constant private KNIGHT_DEFAULT_BUFF_DAMAGE = 5;
 	
 	DelightInfoInterface private info;
-	DelightKnightItem private knightItem;
+	DelightKnightItemInterface private knightItem;
 	
 	DelightBuildingManager private buildingManager;
 	DelightArmyManager private armyManager;
@@ -46,7 +47,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			
 			// knight item
 			// 기사 아이템
-			knightItem = DelightKnightItem(0x09F0419cC8C65df3C309dd511fF0296394dCF6cc);
+			knightItem = DelightKnightItemInterface(0x09F0419cC8C65df3C309dd511fF0296394dCF6cc);
 			
 			// managers
 			// 관리자들
@@ -151,13 +152,20 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 				// 아군의 데미지 추가
 				totalDamage = totalDamage.add(
 					info.getUnitDamage(armyUnitKind).add(
+						
 						// If the unit's a knight, add the knight item's damage .
 						// 기사인 경우 기사 아이템의 데미지를 추가합니다.
 						i == UNIT_KNIGHT ? knightItem.getItemDamage(armyKnightItemId) : (
+							
 							// If the unit's not a knight, add a knight's buff damage .
 							// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
 							armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(knightItemId) : 0
 						)
+						
+					).add(
+						
+						// 이동 거리가 0일때만 병사 위치의 건물의 버프 데미지를 가져옵니다.
+						distance == 0 ? buildingManager.getBuildingBuffDamage(col, row) : 0
 						
 					).mul(armyUnitCount)
 				);
@@ -210,13 +218,20 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 				// 아군의 데미지 추가
 				totalDamage = totalDamage.add(
 					info.getUnitDamage(armyUnitKind).add(
+						
 						// If the unit's a knight, adds the knight item's damage 
 						// 기사인 경우 기사 아이템의 공격력을 추가합니다.
 						i == UNIT_KNIGHT ? knightItem.getItemDamage(armyKnightItemId) : (
+							
 							// If the unit's not a knight, adds a knight's buff damage 
 							// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
 							armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(knightItemId) : 0
 						)
+						
+					).add(
+						
+						// 병사 위치의 건물의 버프 데미지를 가져옵니다.
+						buildingManager.getBuildingBuffDamage(col, row)
 						
 					).mul(armyUnitCount)
 				);

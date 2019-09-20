@@ -4,6 +4,7 @@ import "./DelightArmyManagerInterface.sol";
 import "./DelightManager.sol";
 import "./DelightBuildingManager.sol";
 import "./DelightItemManager.sol";
+import "./DelightKnightItemInterface.sol";
 import "./Util/SafeMath.sol";
 
 contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
@@ -19,14 +20,14 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	
 	// Delight building manager
 	// Delight 건물 관리자
-	DelightBuildingManager private delightBuildingManager;
+	DelightBuildingManager private buildingManager;
 	
 	// Delight item manager
 	// Delight 아이템 관리자
-	DelightItemManager private delightItemManager;
+	DelightItemManager private itemManager;
 	
 	// 기사 아이템
-	DelightKnightItem private knightItem;
+	DelightKnightItemInterface private knightItem;
 	
 	constructor() DelightManager() public {
 		
@@ -35,9 +36,10 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		}
 		
 		else if (network == Network.Kovan) {
+			
 			// Knight item.
 			// 기사 아이템
-			knightItem	= DelightKnightItem(0x09F0419cC8C65df3C309dd511fF0296394dCF6cc);
+			knightItem	= DelightKnightItemInterface(0x09F0419cC8C65df3C309dd511fF0296394dCF6cc);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -65,19 +67,21 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	}
 	
 	function setDelightBuildingManagerOnce(address addr) external {
+		
 		// The address must be empty.
 		// 비어있는 주소인 경우에만
-		require(address(delightBuildingManager) == address(0));
+		require(address(buildingManager) == address(0));
 		
-		delightBuildingManager = DelightBuildingManager(addr);
+		buildingManager = DelightBuildingManager(addr);
 	}
 	
 	function setDelightItemManagerOnce(address addr) external {
+		
 		// The address must be empty.
 		// 비어있는 주소인 경우에만
-		require(address(delightItemManager) == address(0));
+		require(address(itemManager) == address(0));
 		
-		delightItemManager = DelightItemManager(addr);
+		itemManager = DelightItemManager(addr);
 	}
 	
 	// Executed only when the sender is Delight.
@@ -85,8 +89,8 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	modifier onlyDelight() {
 		require(
 			msg.sender == delight ||
-			msg.sender == address(delightBuildingManager) ||
-			msg.sender == address(delightItemManager)
+			msg.sender == address(buildingManager) ||
+			msg.sender == address(itemManager)
 		);
 		_;
 	}
@@ -265,7 +269,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		
 		// Transfers items to Delight.
 		// 아이템을 Delight로 이전합니다.
-		delightItemManager.attachItem(owner, itemKind, unitCount);
+		itemManager.attachItem(owner, itemKind, unitCount);
 		
 		// Creates a new army, changing some of the units.
 		// 유닛의 일부를 변경하여 새로운 부대를 생성합니다.
@@ -348,7 +352,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		
 		// Transfers the item to Delight.
 		// 아이템을 Delight로 이전합니다.
-		delightItemManager.attachKnightItem(owner, itemId);
+		itemManager.attachKnightItem(owner, itemId);
 		
 		// Assigns the knight item.
 		// 기사 아이템을 지정합니다.
@@ -550,13 +554,20 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				// Calcultes the HPs of the friendly army.
 				// 아군의 체력을 계산합니다.
 				uint armyHP = info.getUnitHP(army.unitKind).add(
+					
 					// Adds the knight item's HP if the unit's a knight.
 					// 기사인 경우 기사 아이템의 HP를 추가합니다.
 					i == UNIT_KNIGHT ? knightItem.getItemHP(army.knightItemId) : (
+						
 						// If the unit's not a knight, adds the knight's buff HP.
 						// 기사가 아닌 경우 기사의 버프 HP를 추가합니다.
 						armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
 					)
+					
+				).add(
+					
+					// 병사 위치의 건물의 버프 HP를 가져옵니다.
+					buildingManager.getBuildingBuffHP(col, row)
 					
 				).mul(army.unitCount);
 				
@@ -581,7 +592,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				// 장착한 아이템을 분해합니다.
 				uint itemKind = getItemKindByUnitKind(army.unitKind);
 				if (itemKind != 0) {
-					delightItemManager.disassembleItem(itemKind, deadUnitCount);
+					itemManager.disassembleItem(itemKind, deadUnitCount);
 				}
 				
 				// Saves the number of remaining units.
@@ -611,7 +622,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		
 		// The building must exist.
 		// 건물이 존재하는 경우에만
-		if (delightBuildingManager.getPositionBuildingId(col, row) != 0) {
+		if (buildingManager.getPositionBuildingId(col, row) != 0) {
 			
 			// Loot
 			// 전리품
@@ -622,7 +633,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				uint stone,
 				uint iron,
 				uint ducat
-			) = delightBuildingManager.destroyBuilding(col, row);
+			) = buildingManager.destroyBuilding(col, row);
 			
 			// Adds to the loot.
 			// 전리품에 추가합니다.
@@ -673,13 +684,20 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				// Calculates the HP of the friendly force.
 				// 아군의 체력을 계산합니다.
 				uint armyHP = info.getUnitHP(army.unitKind).add(
+					
 					// If the unit's a knight, adds the knight item's HP.
 					// 기사인 경우 기사 아이템의 HP를 추가합니다.
 					i == UNIT_KNIGHT ? knightItem.getItemHP(army.knightItemId) : (
+						
 						// If the unit's not a knight, add the knight's buff HP.
 						// 기사가 아닌 경우 기사의 버프 HP를 추가합니다.
 						armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
 					)
+					
+				).add(
+					
+					// 병사 위치의 건물의 버프 HP를 가져옵니다.
+					buildingManager.getBuildingBuffHP(col, row)
 					
 				).mul(army.unitCount);
 				
@@ -705,7 +723,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				// 장착한 아이템을 분해합니다.
 				uint itemKind = getItemKindByUnitKind(army.unitKind);
 				if (itemKind != 0) {
-					delightItemManager.disassembleItem(itemKind, deadUnitCount);
+					itemManager.disassembleItem(itemKind, deadUnitCount);
 				}
 				
 				// Saves the number of remaining soldiers.

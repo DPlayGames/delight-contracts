@@ -41,4 +41,10 @@ interface DelightBuildingManagerInterface {
 	// Returns the owner of the building on a given tile.
 	// 특정 위치의 건물의 주인을 반환합니다.
 	function getPositionBuildingOwner(uint col, uint row) view external returns (address);
+	
+	// 특정 위치의 건물의 버프 HP를 반환합니다.
+	function getBuildingBuffHP(uint col, uint row) view external returns (uint);
+	
+	// 특정 위치의 건물의 버프 데미지를 반환합니다.
+	function getBuildingBuffDamage(uint col, uint row) view external returns (uint);
 }

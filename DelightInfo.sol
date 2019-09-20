@@ -151,17 +151,10 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 			ducat : 300
 		});
 		
-		buildingMaterials[BUILDING_WALL] = Material({
+		buildingMaterials[BUILDING_TOWER] = Material({
 			wood : 0,
 			stone : 400,
 			iron : 0,
-			ducat : 0
-		});
-		
-		buildingMaterials[BUILDING_GATE] = Material({
-			wood : 100,
-			stone : 600,
-			iron : 200,
 			ducat : 0
 		});
 		

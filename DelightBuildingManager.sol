@@ -11,27 +11,28 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 	
 	// Delight army manager
 	// Delight 부대 관리자
-	DelightArmyManager private delightArmyManager;
+	DelightArmyManager private armyManager;
 	
 	// Delight item manager
 	// Delight 아이템 관리자
-	DelightItemManager private delightItemManager;
+	DelightItemManager private itemManager;
 	
 	function setDelightArmyManagerOnce(address addr) external {
 		
 		// The address has to be empty.
 		// 비어있는 주소인 경우에만
-		require(address(delightArmyManager) == address(0));
+		require(address(armyManager) == address(0));
 		
-		delightArmyManager = DelightArmyManager(addr);
+		armyManager = DelightArmyManager(addr);
 	}
 	
 	function setDelightItemManagerOnce(address addr) external {
+		
 		// The address has to be empty.
 		// 비어있는 주소인 경우에만
-		require(address(delightItemManager) == address(0));
+		require(address(itemManager) == address(0));
 		
-		delightItemManager = DelightItemManager(addr);
+		itemManager = DelightItemManager(addr);
 	}
 	
 	// Executes only if the sender is Delight.
@@ -39,8 +40,8 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 	modifier onlyDelight() {
 		require(
 			msg.sender == delight ||
-			msg.sender == address(delightArmyManager) ||
-			msg.sender == address(delightItemManager)
+			msg.sender == address(armyManager) ||
+			msg.sender == address(itemManager)
 		);
 		_;
 	}
@@ -104,6 +105,36 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 		return buildings[positionToBuildingId[col][row]].owner;
 	}
 	
+	// 특정 위치의 건물의 버프 HP를 반환합니다.
+	function getBuildingBuffHP(uint col, uint row) view external returns (uint) {
+		
+		uint buildingId = positionToBuildingId[col][row];
+		if (buildingId != 0) {
+			
+			// 탑인 경우 버프 HP는 20
+			if (buildings[buildingId].kind == BUILDING_TOWER) {
+				return 20;
+			}
+		}
+		
+		return 0;
+	}
+	
+	// 특정 위치의 건물의 버프 데미지를 반환합니다.
+	function getBuildingBuffDamage(uint col, uint row) view external returns (uint) {
+		
+		uint buildingId = positionToBuildingId[col][row];
+		if (buildingId != 0) {
+			
+			// 탑인 경우 버프 데미지는 20
+			if (buildings[buildingId].kind == BUILDING_TOWER) {
+				return 20;
+			}
+		}
+		
+		return 0;
+	}
+	
 	// Builds a building.
 	// 건물을 짓습니다.
 	function build(address owner, uint kind, uint col, uint row) onlyDelight external {
@@ -116,7 +147,7 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 		// 필드에 건물이 존재하면 안됩니다.
 		require(positionToBuildingId[col][row] == 0);
 		
-		address positionOwner = delightArmyManager.getPositionOwner(col, row);
+		address positionOwner = armyManager.getPositionOwner(col, row);
 		
 		// There should be no enemy on the construction site.
 		// 필드에 적군이 존재하면 안됩니다.
@@ -278,7 +309,7 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 		
 		// Creates the army.
 		// 부대를 생산합니다.
-		delightArmyManager.createArmy(owner, building.col, building.row, unitKind, unitCount);
+		armyManager.createArmy(owner, building.col, building.row, unitKind, unitCount);
 	}
 	
 	// Destory the building on a specific tile.
