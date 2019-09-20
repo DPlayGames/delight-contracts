@@ -170,6 +170,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		// 건물이 위치한 곳의 총 유닛 숫자가 최대 유닛 수를 넘기면 안됩니다.
 		require(totalUnitCount <= MAX_POSITION_UNIT_COUNT);
 		
+		// 기사는 하나 이상 생성할 수 없습니다.
+		require(unitKind != UNIT_KNIGHT || unitCount == 1);
+		
 		uint materialWood = info.getUnitMaterialWood(unitKind).mul(unitCount);
 		uint materialStone = info.getUnitMaterialStone(unitKind).mul(unitCount);
 		uint materialIron = info.getUnitMaterialIron(unitKind).mul(unitCount);
@@ -189,6 +192,10 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		// If an army exists already, the number of units in the army increases.
 		// 기존에 부대가 존재하면 부대원의 숫자 증가
 		if (armyIds[unitKind] != 0) {
+			
+			// 기사는 추가할 수 없습니다.
+			require(unitKind != UNIT_KNIGHT);
+			
 			armies[armyIds[unitKind]].unitCount = armies[armyIds[unitKind]].unitCount.add(unitCount);
 		}
 		
@@ -456,6 +463,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 					// 비어있지 않으면 병합합니다.
 					else {
 						
+						// 기사는 병합할 수 없습니다.
+						require(army.unitKind != UNIT_KNIGHT);
+						
 						targetArmy.unitCount = targetArmy.unitCount.add(movableUnitCount);
 						army.unitCount = army.unitCount.sub(movableUnitCount);
 					}
@@ -481,8 +491,11 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 					}
 					
 					// merge with an existing army if it isn't empty.
-					// 비어있지 않으면 합병합니다.
+					// 비어있지 않으면 병합합니다.
 					else {
+						
+						// 기사는 병합할 수 없습니다.
+						require(army.unitKind != UNIT_KNIGHT);
 						
 						targetArmy.unitCount = targetArmy.unitCount.add(army.unitCount);
 						
