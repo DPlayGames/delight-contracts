@@ -57,7 +57,7 @@ contract DelightTradingPost is DelightTradingPostInterface, NetworkChecker {
 			
 			delightKnightItem = address(0xEC9cea97B2e4d9753832566d1fd21C74D4Bb216d);
 			
-			dplayTradingPost = DPlayTradingPostInterface(0x96097086b9b75a6A989ddDD7Fc5559901Fb46066);
+			dplayTradingPost = DPlayTradingPostInterface(0x0B7D367900d0fB627C2Fa22C245a51A6B3d8885c);
 		}
 		
 		else if (network == Network.Ropsten) {
