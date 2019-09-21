@@ -326,6 +326,8 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	// 명령 큐를 실행합니다.
 	function runOrderQueue(uint[] calldata orders, uint[] calldata params1, uint[] calldata params2, uint[] calldata params3, uint[] calldata params4) external {
 		
+		require(orders.length > 0);
+		
 		for (uint i = 0; i < orders.length; i += 1) {
 			
 			Record memory record = Record({

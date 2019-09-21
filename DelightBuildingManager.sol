@@ -164,7 +164,7 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 			
 			if (
 			(col < hqCol ? hqCol - col : col - hqCol) +
-			(row < hqRow ? hqRow - row : row - hqRow) <= 5 + building.level.mul(2)
+			(row < hqRow ? hqRow - row : row - hqRow) <= 3 + building.level.mul(1)
 			) {
 				existsHQAround = true;
 				break;
@@ -180,11 +180,12 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 			// 본부인 경우, 월드에 본부가 아예 없거나, 내 병사가 있는 위치에 지을 수 있습니다.
 			(kind == BUILDING_HQ && (ownerToHQIds[owner].length == 0 || positionOwner == owner))
 		);
+		
 		// If there's no other HQ of the builder in the world, there should be no any building near the construction site.
 		// 만약 월드에 본부가 아예 없는 경우, 처음 짓는 곳 주변에 건물이 존재하면 안됩니다.
 		if (ownerToHQIds[owner].length == 0) {
-			for (uint i = (col <= 9 ? 0 : col - 9); i < (col >= 91 ? 100 : col + 9); i += 1) {
-				for (uint j = (row <= 9 ? 0 : row - 9); j < (row >= 91 ? 100 : row + 9); j += 1) {
+			for (uint i = (col <= 5 ? 0 : col - 5); i < (col >= 95 ? 100 : col + 5); i += 1) {
+				for (uint j = (row <= 5 ? 0 : row - 5); j < (row >= 95 ? 100 : row + 5); j += 1) {
 					require(positionToBuildingId[i][j] == 0);
 				}
 			}
