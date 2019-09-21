@@ -130,6 +130,23 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		);
 	}
 	
+	// 보상 정보를 반환합니다.
+	function getRewardInfo(uint battleId) view external returns (
+		uint wood,
+		uint stone,
+		uint iron,
+		uint ducat
+	) {
+		Reward memory reward = battleIdToReward[battleId];
+		
+		return (
+			reward.wood,
+			reward.stone,
+			reward.iron,
+			reward.ducat
+		);
+	}
+	
 	// Gets the IDs of the armies in a specific tile.
 	// 특정 위치에 존재하는 부대의 ID들을 가져옵니다.
 	function getPositionArmyIds(uint col, uint row) view external returns (uint[] memory) {

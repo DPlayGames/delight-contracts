@@ -48,6 +48,14 @@ interface DelightArmyManagerInterface {
 		uint createTime
 	);
 	
+	// 보상 정보를 반환합니다.
+	function getRewardInfo(uint battleId) view external returns (
+		uint wood,
+		uint stone,
+		uint iron,
+		uint ducat
+	);
+	
 	// Gets the IDs of the armies located in a specific tile.
 	// 특정 위치에 존재하는 부대의 ID들을 가져옵니다.
 	function getPositionArmyIds(uint col, uint row) view external returns (uint[] memory);
