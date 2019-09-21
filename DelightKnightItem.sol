@@ -359,7 +359,7 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 	
 	//ERC721: If a smart contract is the receiver of the item, executes the function onERC721Received.
 	//ERC721: 아이템을 받는 대상이 스마트 계약인 경우, onERC721Received 함수를 실행합니다.
-	function safeTransferFrom(address from, address to, uint itemId, bytes memory data) payable public {
+	function safeTransferFrom(address from, address to, uint itemId, bytes memory data) public {
 		
 		transferFrom(from, to, itemId);
 		
@@ -375,13 +375,13 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 	
 	//ERC721: If a smart contract is the receiver of the item, executes the function onERC721Received.
 	//ERC721: 아이템을 받는 대상이 스마트 계약인 경우, onERC721Received 함수를 실행합니다.
-	function safeTransferFrom(address from, address to, uint itemId) payable external {
+	function safeTransferFrom(address from, address to, uint itemId) external {
 		safeTransferFrom(from, to, itemId, "");
 	}
 	
 	//ERC721: Transfers the item.
 	//ERC721: 아이템을 이전합니다.
-	function transferFrom(address from, address to, uint itemId) onlyApprovedOf(itemId) payable public {
+	function transferFrom(address from, address to, uint itemId) onlyApprovedOf(itemId) public {
 		
 		require(from == ownerOf(itemId));
 		require(to != ownerOf(itemId));
@@ -414,7 +414,7 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 	
 	//ERC721: Approves trading to a given contract.
 	//ERC721: 특정 계약에 거래 권한을 부여합니다.
-	function approve(address approved, uint itemId) onlyOwnerOf(itemId) payable external {
+	function approve(address approved, uint itemId) onlyOwnerOf(itemId) external {
 		
 		address owner = ownerOf(itemId);
 		

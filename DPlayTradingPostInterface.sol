@@ -107,9 +107,9 @@ interface DPlayTradingPostInterface {
 	
 	// Buys items.
 	// 아이템을 구매합니다.
-	function buyItem(uint saleId) payable external;
+	function buyItem(uint saleId) external;
 	
 	// Buys unique items.
 	// 유니크 아이템을 구매합니다.
-	function buyUniqueItem(uint saleId) payable external;
+	function buyUniqueItem(uint saleId) external;
 }

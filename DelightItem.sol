@@ -131,7 +131,7 @@ contract DelightItem is ERC20, ERC165, NetworkChecker {
 	
 	//ERC20: Transmits tokens to a specific user.
 	//ERC20: 특정 유저에게 토큰을 전송합니다.
-	function transfer(address to, uint amount) external payable returns (bool success) {
+	function transfer(address to, uint amount) external returns (bool success) {
 		
 		// Blocks misuse of an address.
 		// 주소 오용 차단
@@ -149,7 +149,7 @@ contract DelightItem is ERC20, ERC165, NetworkChecker {
 	
 	//ERC20: Grants rights to send the amount of tokens to the spender.
 	//ERC20: spender에 amount만큼의 토큰을 보낼 권리를 부여합니다.
-	function approve(address spender, uint amount) external payable returns (bool success) {
+	function approve(address spender, uint amount) external returns (bool success) {
 		
 		allowed[msg.sender][spender] = amount;
 		
@@ -174,7 +174,7 @@ contract DelightItem is ERC20, ERC165, NetworkChecker {
 	
 	//ERC20: The allowed spender sends the "amount" of tokens from the "from" to the "to".
 	//ERC20: 허락된 spender가 from으로부터 amount만큼의 토큰을 to에게 전송합니다.
-	function transferFrom(address from, address to, uint amount) external payable returns (bool success) {
+	function transferFrom(address from, address to, uint amount) external returns (bool success) {
 		
 		// Blocks misuse of an address.
 		// 주소 오용 차단

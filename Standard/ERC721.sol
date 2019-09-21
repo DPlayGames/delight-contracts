@@ -8,10 +8,10 @@ interface ERC721 {
     
     function balanceOf(address _owner) external view returns (uint);
     function ownerOf(uint _tokenId) external view returns (address);
-    function safeTransferFrom(address _from, address _to, uint _tokenId, bytes calldata data) external payable;
-    function safeTransferFrom(address _from, address _to, uint _tokenId) external payable;
-    function transferFrom(address _from, address _to, uint _tokenId) external payable;
-    function approve(address _approved, uint _tokenId) external payable;
+    function safeTransferFrom(address _from, address _to, uint _tokenId, bytes calldata data) external;
+    function safeTransferFrom(address _from, address _to, uint _tokenId) external;
+    function transferFrom(address _from, address _to, uint _tokenId) external;
+    function approve(address _approved, uint _tokenId) external;
     function setApprovalForAll(address _operator, bool _approved) external;
     function getApproved(uint _tokenId) external view returns (address);
     function isApprovedForAll(address _owner, address _operator) external view returns (bool);
