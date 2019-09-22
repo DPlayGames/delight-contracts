@@ -294,7 +294,7 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 		
 		// An achery range creates archers.
 		// 사격소의 경우 궁수를 생산합니다.
-		else if (building.kind == BUILDING_TRAINING_CENTER) {
+		else if (building.kind == BUILDING_ARCHERY_RANGE) {
 			unitKind = UNIT_ARCHER;
 		}
 		

@@ -27,13 +27,13 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		
 		else if (network == Network.Kovan) {
 			
-			delight			= DelightInterface(0xcCD52CC46dDFc1ccA40CC1922992109Fb044c7D6);
-			buildingManager	= DelightBuildingManagerInterface(0xb07a997141c984869e786DbA66A3c4f7C9a5522f);
-			armyManager		= DelightArmyManagerInterface(0x91850B2e1450123C873a90907C733F5b1117EAe4);
+			delight			= DelightInterface(0x9Be33a6A4127636ad6beC3C0401c7c83B8DF2EB5);
+			buildingManager	= DelightBuildingManagerInterface(0xD42Bc033801ee3c2524f6d3Ab994fB6e38b99e4E);
+			armyManager		= DelightArmyManagerInterface(0x64Fb9B75e77FB7609E90Bb0795612094cB48eF13);
 			
 			// knight item.
 			// 기사 아이템
-			knightItem		= DelightKnightItemInterface(0xA4221B6BE292f75Fb7f9EFAD81613DDB164a9279);
+			knightItem		= DelightKnightItemInterface(0x2BEF206F177b08d15617Cc4861FA0Ecc4851D84F);
 		}
 		
 		else if (network == Network.Ropsten) {
