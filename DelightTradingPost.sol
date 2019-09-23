@@ -96,7 +96,6 @@ contract DelightTradingPost is DelightTradingPostInterface, NetworkChecker {
 				resourceAddress == ducat
 			) {
 				saleCount += 1;
-				break;
 			}
 		}
 		
@@ -122,7 +121,6 @@ contract DelightTradingPost is DelightTradingPostInterface, NetworkChecker {
 			) {
 				saleIds[j] = i;
 				j += 1;
-				break;
 			}
 		}
 		
