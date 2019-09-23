@@ -78,57 +78,51 @@ contract DelightTradingPost is DelightTradingPostInterface, NetworkChecker {
 		
 		uint saleCount = 0;
 		
-		for (uint i = 0; i < dplayTradingPost.getItemSaleCount(); i += 1) {
+		for (uint i = 0; i < dplayTradingPost.getResourceSaleCount(); i += 1) {
 			
 			(
 				,
-				address[] memory itemAddresses,
+				address resourceAddress,
 				,
 				,
 				,
 				
-			) = dplayTradingPost.getItemSaleInfo(i);
+			) = dplayTradingPost.getResourceSaleInfo(i);
 			
-			for (uint j = 0; j < itemAddresses.length; j += 1) {
-				
-				if (
-					itemAddresses[j] == wood ||
-					itemAddresses[j] == stone ||
-					itemAddresses[j] == iron ||
-					itemAddresses[j] == ducat
-				) {
-					saleCount += 1;
-					break;
-				}
+			if (
+				resourceAddress == wood ||
+				resourceAddress == stone ||
+				resourceAddress == iron ||
+				resourceAddress == ducat
+			) {
+				saleCount += 1;
+				break;
 			}
 		}
 		
 		uint[] memory saleIds = new uint[](saleCount);
-		uint k = 0;
+		uint j = 0;
 		
-		for (uint i = 0; i < dplayTradingPost.getItemSaleCount(); i += 1) {
+		for (uint i = 0; i < dplayTradingPost.getResourceSaleCount(); i += 1) {
 			
 			(
 				,
-				address[] memory itemAddresses,
+				address resourceAddress,
 				,
 				,
 				,
 				
-			) = dplayTradingPost.getItemSaleInfo(i);
+			) = dplayTradingPost.getResourceSaleInfo(i);
 			
-			for (uint j = 0; j < itemAddresses.length; j += 1) {
-				
-				if (
-					itemAddresses[j] == wood ||
-					itemAddresses[j] == stone ||
-					itemAddresses[j] == iron ||
-					itemAddresses[j] == ducat
-				) {
-					saleIds[k] = i;
-					k += 1;
-					break;
-				}
+			if (
+				resourceAddress == wood ||
+				resourceAddress == stone ||
+				resourceAddress == iron ||
+				resourceAddress == ducat
+			) {
+				saleIds[j] = i;
+				j += 1;
+				break;
 			}
 		}
 		
