@@ -638,7 +638,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				
 				// Adds to the number of total casualties.
 				// 총 사망 병사 숫자에 추가합니다.
-				totalDeadUnitCount = deadUnitCount;
+				totalDeadUnitCount = totalDeadUnitCount.add(deadUnitCount);
 				
 				// 이벤트 발생
 				emit DeadUnits(armyIds[i]);
@@ -769,7 +769,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				
 				// Adds to the total number of casualties.
 				// 총 사망 병사 숫자에 추가합니다.
-				totalDeadUnitCount = deadUnitCount;
+				totalDeadUnitCount = totalDeadUnitCount.add(deadUnitCount);
 				
 				// 이벤트 발생
 				emit DeadUnits(armyIds[i]);
