@@ -389,6 +389,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	// Moves an army.
 	// 부대의 위치를 이전합니다.
 	function moveArmy(uint fromCol, uint fromRow, uint toCol, uint toRow) onlyDelight external {
+		
 		// Calculates the distance.
 		// 거리 계산
 		uint distance = (fromCol < toCol ? toCol - fromCol : fromCol - toCol) + (fromRow < toRow ? toRow - fromRow : fromRow - toRow);
@@ -413,6 +414,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				
 				targetArmyIds[i] = armyIds[i];
 				
+				army.col = toCol;
+				army.row = toRow;
+				
 				// 이벤트 발생
 				emit MoveArmy(armyIds[i]);
 				
@@ -424,6 +428,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	// Merges armies.
 	// 부대를 병합합니다.
 	function mergeArmy(uint fromCol, uint fromRow, uint toCol, uint toRow) onlyDelight external {
+		
 		// Calculates distance.
 		// 거리 계산
 		uint distance = (fromCol < toCol ? toCol - fromCol : fromCol - toCol) + (fromRow < toRow ? toRow - fromRow : fromRow - toRow);
@@ -500,6 +505,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 					if (targetArmy.unitCount == 0) {
 						
 						targetArmyIds[i] = armyIds[i];
+						
+						army.col = toCol;
+						army.row = toRow;
 						
 						// 이벤트 발생
 						emit MergeArmy(armyIds[i], targetArmyIds[i]);
