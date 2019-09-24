@@ -10,7 +10,7 @@ contract DelightIron is DelightResource {
 		
 		_name = "Delight Iron";
 		_symbol = "DI";
-		_totalSupply = 100000000;
+		_totalSupply = 10000000;
 		
 		balances[msg.sender] = _totalSupply;
 		emit Transfer(address(0), msg.sender, _totalSupply);

@@ -10,7 +10,7 @@ contract DelightDucat is DelightResource {
 		
 		_name = "Delight Ducat";
 		_symbol = "DD";
-		_totalSupply = 100000000;
+		_totalSupply = 10000000;
 		
 		balances[msg.sender] = _totalSupply;
 		emit Transfer(address(0), msg.sender, _totalSupply);
