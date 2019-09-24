@@ -27,7 +27,7 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 		}
 		
 		else if (network == Network.Kovan) {
-			dplayTradingPost = address(0x6faB840742BD216884f696b9387373A5F9257Dce);
+			dplayTradingPost = address(0x5341392E21c464EE25294edeDf7ab96836bB9649);
 		}
 		
 		else if (network == Network.Ropsten) {
