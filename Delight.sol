@@ -307,6 +307,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		require(msg.sender == armyManager.getPositionOwner(fromCol, fromRow));
 		
 		address enemy = armyManager.getPositionOwner(toCol, toRow);
+		
 		// Cannot attack friendly force.
 		// 아군은 공격할 수 없습니다.
 		require(enemy != msg.sender);
