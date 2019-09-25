@@ -425,6 +425,11 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		}
 	}
 	
+	// 단일 부대의 위치를 이전합니다.
+	function moveArmyOne(uint armyId, uint unitCount, uint toCol, uint toRow) onlyDelight external {
+		//TODO:
+	}
+	
 	// Merges armies.
 	// 부대를 병합합니다.
 	function mergeArmy(uint fromCol, uint fromRow, uint toCol, uint toRow) onlyDelight external {
@@ -535,6 +540,11 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		}
 	}
 	
+	// 단일 부대를 병합합니다.
+	function mergeArmyOne(uint armyId, uint unitCount, uint toCol, uint toRow) onlyDelight external {
+		//TODO:
+	}
+	
 	function getItemKindByUnitKind(uint unitKind) pure private returns (uint) {
 		
 		if (unitKind == UNIT_AXEMAN) {
@@ -599,7 +609,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 						
 						// If the unit's not a knight, adds the knight's buff HP.
 						// 기사가 아닌 경우 기사의 버프 HP를 추가합니다.
-						armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
+						armyIds[UNIT_KNIGHT] != 0 ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
 					)
 					
 				).add(
@@ -610,6 +620,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				).mul(army.unitCount);
 				
 				armyHP = armyHP <= damage ? 0 : armyHP.sub(damage);
+				
 				// Calculates the result of the battle.
 				// 전투 결과를 계산합니다.
 				uint remainUnitCount = armyHP.add(armyHP % info.getUnitHP(army.unitKind)).div(info.getUnitHP(army.unitKind));
@@ -637,21 +648,89 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				// 남은 병사 숫자를 저장합니다.
 				army.unitCount = remainUnitCount;
 				
-				// The army was annihilated.
-				// 부대가 전멸했습니다.
-				if (army.unitCount == 0) {
-					delete armies[armyIds[i]];
-					delete armyIds[i];
-				}
-				
 				// Adds to the number of total casualties.
 				// 총 사망 병사 숫자에 추가합니다.
 				totalDeadUnitCount = totalDeadUnitCount.add(deadUnitCount);
 				
 				// 이벤트 발생
 				emit DeadUnits(armyIds[i]);
+				
+				// The army was annihilated.
+				// 부대가 전멸했습니다.
+				if (army.unitCount == 0) {
+					delete armies[armyIds[i]];
+					delete armyIds[i];
+				}
 			}
 		}
+	}
+	
+	// 한 부대를 공격합니다.
+	function attackOne(uint battleId, uint damage, uint armyId, uint unitCount) onlyDelight external returns (uint) {
+		
+		// Loot
+		// 전리품
+		Reward storage reward = battleIdToReward[battleId];
+		
+		Army storage army = armies[armyId];
+		
+		uint[] storage armyIds = positionToArmyIds[army.col][army.row];
+		
+		uint deadUnitCount = 0;
+		
+		if (
+		// The number of units must be more than 0.
+		// 유닛의 개수가 0개 이상이어야 합니다.
+		unitCount > 0) {
+			
+			// Calcultes the HPs of the friendly army.
+			// 아군의 체력을 계산합니다.
+			uint armyHP = info.getUnitHP(army.unitKind).add(
+				
+				// Adds the knight item's HP if the unit's a knight.
+				// 기사인 경우 기사 아이템의 HP를 추가합니다.
+				army.unitKind == UNIT_KNIGHT ? knightItem.getItemHP(army.knightItemId) : 0
+				
+			).mul(unitCount);
+			
+			armyHP = armyHP <= damage ? 0 : armyHP.sub(damage);
+			
+			// Calculates the result of the battle.
+			// 전투 결과를 계산합니다.
+			uint remainUnitCount = armyHP.add(armyHP % info.getUnitHP(army.unitKind)).div(info.getUnitHP(army.unitKind));
+			
+			deadUnitCount = unitCount.sub(remainUnitCount);
+			
+			// Adds loot.
+			// 전리품을 추가합니다.
+			reward.wood = reward.wood.add(info.getUnitMaterialWood(army.unitKind).mul(deadUnitCount));
+			reward.stone = reward.stone.add(info.getUnitMaterialStone(army.unitKind).mul(deadUnitCount));
+			reward.iron = reward.iron.add(info.getUnitMaterialIron(army.unitKind).mul(deadUnitCount));
+			reward.ducat = reward.ducat.add(info.getUnitMaterialDucat(army.unitKind).mul(deadUnitCount));
+			
+			// Dismantles the equipped item.
+			// 장착한 아이템을 분해합니다.
+			uint itemKind = getItemKindByUnitKind(army.unitKind);
+			if (itemKind != 0) {
+				itemManager.disassembleItem(itemKind, deadUnitCount);
+			}
+			
+			// Saves the number of remaining units.
+			// 남은 병사 숫자를 저장합니다.
+			army.unitCount = army.unitCount.sub(deadUnitCount);
+			
+			// 이벤트 발생
+			emit DeadUnits(armyId);
+			
+			// The army was annihilated.
+			// 부대가 전멸했습니다.
+			if (army.unitCount == 0) {
+				delete armies[armyId];
+				delete armyIds[army.unitKind];
+			}
+		}
+		
+		return deadUnitCount;
 	}
 	
 	// Destroys the building.
@@ -729,7 +808,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 						
 						// If the unit's not a knight, add the knight's buff HP.
 						// 기사가 아닌 경우 기사의 버프 HP를 추가합니다.
-						armyIds[UNIT_KNIGHT] != 0 == true ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
+						armyIds[UNIT_KNIGHT] != 0 ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
 					)
 					
 				).add(
@@ -768,19 +847,19 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				// 남은 병사 숫자를 저장합니다.
 				army.unitCount = remainUnitCount;
 				
-				// The army was annihilated.
-				// 부대가 전멸했습니다.
-				if (army.unitCount == 0) {
-					delete armies[armyIds[i]];
-					delete armyIds[i];
-				}
-				
 				// Adds to the total number of casualties.
 				// 총 사망 병사 숫자에 추가합니다.
 				totalDeadUnitCount = totalDeadUnitCount.add(deadUnitCount);
 				
 				// 이벤트 발생
 				emit DeadUnits(armyIds[i]);
+				
+				// The army was annihilated.
+				// 부대가 전멸했습니다.
+				if (army.unitCount == 0) {
+					delete armies[armyIds[i]];
+					delete armyIds[i];
+				}
 			}
 		}
 	}
