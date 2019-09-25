@@ -13,8 +13,4 @@ interface DelightOwnerInterface {
 	// Gets the army IDs of the owner.
 	// 소유주의 부대 ID들을 가져옵니다.
 	function getArmyIds(address owner) view external returns (uint[] memory);
-	
-	// Gets the knight IDs of the owner.
-	// 소유주의 기사 ID들을 가져옵니다.
-	function getKnightItemIds(address owner) view external returns (uint[] memory);
 }

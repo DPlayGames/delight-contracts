@@ -455,7 +455,7 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 	
 	// Returns the number of items.
 	// 아이템의 개수를 반환합니다.
-	function getItemCount() external view returns (uint) {
+	function getItemCount() public view returns (uint) {
 		return items.length;
 	}
 	
@@ -500,5 +500,30 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 	// 아이템의 버프 데미지를 반환합니다.
 	function getItemBuffDamage(uint itemId) external view returns (uint) {
 		return items[itemId].buffDamage;
+	}
+	
+	// Gets the knight IDs of the owner.
+	// 소유주의 기사 ID들을 가져옵니다.
+	function getOwnerItemIds(address owner) external view returns (uint[] memory) {
+		
+		uint itemCount = 0;
+		
+		for (uint i = 0; i < getItemCount(); i += 1) {
+			if (ownerOf(i) == owner) {
+				itemCount += 1;
+			}
+		}
+		
+		uint[] memory itemIds = new uint[](itemCount);
+		uint j = 0;
+		
+		for (uint i = 0; i < getItemCount(); i += 1) {
+			if (ownerOf(i) == owner) {
+				itemIds[j] = i;
+				j += 1;
+			}
+		}
+		
+		return itemIds;
 	}
 }

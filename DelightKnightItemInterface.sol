@@ -44,4 +44,8 @@ interface DelightKnightItemInterface {
 	// Returns the buff damage of the item.
 	// 아이템의 버프 데미지를 반환합니다.
 	function getItemBuffDamage(uint itemId) external view returns (uint);
+	
+	// Gets the knight IDs of the owner.
+	// 소유주의 기사 ID들을 가져옵니다.
+	function getOwnerItemIds(address owner) external view returns (uint[] memory);
 }

@@ -4,7 +4,6 @@ import "./DelightOwnerInterface.sol";
 import "./DelightInterface.sol";
 import "./DelightBuildingManagerInterface.sol";
 import "./DelightArmyManagerInterface.sol";
-import "./DelightKnightItemInterface.sol";
 import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
@@ -15,10 +14,6 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 	DelightBuildingManagerInterface private buildingManager;
 	DelightArmyManagerInterface private armyManager;
 	
-	// Knight item
-	// 기사 아이템
-	DelightKnightItemInterface private knightItem;
-	
 	constructor() NetworkChecker() public {
 		
 		if (network == Network.Mainnet) {
@@ -26,14 +21,9 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		}
 		
 		else if (network == Network.Kovan) {
-			
 			delight			= DelightInterface(0xD14c5c410bD238a1a2e8711d5FF763f09B02adBF);
 			buildingManager	= DelightBuildingManagerInterface(0x480443649991468E12606514bA352774759d042c);
 			armyManager		= DelightArmyManagerInterface(0x38a89C8Ec3dCe6B4d59a58015B8e9eC46D2Ee94a);
-			
-			// knight item.
-			// 기사 아이템
-			knightItem		= DelightKnightItemInterface(0xa94ab45258C46c49a0a1EB1e7AE11d18A2B0fbee);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -192,30 +182,5 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		}
 		
 		return armyIds;
-	}
-	
-	// Gets the knight IDs of the owner.
-	// 소유주의 기사 ID들을 가져옵니다.
-	function getKnightItemIds(address owner) view external returns (uint[] memory) {
-		
-		uint itemCount = 0;
-		
-		for (uint i = 0; i < knightItem.getItemCount(); i += 1) {
-			if (knightItem.ownerOf(i) == owner) {
-				itemCount += 1;
-			}
-		}
-		
-		uint[] memory itemIds = new uint[](itemCount);
-		uint j = 0;
-		
-		for (uint i = 0; i < knightItem.getItemCount(); i += 1) {
-			if (knightItem.ownerOf(i) == owner) {
-				itemIds[j] = i;
-				j += 1;
-			}
-		}
-		
-		return itemIds;
 	}
 }
