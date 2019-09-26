@@ -390,6 +390,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	// 부대의 위치를 이전합니다.
 	function moveArmy(uint fromCol, uint fromRow, uint toCol, uint toRow) onlyDelight external {
 		
+		// 위치가 달라야 합니다.
+		require(fromCol != toCol || fromRow != toRow);
+		
 		// Calculates the distance.
 		// 거리 계산
 		uint distance = (fromCol < toCol ? toCol - fromCol : fromCol - toCol) + (fromRow < toRow ? toRow - fromRow : fromRow - toRow);
@@ -433,6 +436,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	// Merges armies.
 	// 부대를 병합합니다.
 	function mergeArmy(uint fromCol, uint fromRow, uint toCol, uint toRow) onlyDelight external {
+		
+		// 위치가 달라야 합니다.
+		require(fromCol != toCol || fromRow != toRow);
 		
 		// Calculates distance.
 		// 거리 계산

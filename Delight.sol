@@ -248,6 +248,9 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	// 부대를 이동시키고, 해당 지역에 적이 있으면 공격합니다.
 	function moveAndAttack(uint fromCol, uint fromRow, uint toCol, uint toRow, Record memory record) private {
 		
+		// 위치가 달라야 합니다.
+		require(fromCol != toCol || fromRow != toRow);
+		
 		require(fromCol < COL_RANGE && fromCol < ROW_RANGE);
 		require(toCol < COL_RANGE && toCol < ROW_RANGE);
 		
@@ -317,7 +320,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			uint armyRow,
 			address armyOwner,
 			
-		) = armyManager.getArmyInfo(armyId)
+		) = armyManager.getArmyInfo(armyId);
 		
 		// 부대의 소유주인지 확인합니다.
 		require(msg.sender == armyOwner);
@@ -392,6 +395,9 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	// Range unit attacks a given tile.
 	// 원거리 유닛으로 특정 지역을 공격합니다.
 	function rangedAttack(uint fromCol, uint fromRow, uint toCol, uint toRow, Record memory record) private {
+		
+		// 위치가 달라야 합니다.
+		require(fromCol != toCol || fromRow != toRow);
 		
 		require(fromCol < COL_RANGE && fromCol < ROW_RANGE);
 		require(toCol < COL_RANGE && toCol < ROW_RANGE);
