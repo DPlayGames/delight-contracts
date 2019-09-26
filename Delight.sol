@@ -417,8 +417,8 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		uint totalDamage = getTotalRangedDamage(distance, fromCol, fromRow);
 		uint totalEnemyDamage = getTotalRangedDamage(distance, toCol, toRow);
 		
-		record.kill = armyManager.rangedAttack(totalDamage, distance, toCol, toRow);
-		record.death = armyManager.rangedAttack(totalEnemyDamage, distance, fromCol, fromRow);
+		record.kill = armyManager.rangedAttack(totalDamage, toCol, toRow);
+		record.death = armyManager.rangedAttack(totalEnemyDamage, fromCol, fromRow);
 	}
 	
 	// Executes the order que.

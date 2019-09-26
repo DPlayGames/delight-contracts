@@ -785,7 +785,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	
 	// Attacks from distance.
 	// 부대를 원거리에서 공격합니다.
-	function rangedAttack(uint totalDamage, uint distance, uint col, uint row) onlyDelight external returns (uint totalDeadUnitCount) {
+	function rangedAttack(uint totalDamage, uint col, uint row) onlyDelight external returns (uint totalDeadUnitCount) {
 		
 		uint damage = totalDamage;
 		
@@ -798,11 +798,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 			if (
 			// The number of units must be more than 0.
 			// 유닛의 개수가 0개 이상이어야 합니다.
-			army.unitCount > 0 &&
-			
-			// Checks if the units can reach the distance.
-			// 공격이 가능한 거리인지 확인합니다.
-			distance <= info.getUnitAttackableDistance(army.unitKind)) {
+			army.unitCount > 0) {
 				
 				// Calculates the HP of the friendly force.
 				// 아군의 체력을 계산합니다.
