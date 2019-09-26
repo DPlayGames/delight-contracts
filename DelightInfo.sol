@@ -70,7 +70,7 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		units[UNIT_BALLISTA] = Unit({
 			hp : 20,
 			damage : 35,
-			movableDistance : 2,
+			movableDistance : 0,
 			attackableDistance : 4
 		});
 		
