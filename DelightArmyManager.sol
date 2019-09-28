@@ -39,7 +39,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 			
 			// Knight item.
 			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x27E124cf79348F06345C9D97F557743Cf485c9EA);
+			knightItem = DelightKnightItemInterface(0x474A7238d3067A1AD7B8A5589a6Ce411090f913b);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -176,7 +176,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		uint[] memory armyIds = positionToArmyIds[col][row];
 		
 		uint totalUnitCount = 0;
-		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+		for (uint i = 0; i < armyIds.length; i += 1) {
 			totalUnitCount = totalUnitCount.add(armies[armyIds[i]].unitCount);
 		}
 	}
