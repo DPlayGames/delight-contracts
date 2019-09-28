@@ -359,6 +359,12 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 			emit CreateArmy(armyIds[unitKind]);
 		}
 		
+		// 기존 부대원이 남아있지 않으면 제거합니다.
+		if (army.unitCount == 0) {
+			delete armies[armyId];
+			delete armyIds[army.unitKind];
+		}
+		
 		// 이벤트 발생
 		emit AttachItem(armyId, armyIds[unitKind]);
 	}
