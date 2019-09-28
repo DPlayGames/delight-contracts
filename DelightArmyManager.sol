@@ -350,6 +350,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				owner : owner,
 				createTime : now
 			})).sub(1);
+			
+			// 이벤트 발생
+			emit CreateArmy(armyIds[unitKind]);
 		}
 		
 		// 이벤트 발생
@@ -430,7 +433,51 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	
 	// 단일 부대의 위치를 이전합니다.
 	function moveArmyOne(uint armyId, uint unitCount, uint toCol, uint toRow) onlyDelight external {
-		//TODO:
+		
+		Army storage army = armies[armyId];
+		
+		uint[] storage armyIds = positionToArmyIds[army.col][army.row];
+		
+		uint[] storage targetArmyIds = positionToArmyIds[toCol][toRow];
+		
+		targetArmyIds.length = UNIT_KIND_COUNT;
+		
+		// 모든 유닛 이동
+		if (army.unitCount == unitCount) {
+			
+			targetArmyIds[army.unitKind] = armyId;
+			
+			army.col = toCol;
+			army.row = toRow;
+			
+			// 이벤트 발생
+			emit MoveArmy(armyId);
+			
+			delete armyIds[army.unitKind];
+		}
+		
+		// 일부 유닛 이동
+		else {
+			
+			// 새 부대 생성
+			targetArmyIds[army.unitKind] = armies.push(Army({
+				unitKind : army.unitKind,
+				unitCount : unitCount,
+				knightItemId : 0,
+				col : toCol,
+				row : toRow,
+				owner : army.owner,
+				createTime : now
+			})).sub(1);
+			
+			army.unitCount = army.unitCount.sub(unitCount);
+			
+			// 이벤트 발생
+			emit CreateArmy(targetArmyIds[army.unitKind]);
+			
+			// 이벤트 발생
+			emit MoveArmy(armyId);
+		}
 	}
 	
 	// Merges armies.
@@ -490,6 +537,11 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 							owner : army.owner,
 							createTime : now
 						})).sub(1);
+						
+						army.unitCount = army.unitCount.sub(movableUnitCount);
+						
+						// 이벤트 발생
+						emit CreateArmy(targetArmyIds[army.unitKind]);
 					}
 					
 					// Merges with an existing army if it isn't empty.
@@ -504,7 +556,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 					}
 					
 					// 이벤트 발생
-					emit MergeArmy(armyIds[i], targetArmyIds[i]);
+					emit MergeArmy(armyIds[i], targetArmyIds[i], movableUnitCount);
 				}
 				
 				// If an army can just move, 
@@ -521,7 +573,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 						army.row = toRow;
 						
 						// 이벤트 발생
-						emit MergeArmy(armyIds[i], targetArmyIds[i]);
+						emit MoveArmy(armyIds[i]);
 						
 						delete armyIds[i];
 					}
@@ -536,7 +588,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 						targetArmy.unitCount = targetArmy.unitCount.add(army.unitCount);
 						
 						// 이벤트 발생
-						emit MergeArmy(armyIds[i], targetArmyIds[i]);
+						emit MergeArmy(armyIds[i], targetArmyIds[i], army.unitCount);
 						
 						delete armies[armyIds[i]];
 						delete armyIds[i];
@@ -548,7 +600,100 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	
 	// 단일 부대를 병합합니다.
 	function mergeArmyOne(uint armyId, uint unitCount, uint toCol, uint toRow) onlyDelight external {
-		//TODO:
+		
+		Army storage army = armies[armyId];
+		
+		uint[] storage armyIds = positionToArmyIds[army.col][army.row];
+		
+		uint[] storage targetArmyIds = positionToArmyIds[toCol][toRow];
+		
+		targetArmyIds.length = UNIT_KIND_COUNT;
+		
+		// Calculate the total number of units in the tile where the merge take place.
+		// 병합할 위치에 존재하는 총 유닛 숫자를 계산합니다.
+		uint totalUnitCount = 0;
+		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
+			totalUnitCount = totalUnitCount.add(armies[targetArmyIds[i]].unitCount);
+		}
+		
+		Army storage targetArmy = armies[targetArmyIds[army.unitKind]];
+		
+		// If the number of units exceeds the maximum number when just moving,
+		// 그대로 이동했을 때 존재할 수 있는 최대 유닛의 숫자를 넘는 경우
+		if (totalUnitCount.add(unitCount) > MAX_POSITION_UNIT_COUNT) {
+			
+			uint movableUnitCount = MAX_POSITION_UNIT_COUNT.sub(totalUnitCount);
+			
+			// Creates a new army if it's empty.
+			// 비어있는 곳이면 새 부대를 생성합니다.
+			if (targetArmy.unitCount == 0) {
+				
+				targetArmyIds[army.unitKind] = armies.push(Army({
+					unitKind : army.unitKind,
+					unitCount : movableUnitCount,
+					knightItemId : 0,
+					col : toCol,
+					row : toRow,
+					owner : army.owner,
+					createTime : now
+				})).sub(1);
+				
+				army.unitCount = army.unitCount.sub(movableUnitCount);
+				
+				// 이벤트 발생
+				emit CreateArmy(targetArmyIds[army.unitKind]);
+			}
+			
+			// Merges with an existing army if it isn't empty.
+			// 비어있지 않으면 병합합니다.
+			else {
+				
+				// 기사는 병합할 수 없습니다.
+				require(army.unitKind != UNIT_KNIGHT);
+				
+				targetArmy.unitCount = targetArmy.unitCount.add(movableUnitCount);
+				army.unitCount = army.unitCount.sub(movableUnitCount);
+			}
+			
+			// 이벤트 발생
+			emit MergeArmy(armyId, targetArmyIds[army.unitKind], movableUnitCount);
+		}
+		
+		// If an army can just move, 
+		// 그대로 이동 가능할 때
+		else {
+			
+			// move if the tile is empty.
+			// 비어있는 곳이면 이전합니다.
+			if (targetArmy.unitCount == 0) {
+				
+				targetArmyIds[army.unitKind] = armyId;
+				
+				army.col = toCol;
+				army.row = toRow;
+				
+				// 이벤트 발생
+				emit MoveArmy(armyId);
+				
+				delete armyIds[army.unitKind];
+			}
+			
+			// merge with an existing army if it isn't empty.
+			// 비어있지 않으면 병합합니다.
+			else {
+				
+				// 기사는 병합할 수 없습니다.
+				require(army.unitKind != UNIT_KNIGHT);
+				
+				targetArmy.unitCount = targetArmy.unitCount.add(army.unitCount);
+				
+				// 이벤트 발생
+				emit MergeArmy(armyId, targetArmyIds[army.unitKind], army.unitCount);
+				
+				delete armies[armyId];
+				delete armyIds[army.unitKind];
+			}
+		}
 	}
 	
 	function getItemKindByUnitKind(uint unitKind) pure private returns (uint) {
@@ -684,56 +829,50 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		
 		uint deadUnitCount = 0;
 		
-		if (
-		// The number of units must be more than 0.
-		// 유닛의 개수가 0개 이상이어야 합니다.
-		unitCount > 0) {
+		// Calcultes the HPs of the friendly army.
+		// 아군의 체력을 계산합니다.
+		uint armyHP = info.getUnitHP(army.unitKind).add(
 			
-			// Calcultes the HPs of the friendly army.
-			// 아군의 체력을 계산합니다.
-			uint armyHP = info.getUnitHP(army.unitKind).add(
-				
-				// Adds the knight item's HP if the unit's a knight.
-				// 기사인 경우 기사 아이템의 HP를 추가합니다.
-				army.unitKind == UNIT_KNIGHT ? knightItem.getItemHP(army.knightItemId) : 0
-				
-			).mul(unitCount);
+			// Adds the knight item's HP if the unit's a knight.
+			// 기사인 경우 기사 아이템의 HP를 추가합니다.
+			army.unitKind == UNIT_KNIGHT ? knightItem.getItemHP(army.knightItemId) : 0
 			
-			armyHP = armyHP <= damage ? 0 : armyHP.sub(damage);
-			
-			// Calculates the result of the battle.
-			// 전투 결과를 계산합니다.
-			uint remainUnitCount = armyHP.add(armyHP % info.getUnitHP(army.unitKind)).div(info.getUnitHP(army.unitKind));
-			
-			deadUnitCount = unitCount.sub(remainUnitCount);
-			
-			// Adds loot.
-			// 전리품을 추가합니다.
-			reward.wood = reward.wood.add(info.getUnitMaterialWood(army.unitKind).mul(deadUnitCount));
-			reward.stone = reward.stone.add(info.getUnitMaterialStone(army.unitKind).mul(deadUnitCount));
-			reward.iron = reward.iron.add(info.getUnitMaterialIron(army.unitKind).mul(deadUnitCount));
-			reward.ducat = reward.ducat.add(info.getUnitMaterialDucat(army.unitKind).mul(deadUnitCount));
-			
-			// Dismantles the equipped item.
-			// 장착한 아이템을 분해합니다.
-			uint itemKind = getItemKindByUnitKind(army.unitKind);
-			if (itemKind != 0) {
-				itemManager.disassembleItem(itemKind, deadUnitCount);
-			}
-			
-			// Saves the number of remaining units.
-			// 남은 병사 숫자를 저장합니다.
-			army.unitCount = army.unitCount.sub(deadUnitCount);
-			
-			// 이벤트 발생
-			emit DeadUnits(armyId);
-			
-			// The army was annihilated.
-			// 부대가 전멸했습니다.
-			if (army.unitCount == 0) {
-				delete armies[armyId];
-				delete armyIds[army.unitKind];
-			}
+		).mul(unitCount);
+		
+		armyHP = armyHP <= damage ? 0 : armyHP.sub(damage);
+		
+		// Calculates the result of the battle.
+		// 전투 결과를 계산합니다.
+		uint remainUnitCount = armyHP.add(armyHP % info.getUnitHP(army.unitKind)).div(info.getUnitHP(army.unitKind));
+		
+		deadUnitCount = unitCount.sub(remainUnitCount);
+		
+		// Adds loot.
+		// 전리품을 추가합니다.
+		reward.wood = reward.wood.add(info.getUnitMaterialWood(army.unitKind).mul(deadUnitCount));
+		reward.stone = reward.stone.add(info.getUnitMaterialStone(army.unitKind).mul(deadUnitCount));
+		reward.iron = reward.iron.add(info.getUnitMaterialIron(army.unitKind).mul(deadUnitCount));
+		reward.ducat = reward.ducat.add(info.getUnitMaterialDucat(army.unitKind).mul(deadUnitCount));
+		
+		// Dismantles the equipped item.
+		// 장착한 아이템을 분해합니다.
+		uint itemKind = getItemKindByUnitKind(army.unitKind);
+		if (itemKind != 0) {
+			itemManager.disassembleItem(itemKind, deadUnitCount);
+		}
+		
+		// Saves the number of remaining units.
+		// 남은 병사 숫자를 저장합니다.
+		army.unitCount = army.unitCount.sub(deadUnitCount);
+		
+		// 이벤트 발생
+		emit DeadUnits(armyId);
+		
+		// The army was annihilated.
+		// 부대가 전멸했습니다.
+		if (army.unitCount == 0) {
+			delete armies[armyId];
+			delete armyIds[army.unitKind];
 		}
 		
 		return deadUnitCount;

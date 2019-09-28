@@ -8,7 +8,7 @@ interface DelightArmyManagerInterface {
 	event AttachItem(uint indexed armyId, uint indexed newArmyId);
 	event AttachKnightItem(uint indexed armyId);
 	event MoveArmy(uint indexed armyId);
-	event MergeArmy(uint indexed fromArmyId, uint indexed toArmyId);
+	event MergeArmy(uint indexed fromArmyId, uint indexed toArmyId, uint unitCount);
 	event DeadUnits(uint indexed armyId);
 	
 	// Army information
