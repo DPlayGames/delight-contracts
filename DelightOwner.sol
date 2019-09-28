@@ -21,9 +21,9 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		}
 		
 		else if (network == Network.Kovan) {
-			delight			= DelightInterface(0xD14c5c410bD238a1a2e8711d5FF763f09B02adBF);
-			buildingManager	= DelightBuildingManagerInterface(0x480443649991468E12606514bA352774759d042c);
-			armyManager		= DelightArmyManagerInterface(0x38a89C8Ec3dCe6B4d59a58015B8e9eC46D2Ee94a);
+			delight			= DelightInterface(0x0759ea87f008bd7F1B0770e19522d93E0a2C3bd8);
+			buildingManager	= DelightBuildingManagerInterface(0x4792562d90aD24A6D4cA088747AdD71a71bA73Ae);
+			armyManager		= DelightArmyManagerInterface(0xbC39b9271b043AF40A34AA6B0DbC9811B5979Eea);
 		}
 		
 		else if (network == Network.Ropsten) {

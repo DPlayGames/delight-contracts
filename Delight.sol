@@ -19,8 +19,8 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	uint constant private ORDER_CREATE_ITEM			= 3;
 	uint constant private ORDER_ATTACH_ITEM			= 4;
 	uint constant private ORDER_ATTACH_KNIGHT_ITEM	= 5;
-	uint constant private ORDER_MOVE_AND_ATTACK		= 6;
-	uint constant private ORDER_MOVE_AND_ATTACK_ONE	= 7;
+	uint constant private ORDER_MOVE_ONE			= 6;
+	uint constant private ORDER_MOVE_AND_ATTACK		= 7;
 	uint constant private ORDER_RANGED_ATTACK		= 8;
 	
 	// Knight's default buff damage
@@ -44,17 +44,17 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			
 			// information
 			// 정보
-			info = DelightInfoInterface(0x13e0ec29d53c2984e2157AA6594b45D68e66b18A);
+			info = DelightInfoInterface(0x473b0CD0354C4cf9E2D7d5964963530D0c50ae3B);
 			
 			// knight item
 			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0xa94ab45258C46c49a0a1EB1e7AE11d18A2B0fbee);
+			knightItem = DelightKnightItemInterface(0x27E124cf79348F06345C9D97F557743Cf485c9EA);
 			
 			// managers
 			// 관리자들
-			buildingManager	= DelightBuildingManager(0x480443649991468E12606514bA352774759d042c);
-			armyManager		= DelightArmyManager(0x38a89C8Ec3dCe6B4d59a58015B8e9eC46D2Ee94a);
-			itemManager		= DelightItemManager(0x957490aB7784B7367C7E076ddCDD0882f0F260A9);
+			buildingManager	= DelightBuildingManager(0x4792562d90aD24A6D4cA088747AdD71a71bA73Ae);
+			armyManager		= DelightArmyManager(0xbC39b9271b043AF40A34AA6B0DbC9811B5979Eea);
+			itemManager		= DelightItemManager(0xe9108f2E2b4c60238Ff7a7ADe4Ec83E46e77c18a);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -261,16 +261,9 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		
 		address enemy = armyManager.getPositionOwner(toCol, toRow);
 		
-		// If there's no one in the destination, move.
-		// 아무도 없는 곳이면 부대를 이동합니다.
-		if (enemy == address(0)) {
+		// 아무도 없는 곳이거나 아군이면 부대를 이동시킵니다.
+		if (enemy == address(0) || enemy == msg.sender) {
 			armyManager.moveArmy(fromCol, fromRow, toCol, toRow);
-		}
-		
-		// If there's a friendly army in the destination, merge.
-		// 아군이면 부대를 통합합니다.
-		else if (enemy == msg.sender) {
-			armyManager.mergeArmy(fromCol, fromRow, toCol, toRow);
 		}
 		
 		// If there's a hostile army in the destination, attack.
@@ -306,8 +299,8 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		}
 	}
 	
-	// 단일 부대를 이동시키고, 해당 지역에 적이 있으면 공격합니다.
-	function moveAndAttackOne(uint armyId, uint unitCount, uint toCol, uint toRow, Record memory record) private {
+	// 단일 부대를 이동시킵니다.
+	function moveOne(uint armyId, uint unitCount, uint toCol, uint toRow) private {
 		
 		// 범위 체크
 		require(toCol < COL_RANGE && toCol < ROW_RANGE);
@@ -319,7 +312,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		(
 			uint armyUnitKind,
 			uint armyUnitCount,
-			uint armyKnightItemId,
+			,
 			uint armyCol,
 			uint armyRow,
 			address armyOwner,
@@ -341,53 +334,10 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		
 		address enemy = armyManager.getPositionOwner(toCol, toRow);
 		
-		// If there's no one in the destination, move.
-		// 아무도 없는 곳이면 부대를 이동합니다.
-		if (enemy == address(0)) {
-			armyManager.moveArmyOne(armyId, unitCount, toCol, toRow);
-		}
+		// 아무도 없는 곳이거나 아군인 경우에만 가능합니다.
+		require(enemy == address(0) || enemy == msg.sender);
 		
-		// If there's a friendly army in the destination, merge.
-		// 아군이면 부대를 통합합니다.
-		else if (enemy == msg.sender) {
-			armyManager.mergeArmyOne(armyId, unitCount, toCol, toRow);
-		}
-		
-		// If there's a hostile army in the destination, attack.
-		// 적군이면 전투를 개시합니다.
-		else {
-			
-			record.death = armyManager.attackOne(history.length, getTotalDamage(0, toCol, toRow), armyId, unitCount);
-			
-			record.kill = armyManager.attack(history.length, info.getUnitDamage(armyUnitKind).add(
-				
-				// If the unit's a knight, add the knight item's damage .
-				// 기사인 경우 기사 아이템의 데미지를 추가합니다.
-				armyUnitKind == UNIT_KNIGHT ? knightItem.getItemDamage(armyKnightItemId) : 0
-				
-			).mul(armyUnitCount), 0, toCol, toRow);
-			
-			unitCount = unitCount.sub(record.death);
-			
-			// If the enemy building is captured, move the soldiers.
-			// 적진을 점령했다면, 병사들을 이동시킵니다.
-			if (armyManager.getPositionOwner(toCol, toRow) == address(0)) {
-				
-				if (unitCount > 0) {
-					armyManager.moveArmyOne(armyId, unitCount, toCol, toRow);
-				}
-				
-				armyManager.destroyBuilding(history.length, toCol, toRow);
-				armyManager.win(history.length, msg.sender);
-				record.isWin = true;
-			}
-			
-			// enemy won
-			// 상대가 승리했습니다.
-			else {
-				armyManager.win(history.length, enemy);
-			}
-		}
+		armyManager.moveArmyOne(armyManager.getTotalUnitCount(toCol, toRow), armyId, unitCount, toCol, toRow);
 	}
 	
 	// Range unit attacks a given tile.
@@ -478,15 +428,15 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 				armyManager.attachKnightItem(msg.sender, params1[i], params2[i]);
 			}
 			
+			// 단일 부대를 이동시킵니다.
+			else if (orders[i] == ORDER_MOVE_ONE) {
+				moveOne(params1[i], params2[i], params3[i], params4[i]);
+			}
+			
 			// Armies move and attack.
 			// 부대를 이동시키고, 해당 지역에 적이 있으면 공격합니다.
 			else if (orders[i] == ORDER_MOVE_AND_ATTACK) {
 				moveAndAttack(params1[i], params2[i], params3[i], params4[i], record);
-			}
-			
-			// 단일 부대를 이동시키고, 해당 지역에 적이 있으면 공격합니다.
-			else if (orders[i] == ORDER_MOVE_AND_ATTACK_ONE) {
-				moveAndAttackOne(params1[i], params2[i], params3[i], params4[i], record);
 			}
 			
 			// Ranged units attack given tiles.
