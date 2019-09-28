@@ -277,24 +277,32 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			uint totalDamage = getTotalDamage(distance, fromCol, fromRow);
 			uint totalEnemyDamage = getTotalDamage(0, toCol, toRow);
 			
-			uint battleId = history.length;
+			uint kill = armyManager.attack(history.length, totalDamage, 0, toCol, toRow);
+			uint death = armyManager.attack(history.length, totalEnemyDamage, distance, fromCol, fromRow);
 			
-			record.kill = armyManager.attack(battleId, totalDamage, 0, toCol, toRow);
-			record.death = armyManager.attack(battleId, totalEnemyDamage, distance, fromCol, fromRow);
+			record.kill = record.kill.add(kill);
+			record.death = record.death.add(death);
+			
+			// 한번의 공격으로 전투가 끝나지 않았을 때
+			if ((kill > 0 || death > 0) && armyManager.getTotalUnitCount(fromCol, fromRow) != 0 && armyManager.getTotalUnitCount(toCol, toRow) != 0) {
+				
+				// 재공격
+				moveAndAttack(fromCol, fromRow, toCol, toRow, record);
+			}
 			
 			// If the enemy building is captured, move the soldiers.
 			// 적진을 점령했다면, 병사들을 이동시킵니다.
-			if (armyManager.getPositionOwner(toCol, toRow) == address(0)) {
+			else if (armyManager.getPositionOwner(toCol, toRow) == address(0)) {
 				armyManager.moveArmy(fromCol, fromRow, toCol, toRow);
-				armyManager.destroyBuilding(battleId, toCol, toRow);
-				armyManager.win(battleId, msg.sender);
+				armyManager.destroyBuilding(history.length, toCol, toRow);
+				armyManager.win(history.length, msg.sender);
 				record.isWin = true;
 			}
 			
 			// enemy won
 			// 상대가 승리했습니다.
 			else {
-				armyManager.win(battleId, enemy);
+				armyManager.win(history.length, enemy);
 			}
 		}
 	}
