@@ -30,6 +30,7 @@ interface DelightArmyManagerInterface {
 		uint stone;
 		uint iron;
 		uint ducat;
+		uint knightItemId;
 	}
 	
 	// Returns the total number of armies

@@ -34,7 +34,7 @@ contract DelightResource is ERC20, ERC165, NetworkChecker {
 		}
 		
 		else if (network == Network.Kovan) {
-			dplayTradingPost = address(0xEcDc20F027fF277Dc10DE039d5409D433Bec5eE3);
+			dplayTradingPost = address(0x980f391C9C36BD6d95F5676dDfa7a3B414404570);
 		}
 		
 		else if (network == Network.Ropsten) {

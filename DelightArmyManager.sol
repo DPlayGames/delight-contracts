@@ -39,7 +39,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 			
 			// Knight item.
 			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x3f589D25B52277a7cD3306639a905BD43B3Ba659);
+			knightItem = DelightKnightItemInterface(0xF53aa613fecb8450F3d39533A4daE4AA98159889);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -458,6 +458,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 			
 			uint movableUnitCount = MAX_POSITION_UNIT_COUNT.sub(totalUnitCount);
 			
+			// 이동할 유닛은 1개 이상이어야합니다.
+			require(movableUnitCount > 0);
+			
 			// Creates a new army if it's empty.
 			// 비어있는 곳이면 새 부대를 생성합니다.
 			if (targetArmy.unitCount == 0) {
@@ -694,6 +697,24 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				// The army was annihilated.
 				// 부대가 전멸했습니다.
 				if (army.unitCount == 0) {
+					
+					// 기사가 무기를 장착한 경우
+					if (army.unitKind == UNIT_KNIGHT && army.knightItemId != 0) {
+						
+						// 원거리 공격인 경우
+						if (battleId == 0) {
+							
+							// 기사 무기를 돌려받습니다.
+							itemManager.transferKnightItem(army.owner, army.knightItemId);
+						}
+						
+						else {
+							
+							// 기사 무기를 전리품에 추가합니다.
+							reward.knightItemId = army.knightItemId;
+						}
+					}
+					
 					delete armies[armyIds[i]];
 					delete armyIds[i];
 				}
@@ -743,5 +764,10 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		stone.transferFrom(delight, winner, reward.stone);
 		iron.transferFrom(delight, winner, reward.iron);
 		ducat.transferFrom(delight, winner, reward.ducat);
+		
+		// 기사 무기를 전달합니다.
+		if (reward.knightItemId != 0) {
+			itemManager.transferKnightItem(winner, reward.knightItemId);
+		}
 	}
 }
