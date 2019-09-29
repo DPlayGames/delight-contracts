@@ -38,19 +38,19 @@ contract DelightItemManager is DelightManager {
 			
 			// Items
 			// 아이템
-			axe			= DelightItem(0xe219c78878110F01e24df9100EfA9b41145126E1);
-			ballista	= DelightItem(0xb0674ff6f5713eeeB9Cd29C94c5FF11853fb9e7D);
-			camel		= DelightItem(0xF62323580D95EF91B6F233d484d2107BE9289623);
-			catapult	= DelightItem(0xf1609F3313B1b6dD00166D3A53d2db6AE2fF273D);
-			crossbow	= DelightItem(0x7eb9e3Db74b8d231f7E728728c9E501078dEf027);
-			elephant	= DelightItem(0xEA283dbfD3939EFF9e71555575449b3bB746011C);
-			hood		= DelightItem(0x5690Eac7D907AF544781c83dFf6804246989d23a);
-			shield		= DelightItem(0x2e4225F5c5640696c645aaF758d141B58824d28f);
-			spear		= DelightItem(0x376C53428582cd3F00A1bd78aBc1894d9b9aC15a);
+			axe			= DelightItem(0xD435295cd4FE59f3ec46b1F2495D55692F23d684);
+			ballista	= DelightItem(0xBA0380CbAf3e3ef118f7Acbb62e9CcdeeAa3A2eC);
+			camel		= DelightItem(0x23fB76C6D7e6Eb6a2eD89BB6D2cD0a01F464e56E);
+			catapult	= DelightItem(0xFa9C6E843d0145599c8eFAd5C00132B68332dfa8);
+			crossbow	= DelightItem(0x36F22F6D28b77d22710F28B15CfF993d3731b6c7);
+			elephant	= DelightItem(0x0Eafb02a34A98980074e6359E5F417f4ea67FC67);
+			hood		= DelightItem(0x7e4E5C30996896fd0E8eD407f7Cc9a5Af6e67f5C);
+			shield		= DelightItem(0x214eF3ABBDF830Ac1D600112A94DC381711b72eE);
+			spear		= DelightItem(0x0F5425dF2B6649f6BbBb53a86B9CB882935E3C6E);
 			
 			// Knight item
 			// 기사 아이템
-			knightItem	= DelightKnightItemInterface(0x474A7238d3067A1AD7B8A5589a6Ce411090f913b);
+			knightItem	= DelightKnightItemInterface(0x3f589D25B52277a7cD3306639a905BD43B3Ba659);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -159,6 +159,7 @@ contract DelightItemManager is DelightManager {
 	function disassembleItem(uint kind, uint count) onlyDelight external {
 		
 		DelightItem itemContract = getItemContract(kind);
+		
 		// Dismantles the item.
 		// 아이템을 분해합니다.
 		itemContract.disassemble(count);

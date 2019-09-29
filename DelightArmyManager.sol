@@ -39,7 +39,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 			
 			// Knight item.
 			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x474A7238d3067A1AD7B8A5589a6Ce411090f913b);
+			knightItem = DelightKnightItemInterface(0x3f589D25B52277a7cD3306639a905BD43B3Ba659);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -179,6 +179,8 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		for (uint i = 0; i < armyIds.length; i += 1) {
 			totalUnitCount = totalUnitCount.add(armies[armyIds[i]].unitCount);
 		}
+		
+		return totalUnitCount;
 	}
 	
 	// Creates armies.
@@ -650,12 +652,26 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				// 적의 총 데미지를 낮춥니다.
 				damage = damage <= deadUnitCount.mul(info.getUnitHP(army.unitKind)) ? 0 : damage.sub(deadUnitCount.mul(info.getUnitHP(army.unitKind)));
 				
-				// Adds loot.
-				// 전리품을 추가합니다.
-				reward.wood = reward.wood.add(info.getUnitMaterialWood(army.unitKind).mul(deadUnitCount));
-				reward.stone = reward.stone.add(info.getUnitMaterialStone(army.unitKind).mul(deadUnitCount));
-				reward.iron = reward.iron.add(info.getUnitMaterialIron(army.unitKind).mul(deadUnitCount));
-				reward.ducat = reward.ducat.add(info.getUnitMaterialDucat(army.unitKind).mul(deadUnitCount));
+				// 원거리 공격인 경우
+				if (battleId == 0) {
+					
+					// Gets materials back.
+					// 재료들을 돌려받습니다.
+					wood.transferFrom(delight, army.owner, info.getUnitMaterialWood(army.unitKind).mul(deadUnitCount));
+					stone.transferFrom(delight, army.owner, info.getUnitMaterialStone(army.unitKind).mul(deadUnitCount));
+					iron.transferFrom(delight, army.owner, info.getUnitMaterialIron(army.unitKind).mul(deadUnitCount));
+					ducat.transferFrom(delight, army.owner, info.getUnitMaterialDucat(army.unitKind).mul(deadUnitCount));
+				}
+				
+				else {
+					
+					// Adds loot.
+					// 전리품을 추가합니다.
+					reward.wood = reward.wood.add(info.getUnitMaterialWood(army.unitKind).mul(deadUnitCount));
+					reward.stone = reward.stone.add(info.getUnitMaterialStone(army.unitKind).mul(deadUnitCount));
+					reward.iron = reward.iron.add(info.getUnitMaterialIron(army.unitKind).mul(deadUnitCount));
+					reward.ducat = reward.ducat.add(info.getUnitMaterialDucat(army.unitKind).mul(deadUnitCount));
+				}
 				
 				// Dismantles the equipped item.
 				// 장착한 아이템을 분해합니다.
@@ -727,88 +743,5 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		stone.transferFrom(delight, winner, reward.stone);
 		iron.transferFrom(delight, winner, reward.iron);
 		ducat.transferFrom(delight, winner, reward.ducat);
-	}
-	
-	// Attacks from distance.
-	// 부대를 원거리에서 공격합니다.
-	function rangedAttack(uint totalDamage, uint col, uint row) onlyDelight external returns (uint totalDeadUnitCount) {
-		
-		uint damage = totalDamage;
-		
-		uint[] storage armyIds = positionToArmyIds[col][row];
-		
-		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
-			
-			Army storage army = armies[armyIds[i]];
-			
-			if (
-			// The number of units must be more than 0.
-			// 유닛의 개수가 0개 이상이어야 합니다.
-			army.unitCount > 0) {
-				
-				// Calculates the HP of the friendly force.
-				// 아군의 체력을 계산합니다.
-				uint armyHP = info.getUnitHP(army.unitKind).add(
-					
-					// If the unit's a knight, adds the knight item's HP.
-					// 기사인 경우 기사 아이템의 HP를 추가합니다.
-					i == UNIT_KNIGHT ? knightItem.getItemHP(army.knightItemId) : (
-						
-						// If the unit's not a knight, add the knight's buff HP.
-						// 기사가 아닌 경우 기사의 버프 HP를 추가합니다.
-						armyIds[UNIT_KNIGHT] != 0 ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
-					)
-					
-				).add(
-					
-					// 병사 위치의 건물의 버프 HP를 가져옵니다.
-					buildingManager.getBuildingBuffHP(col, row)
-					
-				).mul(army.unitCount);
-				
-				armyHP = armyHP <= damage ? 0 : armyHP.sub(damage);
-				
-				// Calculates the result of the battle.
-				// 전투 결과를 계산합니다.
-				uint remainUnitCount = armyHP.add(armyHP % info.getUnitHP(army.unitKind)).div(info.getUnitHP(army.unitKind));
-				uint deadUnitCount = army.unitCount.sub(remainUnitCount);
-				
-				// Lowers the enemy's total damage.
-				// 적의 총 공격력을 낮춥니다.
-				damage = damage <= deadUnitCount.mul(info.getUnitHP(army.unitKind)) ? 0 : damage.sub(deadUnitCount.mul(info.getUnitHP(army.unitKind)));
-				
-				// Gets materials back.
-				// 재료들을 돌려받습니다.
-				wood.transferFrom(delight, army.owner, info.getUnitMaterialWood(army.unitKind).mul(deadUnitCount));
-				stone.transferFrom(delight, army.owner, info.getUnitMaterialStone(army.unitKind).mul(deadUnitCount));
-				iron.transferFrom(delight, army.owner, info.getUnitMaterialIron(army.unitKind).mul(deadUnitCount));
-				ducat.transferFrom(delight, army.owner, info.getUnitMaterialDucat(army.unitKind).mul(deadUnitCount));
-				
-				// Dismantles the equipped items.
-				// 장착한 아이템을 분해합니다.
-				uint itemKind = getItemKindByUnitKind(army.unitKind);
-				if (itemKind != 0) {
-					itemManager.disassembleItem(itemKind, deadUnitCount);
-				}
-				
-				// Saves the number of remaining soldiers.
-				// 남은 병사 숫자를 저장합니다.
-				army.unitCount = remainUnitCount;
-				
-				// Adds to the total number of casualties.
-				// 총 사망 병사 숫자에 추가합니다.
-				totalDeadUnitCount = totalDeadUnitCount.add(deadUnitCount);
-				
-				// 이벤트 발생
-				emit DeadUnits(armyIds[i]);
-				
-				// The army was annihilated.
-				// 부대가 전멸했습니다.
-				if (army.unitCount == 0) {
-					delete armies[armyIds[i]];
-					delete armyIds[i];
-				}
-			}
-		}
 	}
 }

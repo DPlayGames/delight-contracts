@@ -44,17 +44,17 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			
 			// information
 			// 정보
-			info = DelightInfoInterface(0x05B4bDf6E63946D2a10198493927F574b1AF9451);
+			info = DelightInfoInterface(0x2f0d5316251933341a05926a4b3134f92c17D239);
 			
 			// knight item
 			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x474A7238d3067A1AD7B8A5589a6Ce411090f913b);
+			knightItem = DelightKnightItemInterface(0x3f589D25B52277a7cD3306639a905BD43B3Ba659);
 			
 			// managers
 			// 관리자들
-			buildingManager	= DelightBuildingManager(0xE94595E1035638382BE99d1599E2B842752AD236);
-			armyManager		= DelightArmyManager(0xB98BF0b196CE8C17355d2529E2dA097B9B38440c);
-			itemManager		= DelightItemManager(0x1eE121a84827A1CD580294428C4C69BC4f3c1bf1);
+			buildingManager	= DelightBuildingManager(0xF52Af5F2F043A6811C4B017902a71e403287AC55);
+			armyManager		= DelightArmyManager(0x9Cf02f73b2090ED11e53979934A1f4709Fa2C49e);
+			itemManager		= DelightItemManager(0xEe681702386d21F7CF3960aDA1f2DADBd6b84343);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -68,6 +68,20 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		else {
 			revert();
 		}
+		
+		// Big Bang!
+		history.push(Record({
+			order : 99,
+			account : address(0),
+			param1 : 0,
+			param2 : 0,
+			param3 : 0,
+			param4 : 0,
+			kill : 0,
+			death : 0,
+			isWin : false,
+			time : now
+		}));
 	}
 	
 	Record[] private history;
@@ -283,8 +297,19 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			record.kill = record.kill.add(kill);
 			record.death = record.death.add(death);
 			
+			// 아무 변화가 없는 경우에는 공격자가 유리합니다. (상대의 남아있는 병력을 모두 제거합니다.)
+			if (kill == 0 && death == 0) {
+				
+				record.kill = record.kill.add(armyManager.attack(history.length, ~uint(0), 0, toCol, toRow));
+				
+				armyManager.moveArmy(fromCol, fromRow, toCol, toRow);
+				armyManager.destroyBuilding(history.length, toCol, toRow);
+				armyManager.win(history.length, msg.sender);
+				record.isWin = true;
+			}
+			
 			// 한번의 공격으로 전투가 끝나지 않았을 때
-			if ((kill > 0 || death > 0) && armyManager.getTotalUnitCount(fromCol, fromRow) != 0 && armyManager.getTotalUnitCount(toCol, toRow) != 0) {
+			else if (armyManager.getTotalUnitCount(fromCol, fromRow) > 0 && armyManager.getTotalUnitCount(toCol, toRow) > 0) {
 				
 				// 재공격
 				moveAndAttack(fromCol, fromRow, toCol, toRow, record);
@@ -375,8 +400,9 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		uint totalDamage = getTotalRangedDamage(distance, fromCol, fromRow);
 		uint totalEnemyDamage = getTotalRangedDamage(distance, toCol, toRow);
 		
-		record.kill = armyManager.rangedAttack(totalDamage, toCol, toRow);
-		record.death = armyManager.rangedAttack(totalEnemyDamage, fromCol, fromRow);
+		// 원거리 공격합니다.
+		record.kill = armyManager.attack(0, totalDamage, 0, toCol, toRow);
+		record.death = armyManager.attack(0, totalEnemyDamage, 0, fromCol, fromRow);
 	}
 	
 	// Executes the order que.
@@ -450,6 +476,14 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			// Ranged units attack given tiles.
 			// 원거리 유닛으로 특정 지역을 공격합니다.
 			else if (orders[i] == ORDER_RANGED_ATTACK) {
+				
+				// 이미 동일한 명령이 내려졌다면 거부합니다.
+				for (uint j = 0; j < i; j += 1) {
+					if (params1[j] == params1[i] && params2[j] == params2[i] && params3[j] == params3[i] && params4[j] == params4[i]) {
+						revert();
+					}
+				}
+				
 				rangedAttack(params1[i], params2[i], params3[i], params4[i], record);
 			}
 			
