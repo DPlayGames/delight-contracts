@@ -164,7 +164,7 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 			
 			if (
 			(col < hqCol ? hqCol - col : col - hqCol) +
-			(row < hqRow ? hqRow - row : row - hqRow) <= 3 + building.level.mul(1)
+			(row < hqRow ? hqRow - row : row - hqRow) <= 3 + building.level
 			) {
 				existsHQAround = true;
 				break;
