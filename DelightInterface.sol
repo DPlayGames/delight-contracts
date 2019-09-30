@@ -9,6 +9,7 @@ interface DelightInterface {
 	struct Record {
 		uint order;
 		address account;
+		address enemy;
 		uint param1;
 		uint param2;
 		uint param3;
@@ -28,6 +29,7 @@ interface DelightInterface {
 	function getRecord(uint recordId) view external returns (
 		uint order,
 		address account,
+		address enemy,
 		uint param1,
 		uint param2,
 		uint param3,

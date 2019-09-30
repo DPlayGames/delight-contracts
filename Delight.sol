@@ -73,6 +73,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		history.push(Record({
 			order : 99,
 			account : address(0),
+			enemy : address(0),
 			param1 : 0,
 			param2 : 0,
 			param3 : 0,
@@ -97,6 +98,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	function getRecord(uint recordId) view external returns (
 		uint order,
 		address account,
+		address enemy,
 		uint param1,
 		uint param2,
 		uint param3,
@@ -111,6 +113,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		return (
 			record.order,
 			record.account,
+			record.enemy,
 			record.param1,
 			record.param2,
 			record.param3,
@@ -294,6 +297,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			uint kill = armyManager.attack(history.length, totalDamage, 0, toCol, toRow);
 			uint death = armyManager.attack(history.length, totalEnemyDamage, distance, fromCol, fromRow);
 			
+			record.enemy = enemy;
 			record.kill = record.kill.add(kill);
 			record.death = record.death.add(death);
 			
@@ -401,6 +405,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		uint totalEnemyDamage = getTotalRangedDamage(distance, toCol, toRow);
 		
 		// 원거리 공격합니다.
+		record.enemy = enemy;
 		record.kill = armyManager.attack(0, totalDamage, 0, toCol, toRow);
 		record.death = armyManager.attack(0, totalEnemyDamage, 0, fromCol, fromRow);
 	}
@@ -416,6 +421,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			Record memory record = Record({
 				order : orders[i],
 				account : msg.sender,
+				enemy : address(0),
 				param1 : params1[i],
 				param2 : params2[i],
 				param3 : params3[i],

@@ -50,6 +50,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 			(
 				,
 				address account,
+				address enemy,
 				,
 				,
 				,
@@ -60,7 +61,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 				
 			) = delight.getRecord(i);
 			
-			if (account == owner) {
+			if (account == owner || enemy == owner) {
 				recordCount += 1;
 			}
 		}
@@ -73,6 +74,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 			(
 				,
 				address account,
+				address enemy,
 				,
 				,
 				,
@@ -83,7 +85,7 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 				
 			) = delight.getRecord(i);
 			
-			if (account == owner) {
+			if (account == owner || enemy == owner) {
 				recordIds[j] = i;
 				j += 1;
 			}
