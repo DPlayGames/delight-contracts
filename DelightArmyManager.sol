@@ -191,7 +191,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		
 		// The total number of units in the building's tile must not exceed the maximum unit number.
 		// 건물이 위치한 곳의 총 유닛 숫자가 최대 유닛 수를 넘기면 안됩니다.
-		require(getTotalUnitCount(col, row) <= MAX_POSITION_UNIT_COUNT);
+		require(getTotalUnitCount(col, row).add(unitKind) <= MAX_POSITION_UNIT_COUNT);
 		
 		// 기사는 하나 이상 생성할 수 없습니다.
 		require(unitKind != UNIT_KNIGHT || unitCount == 1);
@@ -363,8 +363,8 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		
 		// 기존 부대원이 남아있지 않으면 제거합니다.
 		if (army.unitCount == 0) {
-			delete armies[armyId];
 			delete armyIds[army.unitKind];
+			delete armies[armyId];
 		}
 		
 		// 이벤트 발생
@@ -477,6 +477,12 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				
 				army.unitCount = army.unitCount.sub(movableUnitCount);
 				
+				// 기존 부대원이 남아있지 않으면 제거합니다.
+				if (army.unitCount == 0) {
+					delete armyIds[army.unitKind];
+					delete armies[armyId];
+				}
+				
 				// 이벤트 발생
 				emit CreateArmy(targetArmyIds[army.unitKind]);
 			}
@@ -490,6 +496,12 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				
 				targetArmy.unitCount = targetArmy.unitCount.add(movableUnitCount);
 				army.unitCount = army.unitCount.sub(movableUnitCount);
+				
+				// 기존 부대원이 남아있지 않으면 제거합니다.
+				if (army.unitCount == 0) {
+					delete armyIds[army.unitKind];
+					delete armies[armyId];
+				}
 			}
 			
 			// 이벤트 발생
@@ -526,8 +538,8 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				// 이벤트 발생
 				emit MergeArmy(armyId, targetArmyIds[army.unitKind], army.unitCount);
 				
-				delete armies[armyId];
 				delete armyIds[army.unitKind];
+				delete armies[armyId];
 			}
 		}
 		
@@ -715,8 +727,8 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 						}
 					}
 					
-					delete armies[armyIds[i]];
 					delete armyIds[i];
+					delete armies[armyIds[i]];
 				}
 			}
 		}
