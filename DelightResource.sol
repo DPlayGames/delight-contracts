@@ -226,6 +226,7 @@ contract DelightResource is ERC20, ERC165, NetworkChecker {
 			revert();
 		} else {
 			balances[msg.sender] += amount;
+			_totalSupply = _totalSupply.add(amount);
 		}
 	}
 }

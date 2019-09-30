@@ -40,10 +40,6 @@ contract DelightItem is ERC20, ERC165, NetworkChecker {
 		else {
 			revert();
 		}
-		
-		balances[msg.sender] = _totalSupply;
-		
-		emit Transfer(address(0), msg.sender, _totalSupply);
 	}
 	
 	function setDelightItemManagerOnce(address addr) external {
@@ -75,6 +71,8 @@ contract DelightItem is ERC20, ERC165, NetworkChecker {
 		
 		balances[to] = balances[to].add(amount);
 		
+		_totalSupply = _totalSupply.add(amount);
+		
 		emit Transfer(delightItemManager, to, amount);
 	}
 	
@@ -87,6 +85,8 @@ contract DelightItem is ERC20, ERC165, NetworkChecker {
 		require(msg.sender == delightItemManager);
 		
 		balances[delightItemManager] = balances[delightItemManager].sub(amount);
+		
+		_totalSupply = _totalSupply.sub(amount);
 		
 		emit Transfer(delightItemManager, address(0), amount);
 	}
