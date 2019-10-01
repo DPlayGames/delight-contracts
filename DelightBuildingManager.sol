@@ -323,59 +323,61 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 	) {
 		
 		uint buildingId = positionToBuildingId[col][row];
+		
 		// The building must exist.
 		// 존재하는 건물이어야 합니다.
-		require(buildingId != 0);
-		
-		Building memory building = buildings[buildingId];
-		
-		uint buildingKind = building.kind;
-		
-		// If it's an HQ, it is removed from the HQ list.
-		// 본부인 경우, 본부 목록에서 제거합니다.
-		if (buildingKind == BUILDING_HQ) {
+		if (buildingId != 0) {
 			
-			uint[] storage hqIds = ownerToHQIds[building.owner];
+			Building memory building = buildings[buildingId];
 			
-			for (uint i = hqIds.length - 1; i > 0; i -= 1) {
+			uint buildingKind = building.kind;
+			
+			// If it's an HQ, it is removed from the HQ list.
+			// 본부인 경우, 본부 목록에서 제거합니다.
+			if (buildingKind == BUILDING_HQ) {
 				
-				if (hqIds[i - 1] == buildingId) {
-					hqIds[i - 1] = hqIds[i];
-					break;
-				} else {
-					hqIds[i - 1] = hqIds[i];
+				uint[] storage hqIds = ownerToHQIds[building.owner];
+				
+				for (uint i = hqIds.length - 1; i > 0; i -= 1) {
+					
+					if (hqIds[i - 1] == buildingId) {
+						hqIds[i - 1] = hqIds[i];
+						break;
+					} else {
+						hqIds[i - 1] = hqIds[i];
+					}
+				}
+				
+				hqIds.length -= 1;
+				
+				// Returns the upgrade cost of the HQ.
+				// 본부 업그레이드 비용을 반환합니다.
+				for (uint i = 1; i <= building.level; i += 1) {
+					
+					// Adds the returned material.
+					// 반환할 재료를 추가합니다.
+					wood = wood.add(info.getHQUpgradeMaterialWood(buildingKind));
+					stone = stone.add(info.getHQUpgradeMaterialStone(buildingKind));
+					iron = iron.add(info.getHQUpgradeMaterialIron(buildingKind));
+					ducat = ducat.add(info.getHQUpgradeMaterialDucat(buildingKind));
 				}
 			}
 			
-			hqIds.length -= 1;
+			// Adds the returned material.
+			// 반환할 재료를 추가합니다.
+			wood = wood.add(info.getBuildingMaterialWood(buildingKind));
+			stone = stone.add(info.getBuildingMaterialStone(buildingKind));
+			iron = iron.add(info.getBuildingMaterialIron(buildingKind));
+			ducat = ducat.add(info.getBuildingMaterialDucat(buildingKind));
 			
-			// Returns the upgrade cost of the HQ.
-			// 본부 업그레이드 비용을 반환합니다.
-			for (uint i = 1; i <= building.level; i += 1) {
-				
-				// Adds the returned material.
-				// 반환할 재료를 추가합니다.
-				wood = wood.add(info.getHQUpgradeMaterialWood(buildingKind));
-				stone = stone.add(info.getHQUpgradeMaterialStone(buildingKind));
-				iron = iron.add(info.getHQUpgradeMaterialIron(buildingKind));
-				ducat = ducat.add(info.getHQUpgradeMaterialDucat(buildingKind));
-			}
+			// Destroys the building.
+			// 건물을 파괴합니다.
+			delete buildings[buildingId];
+			delete positionToBuildingId[col][row];
+			
+			// Emits the event.
+			// 이벤트 발생
+			emit DestroyBuilding(buildingId);
 		}
-		
-		// Adds the returned material.
-		// 반환할 재료를 추가합니다.
-		wood = wood.add(info.getBuildingMaterialWood(buildingKind));
-		stone = stone.add(info.getBuildingMaterialStone(buildingKind));
-		iron = iron.add(info.getBuildingMaterialIron(buildingKind));
-		ducat = ducat.add(info.getBuildingMaterialDucat(buildingKind));
-		
-		// Destroys the building.
-		// 건물을 파괴합니다.
-		delete buildings[buildingId];
-		delete positionToBuildingId[col][row];
-		
-		// Emits the event.
-		// 이벤트 발생
-		emit DestroyBuilding(buildingId);
 	}
 }

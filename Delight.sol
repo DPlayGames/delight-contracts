@@ -284,6 +284,13 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		// 아무도 없는 곳이거나 아군이면 부대를 이동시킵니다.
 		if (enemy == address(0) || enemy == msg.sender) {
 			armyManager.moveArmy(fromCol, fromRow, toCol, toRow);
+			
+			// 적군의 건물이 존재하면 파괴합니다.
+			if (buildingManager.getPositionBuildingId(toCol, toRow) != 0 && buildingManager.getPositionBuildingOwner(toCol, toRow) != msg.sender) {
+				armyManager.destroyBuilding(history.length, toCol, toRow);
+				armyManager.win(history.length, msg.sender);
+				record.isWin = true;
+			}
 		}
 		
 		// If there's a hostile army in the destination, attack.
