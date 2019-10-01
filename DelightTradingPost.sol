@@ -40,22 +40,22 @@ contract DelightTradingPost is DelightTradingPostInterface, NetworkChecker {
 		
 		else if (network == Network.Kovan) {
 			
-			wood	= address(0x8662cf8b5BA60F36e1494a4BE2179Cb114B7B494);
-			stone	= address(0x0fdFa933543BA18E9103fa3C8426C00ca088c9BD);
-			iron	= address(0xb0F1710b9564BA608ed760FA8265c82b7864d419);
-			ducat	= address(0xfC6F0f00eFe51384912b647648096aDB51688451);
+			wood	= address(0x66a412038bb8e6F4b9f5597Bd579465E7Fc1Deb5);
+			stone	= address(0xD3F9FF0EB49EBbBc6E4FdCCFb6512bb221786593);
+			iron	= address(0xE2d3BEF06C7dD2b0b1d9a4A885d0864f8c3D8199);
+			ducat	= address(0xd8A1388D10d37374968D4E489E3dB451E00E92db);
 			
-			axe			= address(0xB92Cc46FC80b9C12b0033F1cE83384de1E16a734);
-			ballista	= address(0x42Fd06294Af1983012ca521BC3d3fdefc2f1Bc84);
-			camel		= address(0x727ed33b582A2f0619017A1F64981E4C40FBb218);
-			catapult	= address(0xeB80aDEB7FB5D4F65dad7F36e3c798aD02d4aeE7);
-			crossbow	= address(0xF68408893A3D52d611968685154874A1EB0c10AD);
-			elephant	= address(0x3bC7c1BF01C74E18246bF8F30Ef38371B3018440);
-			hood		= address(0xC3BDd75fC213eDD6c743E88D0D4afD320D7c02ee);
-			shield		= address(0xbd0533f77c4674414Cc828c4e2AdC2b95E2D0871);
-			spear		= address(0xcb33d57e5aa4C23e612c656fF95543C1DAAD42b5);
+			axe			= address(0xe8857040c117FC79E394e8Ad9D2D979C44BEE50B);
+			ballista	= address(0xCb4A6d8fc8a0bd91995B2A62cB5F80BDbbbFE9C0);
+			camel		= address(0xC6d4326C748218fB797A425F7b3CbD7B034810E9);
+			catapult	= address(0xd93FF200f683cdc266073c7D4E3aE6E50B9cD727);
+			crossbow	= address(0x8C3ed661BF02D07f86Bac5a9BB0FFDf916d00c18);
+			elephant	= address(0x6068eB1878DFCf0773f36D3C1b4189ac88d98AE0);
+			hood		= address(0x4007E4E371E7114f902a1F9bD9556E35D36Cb71d);
+			shield		= address(0x58Edb48459F925B30235608E548CA880007289DB);
+			spear		= address(0x42F63A596c2B9b02Db6B21E430fd45981C59C0b8);
 			
-			delightKnightItem = address(0xd62bb7Dcc1937D37EBcF2e00Ebe2639138dC1616);
+			delightKnightItem = address(0x8dC216c399fc0b2e6D17777318A6a12A515e6261);
 			
 			dplayTradingPost = DPlayTradingPostInterface(0x980f391C9C36BD6d95F5676dDfa7a3B414404570);
 		}
