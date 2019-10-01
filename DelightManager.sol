@@ -30,14 +30,14 @@ contract DelightManager is DelightBase, NetworkChecker {
 			
 			// Delight basic information
 			// Delight 기본 정보
-			info	= DelightInfoInterface(0x8Bfc41CA726f5c0323213187B2418AF82d2C7B25);
+			info	= DelightInfoInterface(0xA1eCA83D8D960b3a35196D83aa2e40BA6AFaa54b);
 			
 			// Resources
 			// 자원들
-			wood	= DelightResource(0x5cA8735b9Bf868d0A7b66a2eA6d027CACbf2b492);
-			stone	= DelightResource(0x4CF578E436752E272F99C9B9345c05D74f544678);
-			iron	= DelightResource(0x4f3F41f0E04CF301c828B7225F1B907319850f34);
-			ducat	= DelightResource(0x52Be1c4511731aB6EB505754f93Cb3F5Ec9F706d);
+			wood	= DelightResource(0x8662cf8b5BA60F36e1494a4BE2179Cb114B7B494);
+			stone	= DelightResource(0x0fdFa933543BA18E9103fa3C8426C00ca088c9BD);
+			iron	= DelightResource(0xb0F1710b9564BA608ed760FA8265c82b7864d419);
+			ducat	= DelightResource(0xfC6F0f00eFe51384912b647648096aDB51688451);
 		}
 		
 		else if (network == Network.Ropsten) {

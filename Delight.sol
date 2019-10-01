@@ -44,17 +44,17 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			
 			// information
 			// 정보
-			info = DelightInfoInterface(0x8Bfc41CA726f5c0323213187B2418AF82d2C7B25);
+			info = DelightInfoInterface(0xA1eCA83D8D960b3a35196D83aa2e40BA6AFaa54b);
 			
 			// knight item
 			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x58e2075373341dc4Bb2Df89C5147d150A6B54F82);
+			knightItem = DelightKnightItemInterface(0xd62bb7Dcc1937D37EBcF2e00Ebe2639138dC1616);
 			
 			// managers
 			// 관리자들
-			buildingManager	= DelightBuildingManager(0xB608f471aEdD2e9d5CBf5A479A53EA04d25D76F4);
-			armyManager		= DelightArmyManager(0x4dBFae12739aEfAdFBa9607b14A460DBeeFd91ff);
-			itemManager		= DelightItemManager(0x45F2903Dd6AE51Dece8ED734926077Afa35BAA82);
+			buildingManager	= DelightBuildingManager(0xC94B01b5A63c1D28fD6563B14Afa7ae447ED4d13);
+			armyManager		= DelightArmyManager(0xB5Fa2e0a968B0854caDc9bAb8E138C4fF1f44f2a);
+			itemManager		= DelightItemManager(0x093654820DC60e19371F4Cc9D6B594e717040458);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -86,6 +86,9 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	}
 	
 	Record[] private history;
+	
+	uint private lastAttackCol;
+	uint private lastAttackRow;
 	
 	// Returns the total number of records.
 	// 기록의 총 개수를 반환합니다.
@@ -286,6 +289,10 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		// If there's a hostile army in the destination, attack.
 		// 적군이면 전투를 개시합니다.
 		else {
+			
+			// 마지막 공격 위치 저장
+			lastAttackCol = toCol;
+			lastAttackRow = toRow;
 			
 			// Calculates the distance.
 			// 거리 계산
@@ -505,5 +512,13 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			// 이벤트 발생
 			emit NewRecord(msg.sender, recordId);
 		}
+	}
+	
+	// 마지막 공격 위치를 가져옵니다.
+	function getLastAttackPosition() view external returns (uint col, uint row) {
+		return (
+			lastAttackCol,
+			lastAttackRow
+		);
 	}
 }

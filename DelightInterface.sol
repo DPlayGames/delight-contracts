@@ -51,4 +51,7 @@ interface DelightInterface {
 	// Executes the command queue
 	// 명령 큐를 실행합니다.
 	function runOrderQueue(uint[] calldata orders, uint[] calldata params1, uint[] calldata params2, uint[] calldata params3, uint[] calldata params4) external;
+	
+	// 마지막 공격 위치를 가져옵니다.
+	function getLastAttackPosition() view external returns (uint col, uint row);
 }
