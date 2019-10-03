@@ -130,7 +130,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	
 	// Gets the total damage of an army.
 	// 전체 데미지를 가져옵니다.
-	function getTotalDamage(uint distance, uint col, uint row) view public returns (uint) {
+	function getTotalDamage(uint distance, bool isKnightMovable, uint col, uint row) view public returns (uint) {
 		
 		uint totalDamage = 0;
 		
@@ -180,7 +180,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 							
 							// If the unit's not a knight, add a knight's buff damage .
 							// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
-							armyIds[UNIT_KNIGHT] != 0 ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(knightItemId) : 0
+							armyIds[UNIT_KNIGHT] != 0 && isKnightMovable == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(knightItemId) : 0
 						)
 						
 					).add(
@@ -273,8 +273,8 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		require(fromCol != toCol || fromRow != toRow);
 		
 		// 범위 체크
-		require(fromCol < COL_RANGE && fromCol < ROW_RANGE);
-		require(toCol < COL_RANGE && toCol < ROW_RANGE);
+		require(fromCol < COL_RANGE && fromRow < ROW_RANGE);
+		require(toCol < COL_RANGE && toRow < ROW_RANGE);
 		
 		// 부대의 소유주인지 확인합니다.
 		require(msg.sender == armyManager.getPositionOwner(fromCol, fromRow));
@@ -305,8 +305,8 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			// 거리 계산
 			uint distance = (fromCol < toCol ? toCol - fromCol : fromCol - toCol) + (fromRow < toRow ? toRow - fromRow : fromRow - toRow);
 			
-			uint totalDamage = getTotalDamage(distance, fromCol, fromRow);
-			uint totalEnemyDamage = getTotalDamage(0, toCol, toRow);
+			uint totalDamage = getTotalDamage(distance, distance <= info.getUnitMovableDistance(UNIT_KNIGHT), fromCol, fromRow);
+			uint totalEnemyDamage = getTotalDamage(0, true, toCol, toRow);
 			
 			uint kill = armyManager.attack(history.length, totalDamage, 0, toCol, toRow);
 			uint death = armyManager.attack(history.length, totalEnemyDamage, distance, fromCol, fromRow);
@@ -354,7 +354,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	function moveOne(uint armyId, uint unitCount, uint toCol, uint toRow) private {
 		
 		// 범위 체크
-		require(toCol < COL_RANGE && toCol < ROW_RANGE);
+		require(toCol < COL_RANGE && toRow < ROW_RANGE);
 		
 		// 적군의 건물이 존재하면 이동이 불가능합니다.
 		require(buildingManager.getPositionBuildingId(toCol, toRow) == 0 || buildingManager.getPositionBuildingOwner(toCol, toRow) == msg.sender);
@@ -402,8 +402,8 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		require(fromCol != toCol || fromRow != toRow);
 		
 		// 범위 체크
-		require(fromCol < COL_RANGE && fromCol < ROW_RANGE);
-		require(toCol < COL_RANGE && toCol < ROW_RANGE);
+		require(fromCol < COL_RANGE && fromRow < ROW_RANGE);
+		require(toCol < COL_RANGE && toRow < ROW_RANGE);
 		
 		// 부대의 소유주인지 확인합니다.
 		require(msg.sender == armyManager.getPositionOwner(fromCol, fromRow));
