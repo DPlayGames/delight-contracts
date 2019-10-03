@@ -21,49 +21,49 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		units[UNIT_SWORDSMAN] = Unit({
 			hp : 100,
 			damage : 50,
-			movableDistance : 4,
+			movableDistance : 3,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_AXEMAN] = Unit({
 			hp : 150,
 			damage : 50,
-			movableDistance : 4,
+			movableDistance : 3,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_SPEARMAN] = Unit({
 			hp : 100,
 			damage : 75,
-			movableDistance : 4,
+			movableDistance : 3,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_SHIELDMAN] = Unit({
 			hp : 250,
 			damage : 5,
-			movableDistance : 4,
+			movableDistance : 3,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_SPY] = Unit({
 			hp : 50,
 			damage : 50,
-			movableDistance : 6,
+			movableDistance : 5,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_ARCHER] = Unit({
 			hp : 70,
 			damage : 20,
-			movableDistance : 4,
+			movableDistance : 3,
 			attackableDistance : 2
 		});
 		
 		units[UNIT_CROSSBOWMAN] = Unit({
 			hp : 70,
 			damage : 30,
-			movableDistance : 4,
+			movableDistance : 3,
 			attackableDistance : 2
 		});
 		
@@ -84,28 +84,28 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		units[UNIT_CAVALY] = Unit({
 			hp : 150,
 			damage : 50,
-			movableDistance : 8,
+			movableDistance : 6,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_CAMELRY] = Unit({
 			hp : 300,
 			damage : 50,
-			movableDistance : 6,
+			movableDistance : 5,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_WAR_ELEPHANT] = Unit({
 			hp : 400,
 			damage : 50,
-			movableDistance : 4,
+			movableDistance : 3,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_KNIGHT] = Unit({
 			hp : 500,
 			damage : 100,
-			movableDistance : 4,
+			movableDistance : 3,
 			attackableDistance : 0
 		});
 		
