@@ -356,6 +356,9 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		// 범위 체크
 		require(toCol < COL_RANGE && toCol < ROW_RANGE);
 		
+		// 적군의 건물이 존재하면 이동이 불가능합니다.
+		require(buildingManager.getPositionBuildingId(toCol, toRow) == 0 || buildingManager.getPositionBuildingOwner(toCol, toRow) == msg.sender);
+		
 		// The number of units must be bigger than 0.
 		// 유닛의 개수는 0보다 커야합니다.
 		require(unitCount > 0);
