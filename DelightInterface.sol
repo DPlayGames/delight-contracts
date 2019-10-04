@@ -42,11 +42,11 @@ interface DelightInterface {
 	
 	// Gets the total damage.
 	// 전체 데미지를 가져옵니다.
-	function getTotalDamage(uint distance, uint col, uint row) view external returns (uint);
+	function getTotalDamage(uint distance, uint[] calldata armyIds, uint buildingBuffDamage) view external returns (uint);
 	
 	// Gets the total ranged damage.
 	// 전체 원거리 데미지를 가져옵니다.
-	function getTotalRangedDamage(uint distance, uint col, uint row) view external returns (uint);
+	function getTotalRangedDamage(uint distance, uint[] calldata armyIds, uint buildingBuffDamage) view external returns (uint);
 	
 	// Executes the command queue
 	// 명령 큐를 실행합니다.

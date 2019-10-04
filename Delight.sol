@@ -44,17 +44,17 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			
 			// information
 			// 정보
-			info = DelightInfoInterface(0x9Faeb4E41Fb0DE0dA7E2274c8Fb35EDaa39e365E);
+			info = DelightInfoInterface(0xb59Af43973829A8c08Ed99ef53B2265ED02A3f5e);
 			
 			// knight item
 			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x8dC216c399fc0b2e6D17777318A6a12A515e6261);
+			knightItem = DelightKnightItemInterface(0x7CF7B4fEE3DEF9C3800d61798E4A3bf2A275267E);
 			
 			// managers
 			// 관리자들
-			buildingManager	= DelightBuildingManager(0xDC7e8b2CB838cE4884EEfD9637733650D117D810);
-			armyManager		= DelightArmyManager(0xDc7e71A02B6338022EBf6CA533c080A957954FD2);
-			itemManager		= DelightItemManager(0xc945F4704D1eaFd34D2267E9486b1f97109D8c37);
+			buildingManager	= DelightBuildingManager(0x6a110986103e0c6887a605E3dE5185694e5eD509);
+			armyManager		= DelightArmyManager(0x7B8b425eE165367Bc214A984Cfc63C6126B49DCC);
+			itemManager		= DelightItemManager(0x0eE47573a21A1a142B4211c705c06D9C023D138B);
 		}
 		
 		else if (network == Network.Ropsten) {
@@ -130,11 +130,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	
 	// Gets the total damage of an army.
 	// 전체 데미지를 가져옵니다.
-	function getTotalDamage(uint distance, bool isKnightMovable, uint col, uint row) view public returns (uint) {
-		
-		uint totalDamage = 0;
-		
-		uint[] memory armyIds = armyManager.getPositionArmyIds(col, row);
+	function getTotalDamage(uint distance, uint[] memory armyIds, uint buildingBuffDamage) view public returns (uint totalDamage) {
 		
 		(
 			,
@@ -180,13 +176,13 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 							
 							// If the unit's not a knight, add a knight's buff damage .
 							// 기사가 아닌 경우 기사의 버프 데미지를 추가합니다.
-							armyIds[UNIT_KNIGHT] != 0 && isKnightMovable == true ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(knightItemId) : 0
+							armyIds[UNIT_KNIGHT] != 0 && distance <= info.getUnitMovableDistance(UNIT_KNIGHT) ? KNIGHT_DEFAULT_BUFF_DAMAGE + knightItem.getItemBuffDamage(knightItemId) : 0
 						)
 						
 					).add(
 						
 						// 이동 거리가 0일때만 병사 위치의 건물의 버프 데미지를 가져옵니다.
-						distance == 0 ? buildingManager.getBuildingBuffDamage(col, row) : 0
+						distance == 0 ? buildingBuffDamage : 0
 						
 					).mul(armyUnitCount)
 				);
@@ -198,11 +194,9 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	
 	// Gets the total ranged damage.
 	// 전체 원거리 데미지를 가져옵니다.
-	function getTotalRangedDamage(uint distance, uint col, uint row) view public returns (uint) {
+	function getTotalRangedDamage(uint distance, uint[] memory armyIds, uint buildingBuffDamage) view public returns (uint) {
 		
 		uint totalDamage = 0;
-		
-		uint[] memory armyIds = armyManager.getPositionArmyIds(col, row);
 		
 		(
 			,
@@ -255,7 +249,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 					).add(
 						
 						// 병사 위치의 건물의 버프 데미지를 가져옵니다.
-						buildingManager.getBuildingBuffDamage(col, row)
+						buildingBuffDamage
 						
 					).mul(armyUnitCount)
 				);
@@ -305,8 +299,8 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			// 거리 계산
 			uint distance = (fromCol < toCol ? toCol - fromCol : fromCol - toCol) + (fromRow < toRow ? toRow - fromRow : fromRow - toRow);
 			
-			uint totalDamage = getTotalDamage(distance, distance <= info.getUnitMovableDistance(UNIT_KNIGHT), fromCol, fromRow);
-			uint totalEnemyDamage = getTotalDamage(0, true, toCol, toRow);
+			uint totalDamage = getTotalDamage(distance, armyManager.getPositionArmyIds(fromCol, fromRow), buildingManager.getBuildingBuffDamage(fromCol, fromRow));
+			uint totalEnemyDamage = getTotalDamage(0, armyManager.getPositionArmyIds(toCol, toRow), buildingManager.getBuildingBuffDamage(toCol, toRow));
 			
 			uint kill = armyManager.attack(history.length, totalDamage, 0, toCol, toRow);
 			uint death = armyManager.attack(history.length, totalEnemyDamage, distance, fromCol, fromRow);
@@ -418,8 +412,8 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		// 거리 계산
 		uint distance = (fromCol < toCol ? toCol - fromCol : fromCol - toCol) + (fromRow < toRow ? toRow - fromRow : fromRow - toRow);
 		
-		uint totalDamage = getTotalRangedDamage(distance, fromCol, fromRow);
-		uint totalEnemyDamage = getTotalRangedDamage(distance, toCol, toRow);
+		uint totalDamage = getTotalRangedDamage(distance, armyManager.getPositionArmyIds(fromCol, fromRow), buildingManager.getBuildingBuffDamage(fromCol, fromRow));
+		uint totalEnemyDamage = getTotalRangedDamage(distance, armyManager.getPositionArmyIds(toCol, toRow), buildingManager.getBuildingBuffDamage(toCol, toRow));
 		
 		// 원거리 공격합니다.
 		record.enemy = enemy;
