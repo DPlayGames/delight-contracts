@@ -9,28 +9,28 @@ contract DelightBase {
 	
 	// Buildings
 	// 건물
-	uint constant internal BUILDING_HQ				= 0;
-	uint constant internal BUILDING_TRAINING_CENTER	= 1;
-	uint constant internal BUILDING_ARCHERY_RANGE	= 2;
-	uint constant internal BUILDING_STABLE			= 3;
-	uint constant internal BUILDING_TOWER			= 4;
+	uint constant internal BUILDING_HQ				= 1;
+	uint constant internal BUILDING_TRAINING_CENTER	= 2;
+	uint constant internal BUILDING_ARCHERY_RANGE	= 3;
+	uint constant internal BUILDING_STABLE			= 4;
+	uint constant internal BUILDING_TOWER			= 5;
 	
 	// Units
 	// 유닛
-	uint constant internal UNIT_SWORDSMAN		= 4;
-	uint constant internal UNIT_AXEMAN			= 2;
-	uint constant internal UNIT_SPEARMAN		= 6;
-	uint constant internal UNIT_SHIELDMAN		= 0;
-	uint constant internal UNIT_SPY				= 11;
+	uint constant internal UNIT_SWORDSMAN		= 5;
+	uint constant internal UNIT_AXEMAN			= 3;
+	uint constant internal UNIT_SPEARMAN		= 7;
+	uint constant internal UNIT_SHIELDMAN		= 1;
+	uint constant internal UNIT_SPY				= 12;
 	uint constant internal UNIT_ARCHER			= 8;
-	uint constant internal UNIT_CROSSBOWMAN		= 7;
-	uint constant internal UNIT_BALLISTA		= 10;
-	uint constant internal UNIT_CATAPULT		= 9;
-	uint constant internal UNIT_CAVALY			= 5;
-	uint constant internal UNIT_CAMELRY			= 3;
-	uint constant internal UNIT_WAR_ELEPHANT	= 1;
-	uint constant internal UNIT_KNIGHT			= 12;
-	uint constant internal UNIT_KIND_COUNT		= 13;
+	uint constant internal UNIT_CROSSBOWMAN		= 8;
+	uint constant internal UNIT_BALLISTA		= 11;
+	uint constant internal UNIT_CATAPULT		= 10;
+	uint constant internal UNIT_CAVALY			= 6;
+	uint constant internal UNIT_CAMELRY			= 4;
+	uint constant internal UNIT_WAR_ELEPHANT	= 2;
+	uint constant internal UNIT_KNIGHT			= 13;
+	uint constant internal UNIT_KIND_COUNT		= 14;
 	
 	// Items
 	// 아이템

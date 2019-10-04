@@ -13,15 +13,15 @@ import "./Util/SafeMath.sol";
 contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	using SafeMath for uint;
     
-	uint constant private ORDER_BUILD				= 0;
-	uint constant private ORDER_UPGRADE_HQ			= 1;
-	uint constant private ORDER_CREATE_ARMY			= 2;
-	uint constant private ORDER_CREATE_ITEM			= 3;
-	uint constant private ORDER_ATTACH_ITEM			= 4;
-	uint constant private ORDER_ATTACH_KNIGHT_ITEM	= 5;
-	uint constant private ORDER_MOVE_ONE			= 6;
-	uint constant private ORDER_MOVE_AND_ATTACK		= 7;
-	uint constant private ORDER_RANGED_ATTACK		= 8;
+	uint constant private ORDER_BUILD				= 1;
+	uint constant private ORDER_UPGRADE_HQ			= 2;
+	uint constant private ORDER_CREATE_ARMY			= 3;
+	uint constant private ORDER_CREATE_ITEM			= 4;
+	uint constant private ORDER_ATTACH_ITEM			= 5;
+	uint constant private ORDER_ATTACH_KNIGHT_ITEM	= 6;
+	uint constant private ORDER_MOVE_ONE			= 7;
+	uint constant private ORDER_MOVE_AND_ATTACK		= 8;
+	uint constant private ORDER_RANGED_ATTACK		= 9;
 	
 	// Knight's default buff damage
 	// 기사의 기본 버프 데미지
