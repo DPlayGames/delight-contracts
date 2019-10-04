@@ -660,7 +660,10 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				
 				// Calculates the result of the battle.
 				// 전투 결과를 계산합니다.
-				uint remainUnitCount = armyHP.sub(armyHP % info.getUnitHP(army.unitKind)).div(info.getUnitHP(army.unitKind));
+				uint remainUnitCount = armyHP.add(
+					info.getUnitHP(army.unitKind).sub(armyHP % info.getUnitHP(army.unitKind))
+				).div(info.getUnitHP(army.unitKind));
+				
 				uint deadUnitCount = army.unitCount.sub(remainUnitCount);
 				
 				// Lowers the total damage of the enemy.
