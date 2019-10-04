@@ -21,33 +21,33 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		units[UNIT_SWORDSMAN] = Unit({
 			hp : 100,
 			damage : 50,
-			movableDistance : 3,
+			movableDistance : 4,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_AXEMAN] = Unit({
 			hp : 150,
 			damage : 50,
-			movableDistance : 3,
+			movableDistance : 4,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_SPEARMAN] = Unit({
 			hp : 100,
 			damage : 75,
-			movableDistance : 3,
+			movableDistance : 4,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_SHIELDMAN] = Unit({
 			hp : 250,
 			damage : 5,
-			movableDistance : 3,
+			movableDistance : 4,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_SPY] = Unit({
-			hp : 50,
+			hp : 100,
 			damage : 50,
 			movableDistance : 5,
 			attackableDistance : 0
@@ -57,28 +57,28 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 			hp : 70,
 			damage : 20,
 			movableDistance : 3,
-			attackableDistance : 2
+			attackableDistance : 4
 		});
 		
 		units[UNIT_CROSSBOWMAN] = Unit({
 			hp : 70,
 			damage : 30,
 			movableDistance : 3,
-			attackableDistance : 2
+			attackableDistance : 4
 		});
 		
 		units[UNIT_BALLISTA] = Unit({
 			hp : 20,
 			damage : 35,
 			movableDistance : 0,
-			attackableDistance : 4
+			attackableDistance : 7
 		});
 		
 		units[UNIT_CATAPULT] = Unit({
 			hp : 30,
 			damage : 40,
 			movableDistance : 2,
-			attackableDistance : 3
+			attackableDistance : 6
 		});
 		
 		units[UNIT_CAVALY] = Unit({
@@ -90,14 +90,14 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		
 		units[UNIT_CAMELRY] = Unit({
 			hp : 300,
-			damage : 50,
+			damage : 40,
 			movableDistance : 5,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_WAR_ELEPHANT] = Unit({
 			hp : 400,
-			damage : 50,
+			damage : 30,
 			movableDistance : 3,
 			attackableDistance : 0
 		});
@@ -120,14 +120,14 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 			wood : 0,
 			stone : 400,
 			iron : 0,
-			ducat : 200
+			ducat : 100
 		});
 		
 		hpUpgradeMaterials[2] = Material({
 			wood : 0,
 			stone : 0,
 			iron : 400,
-			ducat : 300
+			ducat : 100
 		});
 		
 		buildingMaterials[BUILDING_TRAINING_CENTER] = Material({
