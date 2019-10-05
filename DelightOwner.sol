@@ -1,13 +1,14 @@
 pragma solidity ^0.5.9;
 
 import "./DelightOwnerInterface.sol";
+import "./DelightBase.sol";
 import "./DelightInterface.sol";
 import "./DelightBuildingManagerInterface.sol";
 import "./DelightArmyManagerInterface.sol";
 import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
-contract DelightOwner is DelightOwnerInterface, NetworkChecker {
+contract DelightOwner is DelightOwnerInterface, DelightBase, NetworkChecker {
 	using SafeMath for uint;
 	
 	DelightInterface private delight;
@@ -184,5 +185,33 @@ contract DelightOwner is DelightOwnerInterface, NetworkChecker {
 		}
 		
 		return armyIds;
+	}
+	
+	// 전체 맵의 건물 소유주 목록을 반환합니다.
+	function getMapBuildingOwners() view external returns (address[] memory) {
+		
+		address[] memory owners = new address[](ROW_RANGE * COL_RANGE);
+		
+		for (uint row = 0; row < ROW_RANGE; row += 1) {
+			for (uint col = 0; col < COL_RANGE; col += 1) {
+				owners[row * COL_RANGE + row] = buildingManager.getPositionBuildingOwner(col, row);
+			}
+		}
+		
+		return owners;
+	}
+	
+	// 전체 맵의 부대 소유주 목록을 반환합니다.
+	function getMapArmyOwners() view external returns (address[] memory) {
+		
+		address[] memory owners = new address[](ROW_RANGE * COL_RANGE);
+		
+		for (uint row = 0; row < ROW_RANGE; row += 1) {
+			for (uint col = 0; col < COL_RANGE; col += 1) {
+				owners[row * COL_RANGE + row] = armyManager.getPositionOwner(col, row);
+			}
+		}
+		
+		return owners;
 	}
 }

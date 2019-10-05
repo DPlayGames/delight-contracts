@@ -13,4 +13,10 @@ interface DelightOwnerInterface {
 	// Gets the army IDs of the owner.
 	// 소유주의 부대 ID들을 가져옵니다.
 	function getArmyIds(address owner) view external returns (uint[] memory);
+	
+	// 전체 맵의 건물 소유주 목록을 반환합니다.
+	function getMapBuildingOwners() view external returns (address[] memory);
+	
+	// 전체 맵의 부대 소유주 목록을 반환합니다.
+	function getMapArmyOwners() view external returns (address[] memory);
 }
