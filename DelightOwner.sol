@@ -194,7 +194,7 @@ contract DelightOwner is DelightOwnerInterface, DelightBase, NetworkChecker {
 		
 		for (uint row = 0; row < ROW_RANGE; row += 1) {
 			for (uint col = 0; col < COL_RANGE; col += 1) {
-				owners[row * COL_RANGE + row] = buildingManager.getPositionBuildingOwner(col, row);
+				owners[row * COL_RANGE + col] = buildingManager.getPositionBuildingOwner(col, row);
 			}
 		}
 		
@@ -208,7 +208,7 @@ contract DelightOwner is DelightOwnerInterface, DelightBase, NetworkChecker {
 		
 		for (uint row = 0; row < ROW_RANGE; row += 1) {
 			for (uint col = 0; col < COL_RANGE; col += 1) {
-				owners[row * COL_RANGE + row] = armyManager.getPositionOwner(col, row);
+				owners[row * COL_RANGE + col] = armyManager.getPositionOwner(col, row);
 			}
 		}
 		
