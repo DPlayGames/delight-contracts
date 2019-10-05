@@ -321,7 +321,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			}
 			
 			// 한번의 공격으로 전투가 끝나지 않았을 때
-			else if (armyManager.getTotalUnitCount(fromCol, fromRow) > 0 && armyManager.getTotalUnitCount(toCol, toRow) > 0) {
+			else if (armyManager.getTotalUnitCount(distance, fromCol, fromRow) > 0 && armyManager.getTotalUnitCount(0, toCol, toRow) > 0) {
 				
 				// 재공격
 				moveAndAttack(fromCol, fromRow, toCol, toRow, record);
@@ -385,7 +385,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		// 아무도 없는 곳이거나 아군인 경우에만 가능합니다.
 		require(enemy == address(0) || enemy == msg.sender);
 		
-		armyManager.moveArmyOne(armyManager.getTotalUnitCount(toCol, toRow), armyId, unitCount, toCol, toRow);
+		armyManager.moveArmyOne(armyManager.getTotalUnitCount(0, toCol, toRow), armyId, unitCount, toCol, toRow);
 	}
 	
 	// Range unit attacks a given tile.

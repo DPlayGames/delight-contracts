@@ -171,13 +171,18 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	}
 	
 	// 특정 위치의 총 유닛 숫자를 계산합니다.
-	function getTotalUnitCount(uint col, uint row) view public returns (uint) {
+	function getTotalUnitCount(uint distance, uint col, uint row) view public returns (uint) {
 		
 		uint[] memory armyIds = positionToArmyIds[col][row];
 		
 		uint totalUnitCount = 0;
 		for (uint i = 0; i < armyIds.length; i += 1) {
-			totalUnitCount = totalUnitCount.add(armies[armyIds[i]].unitCount);
+			
+			// Check if the unit can reach the distance.
+			// 이동이 가능한 거리인지 확인합니다.
+			if (distance <= info.getUnitMovableDistance(armies[armyIds[i]].unitKind)) {
+				totalUnitCount = totalUnitCount.add(armies[armyIds[i]].unitCount);
+			}
 		}
 		
 		return totalUnitCount;
@@ -191,7 +196,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		
 		// The total number of units in the building's tile must not exceed the maximum unit number.
 		// 건물이 위치한 곳의 총 유닛 숫자가 최대 유닛 수를 넘기면 안됩니다.
-		require(getTotalUnitCount(col, row).add(unitKind) <= MAX_POSITION_UNIT_COUNT);
+		require(getTotalUnitCount(0, col, row).add(unitKind) <= MAX_POSITION_UNIT_COUNT);
 		
 		// 기사는 하나 이상 생성할 수 없습니다.
 		require(unitKind != UNIT_KNIGHT || unitCount == 1);
@@ -419,7 +424,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		
 		// Calculate the total number of units in the tile where the merge take place.
 		// 병합할 위치에 존재하는 총 유닛 숫자를 계산합니다.
-		uint totalUnitCount = getTotalUnitCount(toCol, toRow);
+		uint totalUnitCount = getTotalUnitCount(0, toCol, toRow);
 		
 		for (uint i = 0; i < UNIT_KIND_COUNT; i += 1) {
 			

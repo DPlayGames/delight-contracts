@@ -105,7 +105,7 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		units[UNIT_KNIGHT] = Unit({
 			hp : 500,
 			damage : 100,
-			movableDistance : 3,
+			movableDistance : 4,
 			attackableDistance : 0
 		});
 		
