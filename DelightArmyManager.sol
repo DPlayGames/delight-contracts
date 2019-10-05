@@ -39,7 +39,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 			
 			// Knight item.
 			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x7CF7B4fEE3DEF9C3800d61798E4A3bf2A275267E);
+			knightItem = DelightKnightItemInterface(0xDF7Bed51bC9974482d2D0E97658DDFb8544A57b3);
 		}
 		
 		else if (network == Network.Ropsten) {
