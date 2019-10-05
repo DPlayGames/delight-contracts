@@ -636,9 +636,8 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 			// 이동이 가능한 거리인지 확인합니다.
 			distance <= info.getUnitMovableDistance(army.unitKind)) {
 				
-				// Calcultes the HPs of the friendly army.
-				// 아군의 체력을 계산합니다.
-				uint armyHP = info.getUnitHP(army.unitKind).add(
+				// 유닛의 체력을 계산합니다.
+				uint unitHP = info.getUnitHP(army.unitKind).add(
 					
 					// Adds the knight item's HP if the unit's a knight.
 					// 기사인 경우 기사 아이템의 HP를 추가합니다.
@@ -653,8 +652,11 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 					
 					// 병사 위치의 건물의 버프 HP를 가져옵니다.
 					buildingManager.getBuildingBuffHP(col, row)
-					
-				).mul(army.unitCount);
+				);
+				
+				// Calcultes the HPs of the friendly army.
+				// 아군의 체력을 계산합니다.
+				uint armyHP = unitHP.mul(army.unitCount);
 				
 				armyHP = armyHP <= damage ? 0 : armyHP.sub(damage);
 				
@@ -663,15 +665,15 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				uint remainUnitCount = armyHP.add(
 					
 					// 나머지가 남지 않도록
-					armyHP % info.getUnitHP(army.unitKind) == 0 ? 0 : info.getUnitHP(army.unitKind).sub(armyHP % info.getUnitHP(army.unitKind))
+					armyHP % unitHP == 0 ? 0 : unitHP.sub(armyHP % unitHP)
 					
-				).div(info.getUnitHP(army.unitKind));
+				).div(unitHP);
 				
 				uint deadUnitCount = army.unitCount.sub(remainUnitCount);
 				
 				// Lowers the total damage of the enemy.
 				// 적의 총 데미지를 낮춥니다.
-				damage = damage <= deadUnitCount.mul(info.getUnitHP(army.unitKind)) ? 0 : damage.sub(deadUnitCount.mul(info.getUnitHP(army.unitKind)));
+				damage = damage <= deadUnitCount.mul(unitHP) ? 0 : damage.sub(deadUnitCount.mul(unitHP));
 				
 				// 원거리 공격인 경우
 				if (battleId == 0) {
@@ -696,9 +698,8 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				
 				// Dismantles the equipped item.
 				// 장착한 아이템을 분해합니다.
-				uint itemKind = getItemKindByUnitKind(army.unitKind);
-				if (itemKind != 0) {
-					itemManager.disassembleItem(itemKind, deadUnitCount);
+				if (getItemKindByUnitKind(army.unitKind) != 0) {
+					itemManager.disassembleItem(getItemKindByUnitKind(army.unitKind), deadUnitCount);
 				}
 				
 				// Saves the number of remaining units.
@@ -735,8 +736,8 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 						}
 					}
 					
-					delete armyIds[i];
 					delete armies[armyIds[i]];
+					delete armyIds[i];
 				}
 			}
 		}
