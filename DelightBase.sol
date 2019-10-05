@@ -22,7 +22,7 @@ contract DelightBase {
 	uint constant internal UNIT_SPEARMAN		= 7;
 	uint constant internal UNIT_SHIELDMAN		= 1;
 	uint constant internal UNIT_SPY				= 12;
-	uint constant internal UNIT_ARCHER			= 8;
+	uint constant internal UNIT_ARCHER			= 9;
 	uint constant internal UNIT_CROSSBOWMAN		= 8;
 	uint constant internal UNIT_BALLISTA		= 11;
 	uint constant internal UNIT_CATAPULT		= 10;

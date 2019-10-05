@@ -661,7 +661,10 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				// Calculates the result of the battle.
 				// 전투 결과를 계산합니다.
 				uint remainUnitCount = armyHP.add(
-					info.getUnitHP(army.unitKind).sub(armyHP % info.getUnitHP(army.unitKind))
+					
+					// 나머지가 남지 않도록
+					armyHP % info.getUnitHP(army.unitKind) == 0 ? 0 : info.getUnitHP(army.unitKind).sub(armyHP % info.getUnitHP(army.unitKind))
+					
 				).div(info.getUnitHP(army.unitKind));
 				
 				uint deadUnitCount = army.unitCount.sub(remainUnitCount);
@@ -707,7 +710,9 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				totalDeadUnitCount = totalDeadUnitCount.add(deadUnitCount);
 				
 				// 이벤트 발생
-				emit DeadUnits(armyIds[i]);
+				if (deadUnitCount > 0) {
+					emit DeadUnits(armyIds[i]);
+				}
 				
 				// The army was annihilated.
 				// 부대가 전멸했습니다.
