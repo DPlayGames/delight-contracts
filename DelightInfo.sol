@@ -48,13 +48,13 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		
 		units[UNIT_SPY] = Unit({
 			hp : 100,
-			damage : 50,
+			damage : 60,
 			movableDistance : 5,
 			attackableDistance : 0
 		});
 		
 		units[UNIT_ARCHER] = Unit({
-			hp : 70,
+			hp : 60,
 			damage : 20,
 			movableDistance : 3,
 			attackableDistance : 4
@@ -63,13 +63,13 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		units[UNIT_CROSSBOWMAN] = Unit({
 			hp : 70,
 			damage : 30,
-			movableDistance : 3,
+			movableDistance : 4,
 			attackableDistance : 4
 		});
 		
 		units[UNIT_BALLISTA] = Unit({
-			hp : 20,
-			damage : 35,
+			hp : 10,
+			damage : 50,
 			movableDistance : 0,
 			attackableDistance : 7
 		});
@@ -189,63 +189,63 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		itemMaterials[ITEM_AXE] = Material({
 			wood : 50,
 			stone : 0,
-			iron : 50,
-			ducat : 0
+			iron : 250,
+			ducat : 100
 		});
 		
 		itemMaterials[ITEM_SPEAR] = Material({
 			wood : 75,
 			stone : 0,
-			iron : 25,
-			ducat : 0
+			iron : 225,
+			ducat : 100
 		});
 		
 		itemMaterials[ITEM_SHIELD] = Material({
 			wood : 0,
 			stone : 0,
-			iron : 100,
-			ducat : 0
+			iron : 300,
+			ducat : 100
 		});
 		
 		itemMaterials[ITEM_HOOD] = Material({
 			wood : 0,
 			stone : 0,
-			iron : 0,
-			ducat : 100
-		});
-		
-		itemMaterials[ITEM_CROSSBOW] = Material({
-			wood : 100,
-			stone : 0,
-			iron : 50,
-			ducat : 0
-		});
-		
-		itemMaterials[ITEM_BALLISTA] = Material({
-			wood : 200,
-			stone : 0,
-			iron : 100,
-			ducat : 100
-		});
-		
-		itemMaterials[ITEM_CATAPULT] = Material({
-			wood : 200,
-			stone : 200,
-			iron : 0,
-			ducat : 100
-		});
-		
-		itemMaterials[ITEM_CAMEL] = Material({
-			wood : 50,
-			stone : 0,
-			iron : 50,
+			iron : 200,
 			ducat : 200
 		});
 		
-		itemMaterials[ITEM_ELEPHANT] = Material({
-			wood : 100,
+		itemMaterials[ITEM_CROSSBOW] = Material({
+			wood : 150,
 			stone : 0,
+			iron : 150,
+			ducat : 100
+		});
+		
+		itemMaterials[ITEM_BALLISTA] = Material({
+			wood : 250,
+			stone : 0,
+			iron : 200,
+			ducat : 200
+		});
+		
+		itemMaterials[ITEM_CATAPULT] = Material({
+			wood : 250,
+			stone : 200,
 			iron : 100,
+			ducat : 200
+		});
+		
+		itemMaterials[ITEM_CAMEL] = Material({
+			wood : 150,
+			stone : 200,
+			iron : 250,
+			ducat : 300
+		});
+		
+		itemMaterials[ITEM_ELEPHANT] = Material({
+			wood : 200,
+			stone : 300,
+			iron : 300,
 			ducat : 300
 		});
 		
