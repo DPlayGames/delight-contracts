@@ -494,9 +494,9 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			// 원거리 유닛으로 특정 지역을 공격합니다.
 			else if (orders[i] == ORDER_RANGED_ATTACK) {
 				
-				// 이미 동일한 명령이 내려졌다면 거부합니다.
+				// 이미 공격 명령이 내려진 부대라면 거부합니다.
 				for (uint j = 0; j < i; j += 1) {
-					if (params1[j] == params1[i] && params2[j] == params2[i] && params3[j] == params3[i] && params4[j] == params4[i]) {
+					if (params1[j] == params1[i] && params2[j] == params2[i]) {
 						revert();
 					}
 				}
