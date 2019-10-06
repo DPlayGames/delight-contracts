@@ -650,7 +650,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 						
 						// If the unit's not a knight, adds the knight's buff HP.
 						// 기사가 아닌 경우 기사의 버프 HP를 추가합니다.
-						armyIds[UNIT_KNIGHT] != 0 ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
+						armyIds[UNIT_KNIGHT] != 0 && distance <= info.getUnitMovableDistance(UNIT_KNIGHT) ? KNIGHT_DEFAULT_BUFF_HP + knightItem.getItemBuffHP(armies[armyIds[UNIT_KNIGHT]].knightItemId) : 0
 					)
 					
 				).add(
