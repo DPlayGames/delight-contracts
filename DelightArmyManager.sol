@@ -744,6 +744,11 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 					delete armies[armyIds[i]];
 					delete armyIds[i];
 				}
+				
+				// 살아남은 부대원이 있으면, 그대로 공격 종료
+				else {
+					break;
+				}
 			}
 		}
 	}
