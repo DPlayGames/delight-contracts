@@ -53,242 +53,242 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 		
 		// Hephaestus' Hammer
 		createItem(KnightItem({
-			hp			: 500,
-			damage		: 250,
-			buffHP		: 20,
+			hp			: 200,
+			damage		: 50,
+			buffHP		: 10,
 			buffDamage	: 10
 		}));
 		
 		// Greek Shield
 		createItem(KnightItem({
-			hp			: 1000,
-			damage		: 170,
-			buffHP		: 50,
-			buffDamage	: 0
+			hp			: 500,
+			damage		: 30,
+			buffHP		: 10,
+			buffDamage	: 10
 		}));
 		
 		// Undead's Sword
 		createItem(KnightItem({
 			hp			: 200,
-			damage		: 350,
+			damage		: 200,
 			buffHP		: 0,
-			buffDamage	: 40
+			buffDamage	: 20
 		}));
 		
 		// Mace
 		createItem(KnightItem({
-			hp			: 400,
-			damage		: 200,
+			hp			: 100,
+			damage		: 50,
 			buffHP		: 30,
-			buffDamage	: 30
+			buffDamage	: 5
 		}));
 		
 		// Glass Sword
 		createItem(KnightItem({
-			hp			: 200,
-			damage		: 1750,
-			buffHP		: 30,
-			buffDamage	: 0
+			hp			: 50,
+			damage		: 350,
+			buffHP		: 10,
+			buffDamage	: 15
 		}));
 		
 		// Slaughter
 		createItem(KnightItem({
-			hp			: 500,
-			damage		: 0,
-			buffHP		: 35,
-			buffDamage	: 35
+			hp			: 100,
+			damage		: 400,
+			buffHP		: 25,
+			buffDamage	: 0
 		}));
 		
 		// Hel's Scythe
 		createItem(KnightItem({
 			hp			: 0,
-			damage		: 3000,
+			damage		: 1500,
 			buffHP		: 0,
 			buffDamage	: 0
 		}));
 		
 		// Laevateinn
 		createItem(KnightItem({
-			hp			: 1000,
-			damage		: 500,
-			buffHP		: 30,
-			buffDamage	: 40
+			hp			: 200,
+			damage		: 100,
+			buffHP		: 10,
+			buffDamage	: 15
 		}));
 		
 		// Crescent Spear
 		createItem(KnightItem({
-			hp			: 500,
-			damage		: 1000,
-			buffHP		: 50,
-			buffDamage	: 30
+			hp			: 200,
+			damage		: 200,
+			buffHP		: 30,
+			buffDamage	: 5
 		}));
 		
 		// Traitor Hero's Straight Sword
 		createItem(KnightItem({
-			hp			: 1000,
-			damage		: 750,
-			buffHP		: 15,
-			buffDamage	: 60
+			hp			: 2000,
+			damage		: 40,
+			buffHP		: 0,
+			buffDamage	: 0
 		}));
 		
 		// Rapier
 		createItem(KnightItem({
 			hp			: 0,
-			damage		: 1250,
+			damage		: 100,
 			buffHP		: 0,
-			buffDamage	: 110
+			buffDamage	: 30
 		}));
 		
 		// Hermes' Staff
 		createItem(KnightItem({
-			hp			: 2100,
+			hp			: 0,
 			damage		: 0,
-			buffHP		: 210,
+			buffHP		: 80,
 			buffDamage	: 0
 		}));
 		
 		// Ymir's Fragment
 		createItem(KnightItem({
-			hp			: 1100,
-			damage		: 575,
-			buffHP		: 110,
-			buffDamage	: 55
+			hp			: 500,
+			damage		: 120,
+			buffHP		: 25,
+			buffDamage	: 10
 		}));
 		
 		// Bone Axe of Typhon
 		createItem(KnightItem({
-			hp			: 1150,
-			damage		: 600,
-			buffHP		: 115,
-			buffDamage	: 57
+			hp			: 230,
+			damage		: 200,
+			buffHP		: 25,
+			buffDamage	: 10
 		}));
 		
 		// Hector's Sword
 		createItem(KnightItem({
-			hp			: 1000,
-			damage		: 730,
+			hp			: 400,
+			damage		: 150,
 			buffHP		: 0,
-			buffDamage	: 120
+			buffDamage	: 25
 		}));
 		
 		// Tyr's Claw
 		createItem(KnightItem({
 			hp			: 200,
-			damage		: 3400,
-			buffHP		: 125,
+			damage		: 900,
+			buffHP		: 25,
 			buffDamage	: 0
 		}));
 		
 		// Jormungand's Canine
 		createItem(KnightItem({
-			hp			: 1300,
-			damage		: 100,
-			buffHP		: 130,
-			buffDamage	: 77
+			hp			: 260,
+			damage		: 350,
+			buffHP		: 25,
+			buffDamage	: 15
 		}));
 		
 		// Kronos' Two Handed Axe
 		createItem(KnightItem({
-			hp			: 100,
-			damage		: 700,
-			buffHP		: 195,
+			hp			: 1250,
+			damage		: 140,
+			buffHP		: 40,
 			buffDamage	: 0
 		}));
 		
 		// Titan Sword
 		createItem(KnightItem({
-			hp			: 1400,
-			damage		: 725,
-			buffHP		: 140,
-			buffDamage	: 70
+			hp			: 500,
+			damage		: 150,
+			buffHP		: 30,
+			buffDamage	: 15
 		}));
 		
 		// Sword of Valhalla
 		createItem(KnightItem({
-			hp			: 200,
-			damage		: 750,
-			buffHP		: 20,
-			buffDamage	: 150
+			hp			: 50,
+			damage		: 300,
+			buffHP		: 5,
+			buffDamage	: 30
 		}));
 		
 		// Ancient God's Sword
 		createItem(KnightItem({
-			hp			: 1000,
-			damage		: 775,
-			buffHP		: 160,
-			buffDamage	: 75
+			hp			: 200,
+			damage		: 155,
+			buffHP		: 40,
+			buffDamage	: 15
 		}));
 		
 		// Triaina
 		createItem(KnightItem({
-			hp			: 500,
-			damage		: 1400,
-			buffHP		: 100,
-			buffDamage	: 100
+			hp			: 100,
+			damage		: 500,
+			buffHP		: 20,
+			buffDamage	: 20
 		}));
 		
 		// Helios' Sun Hammer
 		createItem(KnightItem({
-			hp			: 2500,
-			damage		: 200,
-			buffHP		: 220,
-			buffDamage	: 20
+			hp			: 1000,
+			damage		: 40,
+			buffHP		: 45,
+			buffDamage	: 5
 		}));
 		
 		// Heimdallr's Sword
 		createItem(KnightItem({
-			hp			: 1650,
-			damage		: 4200,
-			buffHP		: 165,
-			buffDamage	: 10
+			hp			: 330,
+			damage		: 840,
+			buffHP		: 35,
+			buffDamage	: 5
 		}));
 		
 		// Gungnir
 		createItem(KnightItem({
-			hp			: 3000,
-			damage		: 3520,
-			buffHP		: 20,
-			buffDamage	: 85
+			hp			: 500,
+			damage		: 700,
+			buffHP		: 5,
+			buffDamage	: 20
 		}));
 		
 		// Mistilteinn
 		createItem(KnightItem({
-			hp			: 250,
-			damage		: 6100,
-			buffHP		: 175,
+			hp			: 50,
+			damage		: 1100,
+			buffHP		: 35,
 			buffDamage	: 0
 		}));
 		
 		// Song of the Cherry Blossoms
 		createItem(KnightItem({
-			hp			: 1800,
-			damage		: 925,
-			buffHP		: 90,
-			buffDamage	: 270
+			hp			: 360,
+			damage		: 190,
+			buffHP		: 0,
+			buffDamage	: 40
 		}));
 		
 		// Oceanus' Axe
 		createItem(KnightItem({
-			hp			: 2800,
-			damage		: 450,
-			buffHP		: 400,
+			hp			: 560,
+			damage		: 90,
+			buffHP		: 80,
 			buffDamage	: 0
 		}));
 		
 		// Tyrfing
 		createItem(KnightItem({
-			hp			: 1900,
-			damage		: 975,
-			buffHP		: 300,
-			buffDamage	: 50
+			hp			: 300,
+			damage		: 250,
+			buffHP		: 60,
+			buffDamage	: 10
 		}));
 		
 		// Skull
 		createItem(KnightItem({
-			hp			: 2000,
-			damage		: 1000,
-			buffHP		: 200,
-			buffDamage	: 100
+			hp			: 400,
+			damage		: 200,
+			buffHP		: 40,
+			buffDamage	: 20
 		}));
 	}
 	
