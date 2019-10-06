@@ -655,8 +655,8 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 					
 				).add(
 					
-					// 병사 위치의 건물의 버프 HP를 가져옵니다.
-					buildingManager.getBuildingBuffHP(col, row)
+					// 이동 거리가 0일때만 병사 위치의 건물의 버프 HP를 가져옵니다.
+					distance == 0 ? buildingManager.getBuildingBuffHP(col, row) : 0
 				);
 				
 				// Calcultes the HPs of the friendly army.
