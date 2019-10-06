@@ -42,6 +42,9 @@ interface DelightBuildingManagerInterface {
 	// 특정 위치의 건물의 주인을 반환합니다.
 	function getPositionBuildingOwner(uint col, uint row) view external returns (address);
 	
+	// 소유주의 본부 ID들을 반환합니다.
+	function getOwnerHQIds(address owner) view external returns (uint[] memory);
+	
 	// 특정 위치의 건물의 버프 HP를 반환합니다.
 	function getBuildingBuffHP(uint col, uint row) view external returns (uint);
 	
