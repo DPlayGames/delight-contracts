@@ -103,8 +103,8 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		});
 		
 		units[UNIT_KNIGHT] = Unit({
-			hp : 500,
-			damage : 100,
+			hp : 200,
+			damage : 60,
 			movableDistance : 4,
 			attackableDistance : 0
 		});
@@ -132,22 +132,22 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		
 		buildingMaterials[BUILDING_TRAINING_CENTER] = Material({
 			wood : 300,
-			stone : 50,
-			iron : 100,
+			stone : 100,
+			iron : 0,
 			ducat : 100
 		});
 		
 		buildingMaterials[BUILDING_ARCHERY_RANGE] = Material({
 			wood : 200,
-			stone : 50,
-			iron : 200,
+			stone : 200,
+			iron : 0,
 			ducat : 200
 		});
 		
 		buildingMaterials[BUILDING_STABLE] = Material({
 			wood : 100,
-			stone : 50,
-			iron : 300,
+			stone : 300,
+			iron : 0,
 			ducat : 300
 		});
 		

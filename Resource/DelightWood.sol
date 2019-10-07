@@ -10,7 +10,7 @@ contract DelightWood is DelightResource {
 		
 		_name = "Delight Wood";
 		_symbol = "DW";
-		_totalSupply = 100000000;
+		_totalSupply = 40000000;
 		
 		balances[msg.sender] = _totalSupply;
 		emit Transfer(address(0), msg.sender, _totalSupply);

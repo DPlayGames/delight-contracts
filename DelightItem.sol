@@ -26,7 +26,7 @@ contract DelightItem is ERC20, ERC165, NetworkChecker {
 		}
 		
 		else if (network == Network.Kovan) {
-			dplayTradingPost = address(0x980f391C9C36BD6d95F5676dDfa7a3B414404570);
+			dplayTradingPost = address(0xA974d0537A5806ab5389007628E0A253d63e842F);
 		}
 		
 		else if (network == Network.Ropsten) {

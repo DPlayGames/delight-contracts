@@ -10,7 +10,7 @@ contract DelightStone is DelightResource {
 		
 		_name = "Delight Stone";
 		_symbol = "DS";
-		_totalSupply = 100000000;
+		_totalSupply = 30000000;
 		
 		balances[msg.sender] = _totalSupply;
 		emit Transfer(address(0), msg.sender, _totalSupply);
