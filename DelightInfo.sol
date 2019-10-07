@@ -159,9 +159,9 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		});
 		
 		unitMaterials[UNIT_KNIGHT] = Material({
-			wood : 0,
-			stone : 0,
-			iron : 300,
+			wood : 100,
+			stone : 100,
+			iron : 100,
 			ducat : 1000
 		});
 		
@@ -173,9 +173,9 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		});
 		
 		unitMaterials[UNIT_ARCHER] = Material({
-			wood : 50,
+			wood : 100,
 			stone : 0,
-			iron : 100,
+			iron : 50,
 			ducat : 100
 		});
 		
@@ -189,64 +189,64 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 		itemMaterials[ITEM_AXE] = Material({
 			wood : 50,
 			stone : 0,
-			iron : 250,
-			ducat : 100
+			iron : 50,
+			ducat : 0
 		});
 		
 		itemMaterials[ITEM_SPEAR] = Material({
 			wood : 75,
 			stone : 0,
-			iron : 225,
-			ducat : 100
+			iron : 25,
+			ducat : 0
 		});
 		
 		itemMaterials[ITEM_SHIELD] = Material({
 			wood : 0,
 			stone : 0,
-			iron : 300,
-			ducat : 100
+			iron : 100,
+			ducat : 0
 		});
 		
 		itemMaterials[ITEM_HOOD] = Material({
 			wood : 0,
 			stone : 0,
-			iron : 200,
-			ducat : 200
+			iron : 0,
+			ducat : 100
 		});
 		
 		itemMaterials[ITEM_CROSSBOW] = Material({
 			wood : 150,
 			stone : 0,
-			iron : 150,
-			ducat : 100
+			iron : 0,
+			ducat : 0
 		});
 		
 		itemMaterials[ITEM_BALLISTA] = Material({
-			wood : 250,
-			stone : 0,
-			iron : 200,
-			ducat : 200
+			wood : 300,
+			stone : 100,
+			iron : 0,
+			ducat : 100
 		});
 		
 		itemMaterials[ITEM_CATAPULT] = Material({
-			wood : 250,
+			wood : 200,
 			stone : 200,
-			iron : 100,
-			ducat : 200
+			iron : 0,
+			ducat : 100
 		});
 		
 		itemMaterials[ITEM_CAMEL] = Material({
-			wood : 150,
+			wood : 50,
 			stone : 200,
-			iron : 250,
-			ducat : 300
+			iron : 50,
+			ducat : 0
 		});
 		
 		itemMaterials[ITEM_ELEPHANT] = Material({
-			wood : 200,
+			wood : 100,
 			stone : 300,
-			iron : 300,
-			ducat : 300
+			iron : 100,
+			ducat : 0
 		});
 		
 		unitMaterials[UNIT_AXEMAN] = Material({
