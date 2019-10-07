@@ -12,7 +12,7 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 	// Material information
 	// 재료 정보
 	mapping(uint => Material) private buildingMaterials;
-	mapping(uint => Material) private hpUpgradeMaterials;
+	mapping(uint => Material) private hqUpgradeMaterials;
 	mapping(uint => Material) private unitMaterials;
 	mapping(uint => Material) private itemMaterials;
 	
@@ -116,14 +116,14 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 			ducat : 100
 		});
 		
-		hpUpgradeMaterials[1] = Material({
+		hqUpgradeMaterials[1] = Material({
 			wood : 0,
 			stone : 400,
 			iron : 0,
 			ducat : 100
 		});
 		
-		hpUpgradeMaterials[2] = Material({
+		hqUpgradeMaterials[2] = Material({
 			wood : 0,
 			stone : 0,
 			iron : 400,
@@ -323,10 +323,10 @@ contract DelightInfo is DelightInfoInterface, DelightBase {
 	function getBuildingMaterialIron	(uint kind) view external returns (uint) { return buildingMaterials[kind].iron; }
 	function getBuildingMaterialDucat	(uint kind) view external returns (uint) { return buildingMaterials[kind].ducat; }
 	
-	function getHQUpgradeMaterialWood	(uint level) view external returns (uint) { return hpUpgradeMaterials[level].wood; }
-	function getHQUpgradeMaterialStone	(uint level) view external returns (uint) { return hpUpgradeMaterials[level].stone; }
-	function getHQUpgradeMaterialIron	(uint level) view external returns (uint) { return hpUpgradeMaterials[level].iron; }
-	function getHQUpgradeMaterialDucat	(uint level) view external returns (uint) { return hpUpgradeMaterials[level].ducat; }
+	function getHQUpgradeMaterialWood	(uint level) view external returns (uint) { return hqUpgradeMaterials[level].wood; }
+	function getHQUpgradeMaterialStone	(uint level) view external returns (uint) { return hqUpgradeMaterials[level].stone; }
+	function getHQUpgradeMaterialIron	(uint level) view external returns (uint) { return hqUpgradeMaterials[level].iron; }
+	function getHQUpgradeMaterialDucat	(uint level) view external returns (uint) { return hqUpgradeMaterials[level].ducat; }
 	
 	function getUnitMaterialWood	(uint kind) view external returns (uint) { return unitMaterials[kind].wood; }
 	function getUnitMaterialStone	(uint kind) view external returns (uint) { return unitMaterials[kind].stone; }
