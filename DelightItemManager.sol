@@ -38,19 +38,19 @@ contract DelightItemManager is DelightManager {
 			
 			// Items
 			// 아이템
-			axe			= DelightItem(0x44058C886De6aA98509eb9e39dDbd3F4B0f02789);
-			ballista	= DelightItem(0x8929Df3A65460fE4A9c3733Af32712A17AD94f4d);
-			camel		= DelightItem(0xE3601FA7413a0bB3B7Bc871781AAfD60935A4f99);
-			catapult	= DelightItem(0xc8BE966187f9a18cacF382e22271Bca4780B1019);
-			crossbow	= DelightItem(0x0596Bd343348184691F97bB98002f17C9b61A19f);
-			elephant	= DelightItem(0xb14bcf83Bf25c6634e57A8a366f39dd5Da1eFe51);
-			hood		= DelightItem(0x3bd90D9cde2330B7Bd440b4Fc02A840e383D4beE);
-			shield		= DelightItem(0x590692bE210e656D43B0e6B57C1c2ae4129CD514);
-			spear		= DelightItem(0xdA7525147ae86153Bf6F0d23E791bAAe23a5A6d4);
+			axe			= DelightItem(0xCB087957434974928f48c46a32710059c6F92908);
+			ballista	= DelightItem(0x3F6b54c0470680AFB298B48f03A68CC21534D614);
+			camel		= DelightItem(0x4D60762E02834675A40F4f1921E2e42B4a40bE6D);
+			catapult	= DelightItem(0xea12fca55F29932C0D5b3b5bF94e3405C6dd8F72);
+			crossbow	= DelightItem(0x52Da9c7b5043fC695Ae4700E42a011BA7795C519);
+			elephant	= DelightItem(0x42eFE39f11C5e3c007985Ddc9205C7463cC2FF22);
+			hood		= DelightItem(0x7Df18560E114469F29d89F649bB76CB59F715ef1);
+			shield		= DelightItem(0x62bb37A414708E52481288509A8Dd7f407B8b59a);
+			spear		= DelightItem(0xbFa014B0078990B667a6679E5C41440E13398ec1);
 			
 			// Knight item
 			// 기사 아이템
-			knightItem	= DelightKnightItemInterface(0x0dA6E4186334D8d1af99C42F50255afe14553098);
+			knightItem	= DelightKnightItemInterface(0x53b5EA3bf75C26c0eFFb5458C871e53466Ae36f5);
 		}
 		
 		else if (network == Network.Ropsten) {
