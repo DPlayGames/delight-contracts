@@ -261,7 +261,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	
 	// Army moves and attacks if there's enemy in the destination tile.
 	// 부대를 이동시키고, 해당 지역에 적이 있으면 공격합니다.
-	function moveAndAttack(uint fromCol, uint fromRow, uint toCol, uint toRow, Record memory record) private {
+	function moveAndAttack(uint fromCol, uint fromRow, uint toCol, uint toRow, Record memory record, uint distance, uint retryCount) private {
 		
 		// 위치가 달라야 합니다.
 		require(fromCol != toCol || fromRow != toRow);
@@ -273,10 +273,8 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 		// 부대의 소유주인지 확인합니다.
 		require(msg.sender == armyManager.getPositionOwner(fromCol, fromRow));
 		
-		address enemy = armyManager.getPositionOwner(toCol, toRow);
-		
 		// 아무도 없는 곳이거나 아군이면 부대를 이동시킵니다.
-		if (enemy == address(0) || enemy == msg.sender) {
+		if (record.enemy == address(0) || record.enemy == msg.sender) {
 			armyManager.moveArmy(fromCol, fromRow, toCol, toRow);
 			
 			// 적군의 건물이 존재하면 파괴합니다.
@@ -295,27 +293,17 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			lastAttackCol = toCol;
 			lastAttackRow = toRow;
 			
-			// Calculates the distance.
-			// 거리 계산
-			uint distance = (fromCol < toCol ? toCol - fromCol : fromCol - toCol) + (fromRow < toRow ? toRow - fromRow : fromRow - toRow);
-			
 			uint totalDamage = getTotalDamage(distance, armyManager.getPositionArmyIds(fromCol, fromRow), buildingManager.getBuildingBuffDamage(fromCol, fromRow));
 			uint totalEnemyDamage = getTotalDamage(0, armyManager.getPositionArmyIds(toCol, toRow), buildingManager.getBuildingBuffDamage(toCol, toRow));
 			
 			uint kill = armyManager.attack(history.length, totalDamage, 0, toCol, toRow);
 			uint death = armyManager.attack(history.length, totalEnemyDamage, distance, fromCol, fromRow);
 			
-			record.enemy = enemy;
 			record.kill = record.kill.add(kill);
 			record.death = record.death.add(death);
 			
 			// 아무 변화가 없는 경우에는 공격자가 유리합니다. (상대의 남아있는 병력을 모두 제거합니다.)
 			if (kill == 0 && death == 0) {
-				
-				record.kill = record.kill.add(armyManager.attack(history.length, ~uint(0), 0, toCol, toRow));
-				
-				armyManager.moveArmy(fromCol, fromRow, toCol, toRow);
-				armyManager.destroyBuilding(history.length, toCol, toRow);
 				armyManager.win(history.length, msg.sender);
 				record.isWin = true;
 			}
@@ -323,8 +311,16 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			// 한번의 공격으로 전투가 끝나지 않았을 때
 			else if (armyManager.getTotalUnitCount(distance, fromCol, fromRow) > 0 && armyManager.getTotalUnitCount(0, toCol, toRow) > 0) {
 				
+				// 재시도 횟수가 5번을 초과한 경우, 공격자가 승리합니다.
+				if (retryCount == 5) {
+					armyManager.win(history.length, msg.sender);
+					record.isWin = true;
+				}
+				
 				// 재공격
-				moveAndAttack(fromCol, fromRow, toCol, toRow, record);
+				else {
+					moveAndAttack(fromCol, fromRow, toCol, toRow, record, distance, retryCount + 1);
+				}
 			}
 			
 			// If the enemy building is captured, move the soldiers.
@@ -339,7 +335,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			// enemy won
 			// 상대가 승리했습니다.
 			else {
-				armyManager.win(history.length, enemy);
+				armyManager.win(history.length, record.enemy);
 			}
 		}
 	}
@@ -487,7 +483,13 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			// Armies move and attack.
 			// 부대를 이동시키고, 해당 지역에 적이 있으면 공격합니다.
 			else if (orders[i] == ORDER_MOVE_AND_ATTACK) {
-				moveAndAttack(params1[i], params2[i], params3[i], params4[i], record);
+				
+				// 거리 계산 (재전투 시 중복 계산을 방지하기 위해 여기서 계산합니다.)
+				uint distance = (params1[i] < params3[i] ? params3[i] - params1[i] : params1[i] - params3[i]) + (params2[i] < params4[i] ? params4[i] - params2[i] : params2[i] - params4[i]);
+				
+				record.enemy = armyManager.getPositionOwner(params3[i], params4[i]);
+				
+				moveAndAttack(params1[i], params2[i], params3[i], params4[i], record, distance, 0);
 			}
 			
 			// Ranged units attack given tiles.
