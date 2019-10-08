@@ -360,10 +360,10 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 					
 					// Adds the returned material.
 					// 반환할 재료를 추가합니다.
-					wood = wood.add(info.getHQUpgradeMaterialWood(buildingKind));
-					stone = stone.add(info.getHQUpgradeMaterialStone(buildingKind));
-					iron = iron.add(info.getHQUpgradeMaterialIron(buildingKind));
-					ducat = ducat.add(info.getHQUpgradeMaterialDucat(buildingKind));
+					wood = wood.add(info.getHQUpgradeMaterialWood(i));
+					stone = stone.add(info.getHQUpgradeMaterialStone(i));
+					iron = iron.add(info.getHQUpgradeMaterialIron(i));
+					ducat = ducat.add(info.getHQUpgradeMaterialDucat(i));
 				}
 			}
 			
