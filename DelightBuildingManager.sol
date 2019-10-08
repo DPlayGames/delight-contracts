@@ -188,8 +188,8 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 		
 		// 만약 월드에 본부가 아예 없는 경우, 처음 짓는 곳 주변에 적군의 건물이 존재하면 안됩니다.
 		if (ownerToHQIds[owner].length == 0) {
-			for (uint i = (col <= 3 ? 0 : col - 3); i < (col >= 97 ? 100 : col + 3); i += 1) {
-				for (uint j = (row <= 3 ? 0 : row - 3); j < (row >= 97 ? 100 : row + 3); j += 1) {
+			for (uint i = (col <= 3 ? 0 : col - 3); i <= (col >= 96 ? 99 : col + 3); i += 1) {
+				for (uint j = (row <= 3 ? 0 : row - 3); j <= (row >= 96 ? 99 : row + 3); j += 1) {
 					require(positionToBuildingId[i][j] == 0 || buildings[positionToBuildingId[i][j]].owner == owner);
 				}
 			}
