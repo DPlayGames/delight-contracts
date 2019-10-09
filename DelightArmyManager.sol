@@ -32,22 +32,31 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	constructor() DelightManager() public {
 		
 		if (network == Network.Mainnet) {
-			//TODO
+			
+			// Knight item.
+			// 기사 아이템
+			knightItem = DelightKnightItemInterface(0x0);
 		}
 		
 		else if (network == Network.Kovan) {
 			
 			// Knight item.
 			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x53b5EA3bf75C26c0eFFb5458C871e53466Ae36f5);
+			knightItem = DelightKnightItemInterface(0xcaF1daACDC81F78b58BE9e48dC2585F2952dd8B9);
 		}
 		
 		else if (network == Network.Ropsten) {
-			//TODO
+			
+			// Knight item.
+			// 기사 아이템
+			knightItem = DelightKnightItemInterface(0xeF7cb3ac85E3b15CF3004a3Ea89e26DFAFb9D371);
 		}
 		
 		else if (network == Network.Rinkeby) {
-			//TODO
+			
+			// Knight item.
+			// 기사 아이템
+			knightItem = DelightKnightItemInterface(0x7bAD16534354FDFd0B020f54237eE4F61fB03726);
 		}
 		
 		else {
@@ -196,7 +205,7 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 		
 		// The total number of units in the building's tile must not exceed the maximum unit number.
 		// 건물이 위치한 곳의 총 유닛 숫자가 최대 유닛 수를 넘기면 안됩니다.
-		require(getTotalUnitCount(0, col, row).add(unitKind) <= MAX_POSITION_UNIT_COUNT);
+		require(getTotalUnitCount(0, col, row).add(unitCount) <= MAX_POSITION_UNIT_COUNT);
 		
 		// 기사는 하나 이상 생성할 수 없습니다.
 		require(unitKind != UNIT_KNIGHT || unitCount == 1);
@@ -482,12 +491,6 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				
 				army.unitCount = army.unitCount.sub(movableUnitCount);
 				
-				// 기존 부대원이 남아있지 않으면 제거합니다.
-				if (army.unitCount == 0) {
-					delete armyIds[army.unitKind];
-					delete armies[armyId];
-				}
-				
 				// 이벤트 발생
 				emit CreateArmy(targetArmyIds[army.unitKind]);
 			}
@@ -501,16 +504,16 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 				
 				targetArmy.unitCount = targetArmy.unitCount.add(movableUnitCount);
 				army.unitCount = army.unitCount.sub(movableUnitCount);
-				
-				// 기존 부대원이 남아있지 않으면 제거합니다.
-				if (army.unitCount == 0) {
-					delete armyIds[army.unitKind];
-					delete armies[armyId];
-				}
 			}
 			
 			// 이벤트 발생
 			emit MergeArmy(armyId, targetArmyIds[army.unitKind], movableUnitCount);
+			
+			// 기존 부대원이 남아있지 않으면 제거합니다.
+			if (army.unitCount == 0) {
+				delete armyIds[army.unitKind];
+				delete armies[armyId];
+			}
 		}
 		
 		// 모든 유닛 이동

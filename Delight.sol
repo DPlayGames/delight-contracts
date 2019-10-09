@@ -37,32 +37,71 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	constructor() NetworkChecker() public {
 		
 		if (network == Network.Mainnet) {
-			//TODO
+			
+			// information
+			// 정보
+			info = DelightInfoInterface(0x0);
+			
+			// knight item
+			// 기사 아이템
+			knightItem = DelightKnightItemInterface(0x0);
+			
+			// managers
+			// 관리자들
+			buildingManager	= DelightBuildingManager(0x0);
+			armyManager		= DelightArmyManager(0x0);
+			itemManager		= DelightItemManager(0x0);
 		}
 		
 		else if (network == Network.Kovan) {
 			
 			// information
 			// 정보
-			info = DelightInfoInterface(0x5c0a567F5E1606B338735243ddd74041F30E3c8e);
+			info = DelightInfoInterface(0x5b17bB8500702aa394989B8db53D348897900EF6);
 			
 			// knight item
 			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x53b5EA3bf75C26c0eFFb5458C871e53466Ae36f5);
+			knightItem = DelightKnightItemInterface(0xcaF1daACDC81F78b58BE9e48dC2585F2952dd8B9);
 			
 			// managers
 			// 관리자들
-			buildingManager	= DelightBuildingManager(0x7Aa710Fb47E39C8e905eB137888A688bDe186B87);
-			armyManager		= DelightArmyManager(0xC5915AA0eE50624f10c9616F2681e41930A69694);
-			itemManager		= DelightItemManager(0xd01fe8A7A18410F9244BBfb017e55baD6B1d907A);
+			buildingManager	= DelightBuildingManager(0xa1BD161dE8B6dAab0C78D0E5084FBEaE19A57f7F);
+			armyManager		= DelightArmyManager(0x0210245083e467aBEbB88040847ce1008848C531);
+			itemManager		= DelightItemManager(0xE7291Fd1A006E7AB6D0d163aCb571B53D1c8E269);
 		}
 		
 		else if (network == Network.Ropsten) {
-			//TODO
+			
+			// information
+			// 정보
+			info = DelightInfoInterface(0x25f0A1da6dD8D161378cf738D422a66Ecd286881);
+			
+			// knight item
+			// 기사 아이템
+			knightItem = DelightKnightItemInterface(0xeF7cb3ac85E3b15CF3004a3Ea89e26DFAFb9D371);
+			
+			// managers
+			// 관리자들
+			buildingManager	= DelightBuildingManager(0x45bd2E95b038489Fc8DfB2107fE507b8404BC533);
+			armyManager		= DelightArmyManager(0xDCcd52b4634C0f3eb9C47b4270F1a4CF5570F086);
+			itemManager		= DelightItemManager(0x1aC312F8d1b2e54402A825836924757af386dfA9);
 		}
 		
 		else if (network == Network.Rinkeby) {
-			//TODO
+			
+			// information
+			// 정보
+			info = DelightInfoInterface(0x8711670B68FAC7a47b1232E87Fa62cdAeb6040E4);
+			
+			// knight item
+			// 기사 아이템
+			knightItem = DelightKnightItemInterface(0x7bAD16534354FDFd0B020f54237eE4F61fB03726);
+			
+			// managers
+			// 관리자들
+			buildingManager	= DelightBuildingManager(0x715955ADaC3b3BEd43bCA07A72913Bc9753770eF);
+			armyManager		= DelightArmyManager(0x581B746f4603a648902aCd64F159d3B901C01cD4);
+			itemManager		= DelightItemManager(0x763EaA87Be84B404C5F1b6C56f80e544C8Ff4810);
 		}
 		
 		else {
@@ -302,7 +341,7 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			record.kill = record.kill.add(kill);
 			record.death = record.death.add(death);
 			
-			// 아무 변화가 없는 경우에는 공격자가 유리합니다. (상대의 남아있는 병력을 모두 제거합니다.)
+			// 아무 변화가 없는 경우에는 공격자가 승리합니다.
 			if (kill == 0 && death == 0) {
 				armyManager.win(history.length, msg.sender);
 				record.isWin = true;
@@ -496,9 +535,9 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			// 원거리 유닛으로 특정 지역을 공격합니다.
 			else if (orders[i] == ORDER_RANGED_ATTACK) {
 				
-				// 이미 공격 명령이 내려진 부대라면 거부합니다.
+				// 이미 원거리 공격 명령이 내려진 부대라면 거부합니다.
 				for (uint j = 0; j < i; j += 1) {
-					if (params1[j] == params1[i] && params2[j] == params2[i]) {
+					if (orders[j] == ORDER_RANGED_ATTACK && params1[j] == params1[i] && params2[j] == params2[i]) {
 						revert();
 					}
 				}

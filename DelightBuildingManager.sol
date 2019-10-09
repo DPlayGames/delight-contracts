@@ -342,13 +342,15 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 				
 				uint[] storage hqIds = ownerToHQIds[building.owner];
 				
-				for (uint i = hqIds.length - 1; i > 0; i -= 1) {
+				for (uint i = 0; i < hqIds.length - 1; i += 1) {
 					
-					if (hqIds[i - 1] == buildingId) {
-						hqIds[i - 1] = hqIds[i];
+					if (hqIds[i] == buildingId) {
+						
+						for (; i < hqIds.length - 1; i += 1) {
+							hqIds[i] = hqIds[i + 1];
+						}
+						
 						break;
-					} else {
-						hqIds[i - 1] = hqIds[i];
 					}
 				}
 				

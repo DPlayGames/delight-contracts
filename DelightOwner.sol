@@ -18,21 +18,27 @@ contract DelightOwner is DelightOwnerInterface, DelightBase, NetworkChecker {
 	constructor() NetworkChecker() public {
 		
 		if (network == Network.Mainnet) {
-			//TODO
+			delight			= DelightInterface(0x0);
+			buildingManager	= DelightBuildingManagerInterface(0x0);
+			armyManager		= DelightArmyManagerInterface(0x0);
 		}
 		
 		else if (network == Network.Kovan) {
-			delight			= DelightInterface(0x27F2a3E520A8aBd0675a88de6F057994e14Cbb9C);
-			buildingManager	= DelightBuildingManagerInterface(0x7Aa710Fb47E39C8e905eB137888A688bDe186B87);
-			armyManager		= DelightArmyManagerInterface(0xC5915AA0eE50624f10c9616F2681e41930A69694);
+			delight			= DelightInterface(0xddD4afA1a399099BA6D8841dbbDC57085420c098);
+			buildingManager	= DelightBuildingManagerInterface(0xa1BD161dE8B6dAab0C78D0E5084FBEaE19A57f7F);
+			armyManager		= DelightArmyManagerInterface(0x0210245083e467aBEbB88040847ce1008848C531);
 		}
 		
 		else if (network == Network.Ropsten) {
-			//TODO
+			delight			= DelightInterface(0x672e0a733a7076Fe5cd9B500785e2172cCD6394D);
+			buildingManager	= DelightBuildingManagerInterface(0x45bd2E95b038489Fc8DfB2107fE507b8404BC533);
+			armyManager		= DelightArmyManagerInterface(0xDCcd52b4634C0f3eb9C47b4270F1a4CF5570F086);
 		}
 		
 		else if (network == Network.Rinkeby) {
-			//TODO
+			delight			= DelightInterface(0xac399eBfEd4C2f73e31a578FCb3b09Ae80BDeC30);
+			buildingManager	= DelightBuildingManagerInterface(0x715955ADaC3b3BEd43bCA07A72913Bc9753770eF);
+			armyManager		= DelightArmyManagerInterface(0x581B746f4603a648902aCd64F159d3B901C01cD4);
 		}
 		
 		else {
