@@ -34,19 +34,19 @@ contract DelightItemManager is DelightManager {
 			
 			// Items
 			// 아이템
-			axe			= DelightItem(0x0);
-			ballista	= DelightItem(0x0);
-			camel		= DelightItem(0x0);
-			catapult	= DelightItem(0x0);
-			crossbow	= DelightItem(0x0);
-			elephant	= DelightItem(0x0);
-			hood		= DelightItem(0x0);
-			shield		= DelightItem(0x0);
-			spear		= DelightItem(0x0);
+			axe			= DelightItem(0x619c0f7d056fa205cff28f5B091f64e3Dc127D2B);
+			ballista	= DelightItem(0x3B49ABF046bBf43A2E778cB9EB74792B98F2969f);
+			camel		= DelightItem(0x439F27Eb7352Ad797256A584316dc076A1eFCd78);
+			catapult	= DelightItem(0x62F2eD69a7a3919A770a0E863d6D20f1fA93B368);
+			crossbow	= DelightItem(0x7c4520E4572bef267b2d511aa155Ef5D7ED7DC2A);
+			elephant	= DelightItem(0x57e48A94A7AdaF15e2dCF8521e9D29a714B0B45F);
+			hood		= DelightItem(0x6B23D0A2aC73834c72A6d7b3cDF933D06A4b376A);
+			shield		= DelightItem(0x41eA181C8aA43339675d036Fe09F4907c1c5b1D9);
+			spear		= DelightItem(0x27F2C83Ad7dd2B538170491Bd657017486945c30);
 			
 			// Knight item
 			// 기사 아이템
-			knightItem	= DelightKnightItemInterface(0x0);
+			knightItem	= DelightKnightItemInterface(0x79078dDe3b55d2dCAd5e5a4Aa84F08FB7d25368a);
 		}
 		
 		else if (network == Network.Kovan) {

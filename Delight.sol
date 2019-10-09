@@ -40,17 +40,17 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 			
 			// information
 			// 정보
-			info = DelightInfoInterface(0x0);
+			info = DelightInfoInterface(0x7e04BedFd6721589f5557385063cf07Ce40262e3);
 			
 			// knight item
 			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x0);
+			knightItem = DelightKnightItemInterface(0x79078dDe3b55d2dCAd5e5a4Aa84F08FB7d25368a);
 			
 			// managers
 			// 관리자들
-			buildingManager	= DelightBuildingManager(0x0);
-			armyManager		= DelightArmyManager(0x0);
-			itemManager		= DelightItemManager(0x0);
+			buildingManager	= DelightBuildingManager(0xb76333a236F95fBf203b70Cf67e124a6B3b61E4a);
+			armyManager		= DelightArmyManager(0x867042C3CcB398A0aFCB58310848Dd156F9e5db0);
+			itemManager		= DelightItemManager(0xc8b9aa7DC77BDC5C688035d8445047d604E0EA21);
 		}
 		
 		else if (network == Network.Kovan) {

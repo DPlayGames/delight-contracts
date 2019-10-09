@@ -34,22 +34,22 @@ contract DelightTradingPost is DelightTradingPostInterface, NetworkChecker {
 		
 		if (network == Network.Mainnet) {
 			
-			wood	= address(0x0);
-			stone	= address(0x0);
-			iron	= address(0x0);
-			ducat	= address(0x0);
+			wood	= address(0x8c804fB79fBD54c333aDBee39F55624C40eC4bE6);
+			stone	= address(0x65AA2BaaE7a71C3012E114C90834339a26719508);
+			iron	= address(0xE9Df44e3b7f3a2DC179237ddD5E104Ff69Db3C9D);
+			ducat	= address(0x664F414d84Cf88a377F4B116273A327e3b6D9ffB);
 			
-			axe			= address(0x0);
-			ballista	= address(0x0);
-			camel		= address(0x0);
-			catapult	= address(0x0);
-			crossbow	= address(0x0);
-			elephant	= address(0x0);
-			hood		= address(0x0);
-			shield		= address(0x0);
-			spear		= address(0x0);
+			axe			= address(0x619c0f7d056fa205cff28f5B091f64e3Dc127D2B);
+			ballista	= address(0x3B49ABF046bBf43A2E778cB9EB74792B98F2969f);
+			camel		= address(0x439F27Eb7352Ad797256A584316dc076A1eFCd78);
+			catapult	= address(0x62F2eD69a7a3919A770a0E863d6D20f1fA93B368);
+			crossbow	= address(0x7c4520E4572bef267b2d511aa155Ef5D7ED7DC2A);
+			elephant	= address(0x57e48A94A7AdaF15e2dCF8521e9D29a714B0B45F);
+			hood		= address(0x6B23D0A2aC73834c72A6d7b3cDF933D06A4b376A);
+			shield		= address(0x41eA181C8aA43339675d036Fe09F4907c1c5b1D9);
+			spear		= address(0x27F2C83Ad7dd2B538170491Bd657017486945c30);
 			
-			delightKnightItem = address(0x0);
+			delightKnightItem = address(0x79078dDe3b55d2dCAd5e5a4Aa84F08FB7d25368a);
 			
 			dplayTradingPost = DPlayTradingPostInterface(0x6242C1f2a80420576e14F239C9500Fc39438E880);
 		}

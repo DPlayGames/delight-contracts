@@ -29,27 +29,27 @@ ERC-721
 - Delight Item Manager에 주소 추가
 
 # Mainnet 스마트 계약 주소들
-- DelightInfo: 
-- DelightWood: 
-- DelightStone: 
-- DelightIron: 
-- DelightDucat: 
-- DelightAxe: 
-- DelightBallista: 
-- DelightCamel: 
-- DelightCatapult: 
-- DelightCrossbow: 
-- DelightElephant: 
-- DelightHood: 
-- DelightShield: 
-- DelightSpear: 
-- DelightKnightItem: 
-- DelightBuildingManager: 
-- DelightArmyManager: 
-- DelightItemManager: 
-- Delight: 
-- DelightOwner: 
-- DelightTradingPost: 
+- DelightInfo: 0x7e04BedFd6721589f5557385063cf07Ce40262e3
+- DelightWood: 0x8c804fB79fBD54c333aDBee39F55624C40eC4bE6
+- DelightStone: 0x65AA2BaaE7a71C3012E114C90834339a26719508
+- DelightIron: 0xE9Df44e3b7f3a2DC179237ddD5E104Ff69Db3C9D
+- DelightDucat: 0x664F414d84Cf88a377F4B116273A327e3b6D9ffB
+- DelightAxe: 0x619c0f7d056fa205cff28f5B091f64e3Dc127D2B
+- DelightBallista: 0x3B49ABF046bBf43A2E778cB9EB74792B98F2969f
+- DelightCamel: 0x439F27Eb7352Ad797256A584316dc076A1eFCd78
+- DelightCatapult: 0x62F2eD69a7a3919A770a0E863d6D20f1fA93B368
+- DelightCrossbow: 0x7c4520E4572bef267b2d511aa155Ef5D7ED7DC2A
+- DelightElephant: 0x57e48A94A7AdaF15e2dCF8521e9D29a714B0B45F
+- DelightHood: 0x6B23D0A2aC73834c72A6d7b3cDF933D06A4b376A
+- DelightShield: 0x41eA181C8aA43339675d036Fe09F4907c1c5b1D9
+- DelightSpear: 0x27F2C83Ad7dd2B538170491Bd657017486945c30
+- DelightKnightItem: 0x79078dDe3b55d2dCAd5e5a4Aa84F08FB7d25368a
+- DelightBuildingManager: 0xb76333a236F95fBf203b70Cf67e124a6B3b61E4a
+- DelightArmyManager: 0x867042C3CcB398A0aFCB58310848Dd156F9e5db0
+- DelightItemManager: 0xc8b9aa7DC77BDC5C688035d8445047d604E0EA21
+- Delight: 0xE03DdC8BBE2C230563Eafe8bc0Ae797E52923645
+- DelightOwner: 0x61376f27cDBC00732173b0De9a8417e6562A386e
+- DelightTradingPost: 0x48A5151Fd06bCe190b5F9a578039396969287505
 
 # Kovan 스마트 계약 주소들
 - DelightInfo: 0x5b17bB8500702aa394989B8db53D348897900EF6

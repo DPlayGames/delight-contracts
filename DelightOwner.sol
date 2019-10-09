@@ -18,9 +18,9 @@ contract DelightOwner is DelightOwnerInterface, DelightBase, NetworkChecker {
 	constructor() NetworkChecker() public {
 		
 		if (network == Network.Mainnet) {
-			delight			= DelightInterface(0x0);
-			buildingManager	= DelightBuildingManagerInterface(0x0);
-			armyManager		= DelightArmyManagerInterface(0x0);
+			delight			= DelightInterface(0xE03DdC8BBE2C230563Eafe8bc0Ae797E52923645);
+			buildingManager	= DelightBuildingManagerInterface(0xb76333a236F95fBf203b70Cf67e124a6B3b61E4a);
+			armyManager		= DelightArmyManagerInterface(0x867042C3CcB398A0aFCB58310848Dd156F9e5db0);
 		}
 		
 		else if (network == Network.Kovan) {
