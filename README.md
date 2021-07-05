@@ -11,6 +11,7 @@
 ERC-721
 
 ## 스마트 계약 배포 순서
+- DPlay Trading Post
 - Delight Info
 - Delight Resource들
 - Delight Item들
@@ -21,12 +22,6 @@ ERC-721
 - Delight
 - Delight Owner
 - Delight Trading Post
-- Delight Resource들에 주소 추가
-- Delight Item들에 주소 추가
-- Delight Knight Item에 주소 추가
-- Delight Building Manager에 주소 추가
-- Delight Army Manager에 주소 추가
-- Delight Item Manager에 주소 추가
 
 # Mainnet 스마트 계약 주소들
 - DelightInfo: 0x7e04BedFd6721589f5557385063cf07Ce40262e3
