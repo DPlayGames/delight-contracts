@@ -5,45 +5,23 @@ import "./DelightBase.sol";
 import "./DelightInterface.sol";
 import "./DelightBuildingManagerInterface.sol";
 import "./DelightArmyManagerInterface.sol";
-import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
-contract DelightOwner is DelightOwnerInterface, DelightBase, NetworkChecker {
+contract DelightOwner is DelightOwnerInterface, DelightBase {
 	using SafeMath for uint;
 	
 	DelightInterface private delight;
 	DelightBuildingManagerInterface private buildingManager;
 	DelightArmyManagerInterface private armyManager;
 	
-	constructor() NetworkChecker() public {
-		
-		if (network == Network.Mainnet) {
-			delight			= DelightInterface(0xE03DdC8BBE2C230563Eafe8bc0Ae797E52923645);
-			buildingManager	= DelightBuildingManagerInterface(0xb76333a236F95fBf203b70Cf67e124a6B3b61E4a);
-			armyManager		= DelightArmyManagerInterface(0x867042C3CcB398A0aFCB58310848Dd156F9e5db0);
-		}
-		
-		else if (network == Network.Kovan) {
-			delight			= DelightInterface(0xddD4afA1a399099BA6D8841dbbDC57085420c098);
-			buildingManager	= DelightBuildingManagerInterface(0xa1BD161dE8B6dAab0C78D0E5084FBEaE19A57f7F);
-			armyManager		= DelightArmyManagerInterface(0x0210245083e467aBEbB88040847ce1008848C531);
-		}
-		
-		else if (network == Network.Ropsten) {
-			delight			= DelightInterface(0x672e0a733a7076Fe5cd9B500785e2172cCD6394D);
-			buildingManager	= DelightBuildingManagerInterface(0x45bd2E95b038489Fc8DfB2107fE507b8404BC533);
-			armyManager		= DelightArmyManagerInterface(0xDCcd52b4634C0f3eb9C47b4270F1a4CF5570F086);
-		}
-		
-		else if (network == Network.Rinkeby) {
-			delight			= DelightInterface(0xac399eBfEd4C2f73e31a578FCb3b09Ae80BDeC30);
-			buildingManager	= DelightBuildingManagerInterface(0x715955ADaC3b3BEd43bCA07A72913Bc9753770eF);
-			armyManager		= DelightArmyManagerInterface(0x581B746f4603a648902aCd64F159d3B901C01cD4);
-		}
-		
-		else {
-			revert();
-		}
+	constructor(
+		DelightInterface _delight,
+		DelightBuildingManagerInterface _buildingManager,
+		DelightArmyManagerInterface _armyManager
+	) public {
+		delight			= _delight;
+		buildingManager	= _buildingManager;
+		armyManager		= _armyManager;
 	}
 	
 	// Gets the record IDs of the owner.

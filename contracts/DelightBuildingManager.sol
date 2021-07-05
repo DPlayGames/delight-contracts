@@ -48,7 +48,13 @@ contract DelightBuildingManager is DelightBuildingManagerInterface, DelightManag
 	
 	Building[] private buildings;
 	
-	constructor() DelightManager() public {
+	constructor(
+		DelightInfoInterface info,
+		DelightResource wood,
+		DelightResource stone,
+		DelightResource iron,
+		DelightResource ducat
+	) DelightManager(info, wood, stone, iron, ducat) public {
 		
 		// Address 0 is not used.
 		// 0번지는 사용하지 않습니다.

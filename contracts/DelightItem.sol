@@ -2,24 +2,15 @@ pragma solidity ^0.5.9;
 
 import "./Standard/ERC20.sol";
 import "./Standard/ERC165.sol";
-import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
-contract DelightResource is ERC20, ERC165, NetworkChecker {
+contract DelightItem is ERC20, ERC165 {
 	using SafeMath for uint;
 	
-	// The four addresses below are the addresses of the trusted smart contract, and don't need to be allowed.
-	// 아래 네 주소는 신뢰하는 스마트 계약의 주소로 허락받을 필요가 없습니다.
+	// The two addresses below are the addresses of the trusted smart contract, and don't need to be allowed.
+	// 아래 두 주소는 신뢰하는 스마트 계약의 주소로 허락받을 필요가 없습니다.
 	
-	// Delight building manager's address
-	// Delight 건물 관리자 주소
-	address public delightBuildingManager;
-	
-	// Delight army manager's address
-	// Delight 부대 관리자 주소
-	address public delightArmyManager;
-	
-	// Delight item manager's address
+	// Delight item manager's address.
 	// Delight 아이템 관리자 주소
 	address public delightItemManager;
 	
@@ -27,41 +18,11 @@ contract DelightResource is ERC20, ERC165, NetworkChecker {
 	// DPlay 교역소 주소
 	address public dplayTradingPost;
 	
-	constructor() NetworkChecker() public {
-		
-		if (network == Network.Mainnet) {
-			dplayTradingPost = address(0x6242C1f2a80420576e14F239C9500Fc39438E880);
-		} else if (network == Network.Kovan) {
-			dplayTradingPost = address(0x80BB9F94cC7d437F322Ebb76BA694F74F0F2A8AC);
-		} else if (network == Network.Ropsten) {
-			dplayTradingPost = address(0x04db52D39f971074af8a6c248b909a36f133e862);
-		} else if (network == Network.Rinkeby) {
-			dplayTradingPost = address(0xff0ba06ec3b482dEdD8B4C3c1C348615b81EDBa8);
-		} else {
-			revert();
-		}
-	}
-	
-	function setDelightBuildingManagerOnce(address addr) external {
-		
-		// The address has to be empty.
-		// 비어있는 주소인 경우에만
-		require(delightBuildingManager == address(0));
-		
-		delightBuildingManager = addr;
-	}
-	
-	function setDelightArmyManagerOnce(address addr) external {
-		
-		// The address has to be empty.
-		// 비어있는 주소인 경우에만
-		require(delightArmyManager == address(0));
-		
-		delightArmyManager = addr;
+	constructor(address _dplayTradingPost) public {
+		dplayTradingPost = _dplayTradingPost;
 	}
 	
 	function setDelightItemManagerOnce(address addr) external {
-		
 		// The address has to be empty.
 		// 비어있는 주소인 경우에만
 		require(delightItemManager == address(0));
@@ -73,12 +34,42 @@ contract DelightResource is ERC20, ERC165, NetworkChecker {
 	// 토큰 정보 
 	string internal _name;
 	string internal _symbol;
-	uint internal _totalSupply;
+	uint private _totalSupply = 0;
 	
 	uint8 constant private DECIMALS = 0;
 	
 	mapping(address => uint) internal balances;
 	mapping(address => mapping(address => uint)) private allowed;
+	
+	// Creates an item and gives to a specific user.
+	// 아이템을 제조하여 특정 유저에게 전달합니다.
+	function assemble(address to, uint amount) external {
+		
+		// This function can only be used by the Delight item manager.
+		// Delight 아이템 관리자만 사용할 수 있는 함수입니다.
+		require(msg.sender == delightItemManager);
+		
+		balances[to] = balances[to].add(amount);
+		
+		_totalSupply = _totalSupply.add(amount);
+		
+		emit Transfer(delightItemManager, to, amount);
+	}
+	
+	// Dismantles an item.
+	// 아이템을 분해합니다.
+	function disassemble(uint amount) external {
+		
+		// This function can only be used by the Delight item manager.
+		// Delight 아이템 관리자만 사용할 수 있는 함수입니다.
+		require(msg.sender == delightItemManager);
+		
+		balances[delightItemManager] = balances[delightItemManager].sub(amount);
+		
+		_totalSupply = _totalSupply.sub(amount);
+		
+		emit Transfer(delightItemManager, address(0), amount);
+	}
 	
 	// Checks if the address is misued.
 	// 주소를 잘못 사용하는 것인지 체크 
@@ -153,8 +144,6 @@ contract DelightResource is ERC20, ERC165, NetworkChecker {
 		
 		if (
 		// Delight와 DPlay 교역소는 모든 토큰을 전송할 수 있습니다.
-		spender == delightBuildingManager ||
-		spender == delightArmyManager ||
 		spender == delightItemManager ||
 		spender == dplayTradingPost) {
 			return balances[user];
@@ -174,9 +163,8 @@ contract DelightResource is ERC20, ERC165, NetworkChecker {
 		require(amount <= balances[from]);
 		
 		require(
+			// Delight and DPlay trading post can transmit any tokens.
 			// Delight와 DPlay 교역소는 모든 토큰을 전송할 수 있습니다.
-			msg.sender == delightBuildingManager ||
-			msg.sender == delightArmyManager ||
 			msg.sender == delightItemManager ||
 			msg.sender == dplayTradingPost ||
 			
@@ -187,11 +175,9 @@ contract DelightResource is ERC20, ERC165, NetworkChecker {
 		balances[to] = balances[to].add(amount);
 		
 		if (
-			msg.sender != delightBuildingManager &&
-			msg.sender != delightArmyManager &&
 			msg.sender != delightItemManager &&
-			msg.sender != dplayTradingPost)
-		{
+			msg.sender != dplayTradingPost
+		) {
 			allowed[from][msg.sender] = allowed[from][msg.sender].sub(amount);
 		}
 		
@@ -209,16 +195,5 @@ contract DelightResource is ERC20, ERC165, NetworkChecker {
 			// ERC20
 			interfaceID == 0x942e8b22 ||
 			interfaceID == 0x36372b07;
-	}
-	
-	// Creates test resources.
-	// 테스트용 자원을 생성합니다.
-	function createResourceForTest(uint amount) external {
-		if (network == Network.Mainnet) {
-			revert();
-		} else {
-			balances[msg.sender] += amount;
-			_totalSupply = _totalSupply.add(amount);
-		}
 	}
 }

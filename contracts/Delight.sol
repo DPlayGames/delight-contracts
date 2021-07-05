@@ -7,10 +7,9 @@ import "./DelightKnightItemInterface.sol";
 import "./DelightBuildingManager.sol";
 import "./DelightArmyManager.sol";
 import "./DelightItemManager.sol";
-import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
-contract Delight is DelightInterface, DelightBase, NetworkChecker {
+contract Delight is DelightInterface, DelightBase {
 	using SafeMath for uint;
     
 	uint constant private ORDER_BUILD				= 1;
@@ -34,79 +33,27 @@ contract Delight is DelightInterface, DelightBase, NetworkChecker {
 	DelightArmyManager private armyManager;
 	DelightItemManager private itemManager;
 	
-	constructor() NetworkChecker() public {
+	constructor(
+		DelightInfoInterface _info,
+		DelightKnightItemInterface _knightItem,
+		DelightBuildingManager _buildingManager,
+		DelightArmyManager _armyManager,
+		DelightItemManager _itemManager
+	) public {
+
+		// information
+		// 정보
+		info = _info;
 		
-		if (network == Network.Mainnet) {
-			
-			// information
-			// 정보
-			info = DelightInfoInterface(0x7e04BedFd6721589f5557385063cf07Ce40262e3);
-			
-			// knight item
-			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x79078dDe3b55d2dCAd5e5a4Aa84F08FB7d25368a);
-			
-			// managers
-			// 관리자들
-			buildingManager	= DelightBuildingManager(0xb76333a236F95fBf203b70Cf67e124a6B3b61E4a);
-			armyManager		= DelightArmyManager(0x867042C3CcB398A0aFCB58310848Dd156F9e5db0);
-			itemManager		= DelightItemManager(0xc8b9aa7DC77BDC5C688035d8445047d604E0EA21);
-		}
+		// knight item
+		// 기사 아이템
+		knightItem = _knightItem;
 		
-		else if (network == Network.Kovan) {
-			
-			// information
-			// 정보
-			info = DelightInfoInterface(0x5b17bB8500702aa394989B8db53D348897900EF6);
-			
-			// knight item
-			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0xcaF1daACDC81F78b58BE9e48dC2585F2952dd8B9);
-			
-			// managers
-			// 관리자들
-			buildingManager	= DelightBuildingManager(0xa1BD161dE8B6dAab0C78D0E5084FBEaE19A57f7F);
-			armyManager		= DelightArmyManager(0x0210245083e467aBEbB88040847ce1008848C531);
-			itemManager		= DelightItemManager(0xE7291Fd1A006E7AB6D0d163aCb571B53D1c8E269);
-		}
-		
-		else if (network == Network.Ropsten) {
-			
-			// information
-			// 정보
-			info = DelightInfoInterface(0x25f0A1da6dD8D161378cf738D422a66Ecd286881);
-			
-			// knight item
-			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0xeF7cb3ac85E3b15CF3004a3Ea89e26DFAFb9D371);
-			
-			// managers
-			// 관리자들
-			buildingManager	= DelightBuildingManager(0x45bd2E95b038489Fc8DfB2107fE507b8404BC533);
-			armyManager		= DelightArmyManager(0xDCcd52b4634C0f3eb9C47b4270F1a4CF5570F086);
-			itemManager		= DelightItemManager(0x1aC312F8d1b2e54402A825836924757af386dfA9);
-		}
-		
-		else if (network == Network.Rinkeby) {
-			
-			// information
-			// 정보
-			info = DelightInfoInterface(0x8711670B68FAC7a47b1232E87Fa62cdAeb6040E4);
-			
-			// knight item
-			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x7bAD16534354FDFd0B020f54237eE4F61fB03726);
-			
-			// managers
-			// 관리자들
-			buildingManager	= DelightBuildingManager(0x715955ADaC3b3BEd43bCA07A72913Bc9753770eF);
-			armyManager		= DelightArmyManager(0x581B746f4603a648902aCd64F159d3B901C01cD4);
-			itemManager		= DelightItemManager(0x763EaA87Be84B404C5F1b6C56f80e544C8Ff4810);
-		}
-		
-		else {
-			revert();
-		}
+		// managers
+		// 관리자들
+		buildingManager	= _buildingManager;
+		armyManager		= _armyManager;
+		itemManager		= _itemManager;
 		
 		// Big Bang!
 		history.push(Record({

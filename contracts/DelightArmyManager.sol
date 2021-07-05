@@ -29,40 +29,20 @@ contract DelightArmyManager is DelightArmyManagerInterface, DelightManager {
 	// 기사 아이템
 	DelightKnightItemInterface private knightItem;
 	
-	constructor() DelightManager() public {
-		
-		if (network == Network.Mainnet) {
-			
-			// Knight item.
-			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x79078dDe3b55d2dCAd5e5a4Aa84F08FB7d25368a);
-		}
-		
-		else if (network == Network.Kovan) {
-			
-			// Knight item.
-			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0xcaF1daACDC81F78b58BE9e48dC2585F2952dd8B9);
-		}
-		
-		else if (network == Network.Ropsten) {
-			
-			// Knight item.
-			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0xeF7cb3ac85E3b15CF3004a3Ea89e26DFAFb9D371);
-		}
-		
-		else if (network == Network.Rinkeby) {
-			
-			// Knight item.
-			// 기사 아이템
-			knightItem = DelightKnightItemInterface(0x7bAD16534354FDFd0B020f54237eE4F61fB03726);
-		}
-		
-		else {
-			revert();
-		}
-		
+	constructor(
+		DelightInfoInterface info,
+		DelightResource wood,
+		DelightResource stone,
+		DelightResource iron,
+		DelightResource ducat,
+
+		DelightKnightItemInterface _knightItem
+	) DelightManager(info, wood, stone, iron, ducat) public {
+
+		// Knight item.
+		// 기사 아이템
+		knightItem = _knightItem;
+
 		// 0번지는 사용하지 않습니다.
 		armies.push(Army({
 			unitKind : 99,

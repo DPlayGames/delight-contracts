@@ -3,10 +3,9 @@ pragma solidity ^0.5.9;
 import "./DelightKnightItemInterface.sol";
 import "./Standard/ERC721.sol";
 import "./Standard/ERC721TokenReceiver.sol";
-import "./Util/NetworkChecker.sol";
 import "./Util/SafeMath.sol";
 
-contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker {
+contract DelightKnightItem is DelightKnightItemInterface, ERC721 {
 	using SafeMath for uint;
 	
 	// The two addresses below are the addresses of the trusted smart contract, and don't need to be allowed.
@@ -20,19 +19,8 @@ contract DelightKnightItem is DelightKnightItemInterface, ERC721, NetworkChecker
 	// DPlay 교역소 주소
 	address public dplayTradingPost;
 	
-	constructor() NetworkChecker() public {
-		
-		if (network == Network.Mainnet) {
-			dplayTradingPost = address(0x6242C1f2a80420576e14F239C9500Fc39438E880);
-		} else if (network == Network.Kovan) {
-			dplayTradingPost = address(0x80BB9F94cC7d437F322Ebb76BA694F74F0F2A8AC);
-		} else if (network == Network.Ropsten) {
-			dplayTradingPost = address(0x04db52D39f971074af8a6c248b909a36f133e862);
-		} else if (network == Network.Rinkeby) {
-			dplayTradingPost = address(0xff0ba06ec3b482dEdD8B4C3c1C348615b81EDBa8);
-		} else {
-			revert();
-		}
+	constructor(address _dplayTradingPost) public {
+		dplayTradingPost = _dplayTradingPost;
 		
 		// The address 0 is not used.
 		// 0번지는 사용하지 않습니다.

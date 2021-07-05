@@ -7,10 +7,21 @@ interface DPlayTradingPostInterface {
 	event SellResource(uint saleId, uint price, address resourceAddresses, uint resourceAmount, string description, uint createTime);
 	event SellItem(uint saleId, uint price, address[] itemAddresses, uint[] itemAmounts, string description, uint createTime);
 	event SellUniqueItem(uint saleId, uint price, address[] uniqueItemAddresses, uint[] uniqueItemIds, string description, uint createTime);
+	
+	event UpdateResourceSaleDescription(uint indexed saleId, string description);
+	event UpdateItemSaleDescription(uint indexed saleId, string description);
+	event UpdateUniqueItemSaleDescription(uint indexed saleId, string description);
+	
+	event RemoveResourceSale(uint indexed saleId);
+	event RemoveItemSale(uint indexed saleId);
+	event RemoveUniqueItemSale(uint indexed saleId);
+	
 	event CancelResourceSale(uint indexed saleId);
 	event CancelItemSale(uint indexed saleId);
 	event CancelUniqueItemSale(uint indexed saleId);
+	
 	event ChangeResourceSaleAmount(uint indexed saleId, uint amount);
+	
 	event BuyResource(uint indexed saleId, uint amount, address indexed buyer);
 	event BuyItem(uint indexed saleId, address indexed buyer);
 	event BuyUniqueItem(uint indexed saleId, address indexed buyer);
@@ -138,6 +149,15 @@ interface DPlayTradingPostInterface {
 		uint createTime
 	);
 	
+	// 자원 판매 설명을 수정합니다.
+	function updateResourceSaleDescription(uint saleId, string calldata description) external;
+	
+	// 아이템 판매 설명을 수정합니다.
+	function updateItemSaleDescription(uint saleId, string calldata description) external;
+	
+	// 유니크 아이템 판매 설명을 수정합니다.
+	function updateUniqueItemSaleDescription(uint saleId, string calldata description) external;
+	
 	// 자원 판매를 취소합니다.
 	function cancelResourceSale(uint saleId) external;
 	
@@ -150,13 +170,13 @@ interface DPlayTradingPostInterface {
 	function cancelUniqueItemSale(uint saleId) external;
 	
 	// 자원을 구매합니다.
-	function buyResource(uint saleId, uint amount) external;
+	function buyResource(uint saleId, uint amount) external payable;
 	
 	// Buys items.
 	// 아이템을 구매합니다.
-	function buyItem(uint saleId) external;
+	function buyItem(uint saleId) external payable;
 	
 	// Buys unique items.
 	// 유니크 아이템을 구매합니다.
-	function buyUniqueItem(uint saleId) external;
+	function buyUniqueItem(uint saleId) external payable;
 }
