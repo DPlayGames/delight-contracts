@@ -6,7 +6,7 @@ import "../Util/SafeMath.sol";
 contract DelightIron is DelightResource {
 	using SafeMath for uint;
 	
-	constructor() public {
+	constructor(address dplayTradingPost) DelightResource(dplayTradingPost) public {
 		
 		_name = "Delight Iron";
 		_symbol = "DI";

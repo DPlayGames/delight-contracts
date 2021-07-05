@@ -13,19 +13,19 @@ async function main() {
 
     // Delight Resources
     const DelightWood = await hardhat.ethers.getContractFactory("DelightWood")
-    const delightWood = await DelightWood.deploy()
+    const delightWood = await DelightWood.deploy(dplayTradingPost.address)
     console.log(`DelightWood address: ${delightWood.address}`)
     
     const DelightStone = await hardhat.ethers.getContractFactory("DelightStone")
-    const delightStone = await DelightStone.deploy()
+    const delightStone = await DelightStone.deploy(dplayTradingPost.address)
     console.log(`DelightStone address: ${delightStone.address}`)
     
     const DelightIron = await hardhat.ethers.getContractFactory("DelightIron")
-    const delightIron = await DelightIron.deploy()
+    const delightIron = await DelightIron.deploy(dplayTradingPost.address)
     console.log(`DelightIron address: ${delightIron.address}`)
     
     const DelightDucat = await hardhat.ethers.getContractFactory("DelightDucat")
-    const delightDucat = await DelightDucat.deploy()
+    const delightDucat = await DelightDucat.deploy(dplayTradingPost.address)
     console.log(`DelightDucat address: ${delightDucat.address}`)
 
     // Delight Items
@@ -141,7 +141,6 @@ async function main() {
     const DelightTradingPost = await hardhat.ethers.getContractFactory("DelightTradingPost")
     const delightTradingPost = await DelightTradingPost.deploy(
         
-		delightInfo.address,
 		delightWood.address,
 		delightStone.address,
 		delightIron.address,

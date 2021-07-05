@@ -14,6 +14,10 @@ const config: HardhatUserConfig = {
       accounts: [process.env.ADMIN || ''],
       chainId: 42,
     },
+    matic: {
+      url: "https://rpc-mainnet.maticvigil.com",
+      accounts: [process.env.ADMIN || ''],
+    },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY
