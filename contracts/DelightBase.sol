@@ -4,8 +4,8 @@ contract DelightBase {
 	
 	// Dimension of the world.
 	// 지형의 범위
-	uint constant internal COL_RANGE = 100;
-	uint constant internal ROW_RANGE = 100;
+	uint constant internal COL_RANGE = 50;
+	uint constant internal ROW_RANGE = 50;
 	
 	// Buildings
 	// 건물
