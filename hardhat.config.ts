@@ -15,7 +15,7 @@ const config: HardhatUserConfig = {
       chainId: 42,
     },
     matic: {
-      url: "https://rpc-mainnet.maticvigil.com",
+      url: "https://matic-mainnet.chainstacklabs.com",
       accounts: [process.env.ADMIN || ''],
     },
   },
